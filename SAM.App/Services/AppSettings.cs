@@ -17,9 +17,10 @@ public sealed class AppSettings
     /// <summary>Keep other Steam accounts' cached data when a different account logs in.</summary>
     public bool KeepOtherAccountsCache { get; set; }
 
-    public LibrarySort LibrarySort { get; set; } = LibrarySort.Name;
+    /// <summary>Defaults to most recently played first; never-played games sort last.</summary>
+    public LibrarySort LibrarySort { get; set; } = LibrarySort.RecentlyPlayed;
 
-    public bool SortDescending { get; set; }
+    public bool SortDescending { get; set; } = true;
 
     /// <summary>Show favorites above everything else regardless of sort.</summary>
     public bool PinFavorites { get; set; } = true;
