@@ -33,7 +33,7 @@ public sealed partial class LibraryWindow : Window
         this.SetTitleBar(this.AppTitleBar);
         this.AppWindow.SetIcon("Assets/SAM.ico");
         this.AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
-        this.SizeAndCenter(1280, 800);
+        this.SizeAndCenter(1440, 900);
         this.UpdateTitleBarTheme();
 
         this._searchDebounce = DispatcherQueue.GetForCurrentThread().CreateTimer();
@@ -177,6 +177,53 @@ public sealed partial class LibraryWindow : Window
     #endregion
 
     #region Grid
+    // Card sizing: as many columns as fit at a minimum card width, then cards stretch to fill
+    // the row, so the grid edges line up with the header. The minimum grows with the window
+    // (~1/6.5 of it, between 300 and 380), giving about 4 columns on a 1440-wide window and
+    // 6 large ones on a 2K screen instead of many small ones.
+    private const double MinCardWidth = 300;
+    private const double MaxMinCardWidth = 380;
+    private const double CardMargin = 12;            // CardContainerStyle margin (6) on both sides
+    private const double GridHorizontalPadding = 36; // GridView padding (18) on both sides
+    private const double CardInfoHeight = 106;       // text area below the image, incl. border
+    private const double ImageAspect = 215.0 / 460.0;
+
+    private double _slotWidth = MinCardWidth + CardMargin;
+    private double _slotHeight = Math.Round((MinCardWidth * ImageAspect) + CardInfoHeight + CardMargin);
+
+    private void OnContentSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        var available = e.NewSize.Width - GridHorizontalPadding;
+        if (available <= 0)
+        {
+            return;
+        }
+
+        var minCardWidth = Math.Clamp(available / 6.5, MinCardWidth, MaxMinCardWidth);
+        var columns = Math.Max(1, (int)Math.Floor(available / (minCardWidth + CardMargin)));
+        // Floor so rounding never pushes the last column onto a new row.
+        this._slotWidth = Math.Floor(available / columns);
+        var cardWidth = this._slotWidth - CardMargin;
+        this._slotHeight = Math.Round((cardWidth * ImageAspect) + CardInfoHeight + CardMargin);
+
+        foreach (var grid in new[] { this.GamesGrid, this.SkeletonGrid })
+        {
+            if (grid.ItemsPanelRoot is ItemsWrapGrid panel)
+            {
+                this.ApplyCardSize(panel);
+            }
+        }
+    }
+
+    /// <summary>Wrap panels are created lazily (e.g. when a grid first becomes visible); size them on load.</summary>
+    private void OnCardPanelLoaded(object sender, RoutedEventArgs e) => this.ApplyCardSize((ItemsWrapGrid)sender);
+
+    private void ApplyCardSize(ItemsWrapGrid panel)
+    {
+        panel.ItemWidth = this._slotWidth;
+        panel.ItemHeight = this._slotHeight;
+    }
+
     private void OnContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
     {
         if (args.Item is not GameCardViewModel card)

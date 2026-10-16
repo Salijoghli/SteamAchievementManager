@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:SAM.App.Controls"
     xmlns:vm="using:SAM.App.ViewModels"
-    Width="276"
     PointerEntered="OnPointerEntered"
     PointerExited="OnPointerExited"
     PointerCanceled="OnPointerExited"
@@ -61,8 +60,9 @@
         CornerRadius="{StaticResource CardCornerRadius}"
         ToolTipService.ToolTip="{x:Bind Card.ToolTipText, Mode=OneWay}">
         <Grid>
+            <!-- The card fills a slot sized by LibraryWindow so the image area keeps a 460x215 aspect. -->
             <Grid.RowDefinitions>
-                <RowDefinition Height="129" />
+                <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
