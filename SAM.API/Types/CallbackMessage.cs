@@ -25,7 +25,10 @@ using System.Runtime.InteropServices;
 
 namespace SAM.API.Types
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    // Natural alignment, matching Steam's CallbackMsg_t: on 64-bit the pointer sits at
+    // offset 8 and the struct is 24 bytes, so Pack = 1 (20 bytes) would let Steam write
+    // past the end of it.
+    [StructLayout(LayoutKind.Sequential)]
     public struct CallbackMessage
     {
         public int User;

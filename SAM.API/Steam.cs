@@ -60,7 +60,11 @@ namespace SAM.API
 
         public static string GetInstallPath()
         {
-            return (string)Registry.GetValue(@"HKEY_LOCAL_MACHINE\Software\Valve\Steam", "InstallPath", null);
+            // Steam registers itself in the 32-bit registry view; open it explicitly so
+            // 64-bit processes don't look in the (empty) 64-bit view.
+            using var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32);
+            using var key = baseKey.OpenSubKey(@"Software\Valve\Steam");
+            return key?.GetValue("InstallPath") as string;
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
@@ -120,7 +124,7 @@ namespace SAM.API
 
             Native.SetDllDirectory(path + ";" + Path.Combine(path, "bin"));
 
-            path = Path.Combine(path, "steamclient.dll");
+            path = Path.Combine(path, Environment.Is64BitProcess ? "steamclient64.dll" : "steamclient.dll");
             IntPtr module = Native.LoadLibraryEx(path, IntPtr.Zero, Native.LoadWithAlteredSearchPath);
             if (module == IntPtr.Zero)
             {
