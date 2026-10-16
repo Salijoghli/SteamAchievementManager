@@ -75,6 +75,11 @@ public sealed partial class LibraryViewModel : ObservableObject
         this.ShowDemos = settings.ShowDemos;
         this.ShowMods = settings.ShowMods;
         this.ShowJunk = settings.ShowJunk;
+        this.FavoritesOnly = settings.FavoritesOnly;
+        this.CompletionFilterIndex = Math.Clamp(settings.CompletionFilter, 0, (int)LibraryCompletionFilter.Perfect);
+        this.LastPlayedFilterIndex = Math.Clamp(settings.LastPlayedFilter, 0, (int)LibraryLastPlayedFilter.Custom);
+        this.CustomFrom = settings.LastPlayedFrom;
+        this.CustomTo = settings.LastPlayedTo;
         this.ThemeIndex = settings.Theme switch
         {
             "Light" => 1,
@@ -374,9 +379,28 @@ public sealed partial class LibraryViewModel : ObservableObject
         this.StartEnrichment();
     }
 
+    private DateTime _lastEnrichment;
+
+    /// <summary>
+    /// Re-reads playtime and achievement progress from Steam's local files, e.g. when the user
+    /// comes back from a game window where they committed changes. Throttled to once every few
+    /// seconds; does nothing while the library is still loading.
+    /// </summary>
+    public void RefreshProgress()
+    {
+        if (this._isShutDown || this.IsLoading || this._master.Count == 0 ||
+            DateTime.UtcNow - this._lastEnrichment < TimeSpan.FromSeconds(3))
+        {
+            return;
+        }
+
+        this.StartEnrichment();
+    }
+
     /// <summary>Loads playtime and achievement progress off the UI thread, updating cards as results arrive.</summary>
     private async void StartEnrichment()
     {
+        this._lastEnrichment = DateTime.UtcNow;
         this._enrichCts?.Cancel();
         var cts = this._enrichCts = new CancellationTokenSource();
         var token = cts.Token;
@@ -622,6 +646,11 @@ public sealed partial class LibraryViewModel : ObservableObject
         settings.ShowDemos = this.ShowDemos;
         settings.ShowMods = this.ShowMods;
         settings.ShowJunk = this.ShowJunk;
+        settings.FavoritesOnly = this.FavoritesOnly;
+        settings.CompletionFilter = this.CompletionFilterIndex;
+        settings.LastPlayedFilter = this.LastPlayedFilterIndex;
+        settings.LastPlayedFrom = this.CustomFrom;
+        settings.LastPlayedTo = this.CustomTo;
         settings.Theme = this.ThemeIndex switch
         {
             1 => "Light",

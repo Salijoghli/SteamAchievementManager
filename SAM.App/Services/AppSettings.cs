@@ -33,8 +33,26 @@ public sealed class AppSettings
 
     public bool ShowJunk { get; set; }
 
+    public bool FavoritesOnly { get; set; }
+
+    /// <summary>Index into the library's completion filter (All, Has achievements, Not started, In progress, Perfect).</summary>
+    public int CompletionFilter { get; set; }
+
+    /// <summary>Index into the library's last-played filter (Any time … Custom range).</summary>
+    public int LastPlayedFilter { get; set; }
+
+    public DateTimeOffset? LastPlayedFrom { get; set; }
+
+    public DateTimeOffset? LastPlayedTo { get; set; }
+
     /// <summary>"System", "Light" or "Dark".</summary>
     public string Theme { get; set; } = "System";
+
+    /// <summary>
+    /// Culture for dates and numbers (and, later, UI text), e.g. "en-US". The UI is English-only
+    /// for now, so this defaults to English rather than following the Windows region format.
+    /// </summary>
+    public string Language { get; set; } = "en-US";
 
     public static AppSettings Load() => JsonFile.Read<AppSettings>(FilePath) ?? new AppSettings();
 

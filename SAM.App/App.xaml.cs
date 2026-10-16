@@ -16,8 +16,14 @@ public partial class App : Application
 {
     private Window? _window;
 
+    private readonly AppSettings _settings;
+    private SingleInstance? _instance;
+
     public App()
     {
+        this._settings = AppSettings.Load();
+        ApplyLanguage(this._settings.Language);
+
         this.InitializeComponent();
         this.UnhandledException += (_, e) =>
         {
@@ -41,9 +47,17 @@ public partial class App : Application
             return;
         }
 
+        // One window per game (and one library): if it's already open, focus it and quit.
+        this._instance = SingleInstance.TryClaim(appId);
+        if (this._instance == null)
+        {
+            this.Exit();
+            return;
+        }
+
         try
         {
-            Services = new AppServices(SteamSession.Initialize(appId));
+            Services = new AppServices(SteamSession.Initialize(appId), this._settings);
         }
         catch (SteamUnavailableException e)
         {
@@ -60,10 +74,47 @@ public partial class App : Application
             : new GameWindow(Services, appId, flags.Contains("--unlock-all"), flags.Contains("--lock-all")));
     }
 
+    /// <summary>
+    /// Formats dates and numbers in the app's language instead of the Windows region format,
+    /// so they match the (English) UI text. WinUI controls such as date pickers follow
+    /// PrimaryLanguageOverride.
+    /// </summary>
+    private static void ApplyLanguage(string language)
+    {
+        CultureInfo culture;
+        try
+        {
+            culture = CultureInfo.GetCultureInfo(language);
+        }
+        catch (CultureNotFoundException)
+        {
+            culture = CultureInfo.GetCultureInfo("en-US");
+        }
+
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        CultureInfo.CurrentCulture = culture;
+        CultureInfo.CurrentUICulture = culture;
+
+        try
+        {
+            Microsoft.Windows.Globalization.ApplicationLanguages.PrimaryLanguageOverride = culture.Name;
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log("Couldn't set the WinUI language override", e);
+        }
+    }
+
     private void Show(Window window)
     {
         this._window = window;
-        window.Closed += (_, _) => Services?.Steam.Dispose();
+        this._instance?.BringToFrontOnRequest(window);
+        window.Closed += (_, _) =>
+        {
+            this._instance?.Dispose();
+            Services?.Steam.Dispose();
+        };
         window.Activate();
     }
 }

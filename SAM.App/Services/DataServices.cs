@@ -7,10 +7,10 @@ namespace SAM.App.Services;
 /// <summary>Creates and holds the services for the process.</summary>
 public sealed class AppServices
 {
-    public AppServices(SteamSession steam)
+    public AppServices(SteamSession steam, AppSettings settings)
     {
         this.Steam = steam;
-        this.Settings = AppSettings.Load();
+        this.Settings = settings;
         this.Cache = new AppCache(steam.SteamId);
         this.AccountSwitched = this.Cache.HandleAccountSwitch(this.Settings.KeepOtherAccountsCache);
         this.Favorites = new FavoritesStore(this.Cache);
