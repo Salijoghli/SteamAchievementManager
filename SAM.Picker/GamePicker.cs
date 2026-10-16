@@ -98,7 +98,7 @@ namespace SAM.Picker
 
         private void DoDownloadList(object sender, DoWorkEventArgs e)
         {
-            this._PickerStatusLabel.Text = "Downloading game list...";
+            this.SetPickerStatus("Downloading game list...");
 
             byte[] bytes;
             using (WebClient downloader = new())
@@ -123,11 +123,23 @@ namespace SAM.Picker
                 }
             }
 
-            this._PickerStatusLabel.Text = "Checking game ownership...";
+            this.SetPickerStatus("Checking game ownership...");
             foreach (var kv in pairs)
             {
                 this.AddGame(kv.Key, kv.Value);
             }
+        }
+
+        private void SetPickerStatus(string text)
+        {
+            // DoDownloadList runs on a worker thread, so marshal UI updates back to the form's thread.
+            if (this.InvokeRequired == true)
+            {
+                this.BeginInvoke(new Action(() => this._PickerStatusLabel.Text = text));
+                return;
+            }
+
+            this._PickerStatusLabel.Text = text;
         }
 
         private void OnDownloadList(object sender, RunWorkerCompletedEventArgs e)
@@ -135,7 +147,14 @@ namespace SAM.Picker
             if (e.Error != null || e.Cancelled == true)
             {
                 this.AddDefaultGames();
-                MessageBox.Show(e.Error.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    this,
+                    e.Error != null
+                        ? "Failed to download the game list:\n\n" + e.Error.Message
+                        : "Downloading the game list was cancelled.",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
 
             this.RefreshGames();
