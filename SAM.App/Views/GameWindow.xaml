@@ -1,0 +1,7 @@
+<Window
+    x:Class="SAM.App.Views.GameWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- TODO(game-ui): placeholder. -->
+    <TextBlock Text="Game" Margin="24" />
+</Window>
