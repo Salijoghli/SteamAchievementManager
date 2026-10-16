@@ -471,7 +471,9 @@ namespace SAM.Picker
 
             try
             {
-                Process.Start("SAM.Game.exe", info.Id.ToString(CultureInfo.InvariantCulture));
+                Process.Start(
+                    Path.Combine(Application.StartupPath, "SAM.Game.exe"),
+                    info.Id.ToString(CultureInfo.InvariantCulture));
             }
             catch (Win32Exception)
             {

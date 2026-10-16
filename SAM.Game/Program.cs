@@ -22,6 +22,7 @@
 
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 
 namespace SAM.Game
@@ -35,7 +36,7 @@ namespace SAM.Game
 
             if (args.Length == 0)
             {
-                Process.Start("SAM.Picker.exe");
+                Process.Start(Path.Combine(Application.StartupPath, "SAM.Picker.exe"));
                 return;
             }
 
