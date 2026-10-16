@@ -30,6 +30,18 @@ public sealed class AchievementDefinition
 
     /// <summary>Bit index within <see cref="StatBlockId"/>.</summary>
     public int BitIndex { get; init; }
+
+    /// <summary>
+    /// ID of the stat whose value tracks progress toward this achievement (the schema's
+    /// progress block with operation "statvalue"), or null if the achievement has no progress stat.
+    /// </summary>
+    public string? ProgressStatId { get; init; }
+
+    /// <summary>Stat value at which progress starts (the progress block's min_val); null without a progress stat.</summary>
+    public double? ProgressMin { get; init; }
+
+    /// <summary>Stat value at which the achievement unlocks (the progress block's max_val); null without a progress stat.</summary>
+    public double? ProgressMax { get; init; }
 }
 
 public enum StatKind
