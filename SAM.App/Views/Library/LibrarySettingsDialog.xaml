@@ -1,0 +1,78 @@
+<ContentDialog
+    x:Class="SAM.App.Views.Library.LibrarySettingsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:SAM.App.Controls"
+    Title="Settings"
+    CloseButtonText="Close"
+    DefaultButton="Close"
+    Style="{StaticResource DefaultContentDialogStyle}">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+        <StackPanel Width="420" Spacing="20">
+            <StackPanel Spacing="8">
+                <TextBlock Text="Appearance" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                <RadioButtons
+                    Header="Theme"
+                    SelectedIndex="{x:Bind ViewModel.ThemeIndex, Mode=TwoWay}"
+                    MaxColumns="3">
+                    <x:String>System</x:String>
+                    <x:String>Light</x:String>
+                    <x:String>Dark</x:String>
+                </RadioButtons>
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="Cache" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                <ToggleSwitch
+                    Header="Keep cached data for other Steam accounts"
+                    IsOn="{x:Bind ViewModel.KeepOtherAccountsCache, Mode=TwoWay}" />
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Spacing="2">
+                        <TextBlock Text="Cache size" />
+                        <Grid>
+                            <controls:Skeleton x:Name="CacheSizeSkeleton" Width="80" Height="14" HorizontalAlignment="Left" />
+                            <TextBlock
+                                x:Name="CacheSizeText"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Visibility="Collapsed" />
+                        </Grid>
+                    </StackPanel>
+                    <Button x:Name="ClearCacheButton" Grid.Column="1" Content="Clear cache">
+                        <Button.Flyout>
+                            <Flyout x:Name="ConfirmFlyout">
+                                <StackPanel Width="280" Spacing="12">
+                                    <TextBlock
+                                        Text="Delete all downloaded images, game lists and other cached data? Favorites and settings are kept. The library will reload."
+                                        TextWrapping="Wrap" />
+                                    <Button
+                                        Content="Clear cache"
+                                        HorizontalAlignment="Right"
+                                        Style="{StaticResource AccentButtonStyle}"
+                                        Click="OnConfirmClearCache" />
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                </Grid>
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="Steam account" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                <StackPanel Spacing="2">
+                    <TextBlock Text="SteamID64" />
+                    <TextBlock
+                        Text="{x:Bind ViewModel.SteamIdText}"
+                        IsTextSelectionEnabled="True"
+                        FontFamily="Consolas"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>

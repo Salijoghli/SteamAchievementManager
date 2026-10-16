@@ -1,0 +1,202 @@
+<UserControl
+    x:Class="SAM.App.Views.Library.GameCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:SAM.App.Controls"
+    xmlns:vm="using:SAM.App.ViewModels"
+    Width="276"
+    PointerEntered="OnPointerEntered"
+    PointerExited="OnPointerExited"
+    PointerCanceled="OnPointerExited"
+    PointerCaptureLost="OnPointerExited">
+
+    <UserControl.ContextFlyout>
+        <MenuFlyout>
+            <MenuFlyoutItem Text="Open" Command="{x:Bind Card.OpenCommand, Mode=OneWay}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE8A7;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem Text="Unlock all achievements…" Command="{x:Bind Card.UnlockAllCommand, Mode=OneWay}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE785;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Lock all achievements…" Command="{x:Bind Card.LockAllCommand, Mode=OneWay}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE72E;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem Text="{x:Bind Card.FavoriteLabel, Mode=OneWay}" Command="{x:Bind Card.ToggleFavoriteCommand, Mode=OneWay}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="{x:Bind Card.FavoriteGlyph, Mode=OneWay}" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Copy App ID" Command="{x:Bind Card.CopyAppIdCommand, Mode=OneWay}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE8C8;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator />
+            <MenuFlyoutItem Text="Open store page" Command="{x:Bind Card.OpenStorePageCommand, Mode=OneWay}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE719;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="Open community achievements page" Command="{x:Bind Card.OpenAchievementsPageCommand, Mode=OneWay}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE774;" />
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+    </UserControl.ContextFlyout>
+
+    <Grid x:Name="CardRoot">
+    <Border
+        Background="{ThemeResource CardBackgroundBrush}"
+        BorderBrush="{ThemeResource CardBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="{StaticResource CardCornerRadius}"
+        ToolTipService.ToolTip="{x:Bind Card.ToolTipText, Mode=OneWay}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="129" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header image (460x215 aspect): skeleton until loaded, fallback if unavailable. -->
+            <Grid CornerRadius="7,7,0,0">
+                <controls:Skeleton x:Name="ImageSkeleton" CornerRadius="0" />
+
+                <Grid x:Name="ImageFallback" Visibility="Collapsed">
+                    <Grid.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Offset="0" Color="{ThemeResource SystemAccentColorDark1}" />
+                            <GradientStop Offset="1" Color="{ThemeResource SystemAccentColorDark3}" />
+                        </LinearGradientBrush>
+                    </Grid.Background>
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+                        <FontIcon Glyph="&#xE7FC;" FontSize="28" Foreground="White" Opacity="0.85" />
+                        <TextBlock
+                            Text="{x:Bind Card.AppIdText, Mode=OneWay}"
+                            Foreground="White"
+                            Opacity="0.7"
+                            FontSize="12"
+                            HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Grid>
+
+                <Image
+                    x:Name="HeaderImage"
+                    Stretch="UniformToFill"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Opacity="0"
+                    ImageOpened="OnImageOpened"
+                    ImageFailed="OnImageFailed" />
+
+                <ToggleButton
+                    x:Name="FavoriteButton"
+                    Width="32"
+                    Height="32"
+                    Padding="0"
+                    Margin="0,8,8,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    CornerRadius="16"
+                    Background="#99000000"
+                    BorderThickness="0"
+                    IsChecked="{x:Bind Card.IsFavorite, Mode=TwoWay}"
+                    AutomationProperties.Name="{x:Bind Card.FavoriteLabel, Mode=OneWay}"
+                    ToolTipService.ToolTip="{x:Bind Card.FavoriteLabel, Mode=OneWay}">
+                    <ToggleButton.Resources>
+                        <SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver" Color="#CC000000" />
+                        <SolidColorBrush x:Key="ToggleButtonBackgroundPressed" Color="#E6000000" />
+                        <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="#99000000" />
+                        <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="#CC000000" />
+                        <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="#E6000000" />
+                        <SolidColorBrush x:Key="ToggleButtonForeground" Color="White" />
+                        <SolidColorBrush x:Key="ToggleButtonForegroundPointerOver" Color="White" />
+                        <SolidColorBrush x:Key="ToggleButtonForegroundPressed" Color="White" />
+                        <SolidColorBrush x:Key="ToggleButtonForegroundChecked" Color="#FFC83D" />
+                        <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPointerOver" Color="#FFD86B" />
+                        <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPressed" Color="#FFC83D" />
+                    </ToggleButton.Resources>
+                    <FontIcon Glyph="{x:Bind Card.FavoriteGlyph, Mode=OneWay}" FontSize="14" />
+                </ToggleButton>
+            </Grid>
+
+            <StackPanel Grid.Row="1" Padding="12,10,12,12" Spacing="6">
+                <TextBlock
+                    Text="{x:Bind Card.Name, Mode=OneWay}"
+                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                    TextTrimming="CharacterEllipsis"
+                    TextWrapping="NoWrap"
+                    MaxLines="1" />
+
+                <!-- Achievement progress. -->
+                <Grid Height="34">
+                    <StackPanel
+                        Spacing="6"
+                        VerticalAlignment="Center"
+                        Visibility="{x:Bind vm:LibraryFormat.CollapsedIf(Card.IsProgressLoaded), Mode=OneWay}">
+                        <controls:Skeleton Height="4" CornerRadius="2" />
+                        <controls:Skeleton Width="110" Height="12" />
+                    </StackPanel>
+                    <StackPanel
+                        Spacing="6"
+                        VerticalAlignment="Center"
+                        Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.IsProgressLoaded), Mode=OneWay}">
+                        <Grid>
+                            <ProgressBar
+                                Value="{x:Bind Card.ProgressPercent, Mode=OneWay}"
+                                Maximum="100"
+                                Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.HasAchievements), Mode=OneWay}" />
+                        </Grid>
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <FontIcon
+                                Glyph="&#xE7C1;"
+                                FontSize="12"
+                                Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                                Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.IsPerfect), Mode=OneWay}" />
+                            <TextBlock
+                                Text="{x:Bind Card.ProgressText, Mode=OneWay}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Playtime and last played. -->
+                <Grid Height="16">
+                    <controls:Skeleton
+                        Width="140"
+                        Height="12"
+                        HorizontalAlignment="Left"
+                        Visibility="{x:Bind vm:LibraryFormat.CollapsedIf(Card.IsPlaytimeLoaded), Mode=OneWay}" />
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Spacing="6"
+                        Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.IsPlaytimeLoaded), Mode=OneWay}">
+                        <FontIcon Glyph="&#xE823;" FontSize="12" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                        <TextBlock
+                            Text="{x:Bind Card.PlaytimeText, Mode=OneWay}"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                            TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </Border>
+    <Border
+        x:Name="HoverBorder"
+        BorderBrush="{ThemeResource AccentFillColorDefaultBrush}"
+        BorderThickness="1"
+        CornerRadius="{StaticResource CardCornerRadius}"
+        IsHitTestVisible="False"
+        Opacity="0" />
+    </Grid>
+</UserControl>
