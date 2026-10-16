@@ -24,7 +24,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <OutputPath>..\upload\app\</OutputPath>
+    <OutputPath>..\upload\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
@@ -38,6 +38,6 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SAM.API\SAM.API.csproj" SetTargetFramework="TargetFramework=net8.0-windows" SetPlatform="Platform=x64" />
+    <ProjectReference Include="..\SAM.API\SAM.API.csproj" />
   </ItemGroup>
 </Project>

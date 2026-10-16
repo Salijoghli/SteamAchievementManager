@@ -13,27 +13,25 @@ There are some changes to the code since the last closed-source release:
 
 [Download latest release](https://github.com/gibbed/SteamAchievementManager/releases/latest).
 
-[![Build status](https://ci.appveyor.com/api/projects/status/00vic6jliar6j0ol/branch/master?svg=true)](https://ci.appveyor.com/project/gibbed/steamachievementmanager/branch/master)
-
 ## About this fork
 
-This is a modified fork of [gibbed/SteamAchievementManager](https://github.com/gibbed/SteamAchievementManager). It is not the original software. Changes from upstream:
-- SAM.Picker and SAM.Game now find each other next to their own executables, so launching them from a shortcut or another working directory works.
-- The game picker no longer crashes when downloading the game list is cancelled, and shows a readable error when it fails.
-- Game schemas with an unknown stat type load instead of failing.
-- `build.ps1` build script and a GitHub Actions build.
+This is a modified fork of [gibbed/SteamAchievementManager](https://github.com/gibbed/SteamAchievementManager). It is not the original software. The original WinForms apps (SAM.Picker and SAM.Game) have been replaced by a new 64-bit WinUI 3 / .NET 8 app, `SAM.exe`:
+- A game library with art, achievement progress, playtime and last played; search (by name or App ID), sorting, filters and per-account favorites.
+- A per-game window with global rarity percentages, unlock dates, filters, Unlock all / Lock all, and a confirmation before anything is committed.
+- Statistics show which achievements depend on them.
+- Downloads (game list, images, rarity data) are cached on disk and kept per Steam account.
+
+`SAM.API` was updated to work in 64-bit processes.
 
 ## Building
 
-Requires Windows and the [.NET SDK](https://dotnet.microsoft.com/download) 8 or newer. Run:
+Requires Windows 10/11 and the [.NET SDK](https://dotnet.microsoft.com/download) 8 or newer. Run:
 
 ```powershell
 .\build.ps1
 ```
 
-or `dotnet build SAM.sln -c Release`.
-
-Release builds are written to `upload\`. Every push to `master` is also built by GitHub Actions, and the executables can be downloaded from the run's artifacts.
+or `dotnet build SAM.sln -c Release -p:Platform=x64`. The app is written to `upload\SAM.exe`; running it requires the .NET 8 Desktop Runtime. Every push is also built by GitHub Actions, and the build can be downloaded from the run's artifacts.
 
 ## Attribution
 
