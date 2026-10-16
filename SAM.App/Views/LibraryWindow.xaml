@@ -1,7 +1,409 @@
 <Window
     x:Class="SAM.App.Views.LibraryWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- TODO(library-ui): placeholder. -->
-    <TextBlock Text="Library" Margin="24" />
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:SAM.App.Controls"
+    xmlns:library="using:SAM.App.Views.Library"
+    xmlns:vm="using:SAM.App.ViewModels">
+
+    <Grid
+        x:Name="Root"
+        RequestedTheme="{x:Bind ViewModel.RequestedTheme, Mode=OneWay}"
+        KeyboardAcceleratorPlacementMode="Hidden">
+        <Grid.KeyboardAccelerators>
+            <KeyboardAccelerator Key="F" Modifiers="Control" Invoked="OnFocusSearchAccelerator" />
+            <KeyboardAccelerator Key="F5" Invoked="OnRefreshAccelerator" />
+        </Grid.KeyboardAccelerators>
+
+        <Grid.Resources>
+            <!-- Cards draw their own hover/press visuals; keep the container's overlay out of the way. -->
+            <SolidColorBrush x:Key="GridViewItemBackgroundPointerOver" Color="Transparent" />
+            <SolidColorBrush x:Key="GridViewItemBackgroundPressed" Color="Transparent" />
+            <SolidColorBrush x:Key="GridViewItemBackgroundSelected" Color="Transparent" />
+            <SolidColorBrush x:Key="GridViewItemBackgroundSelectedPointerOver" Color="Transparent" />
+            <SolidColorBrush x:Key="GridViewItemBackgroundSelectedPressed" Color="Transparent" />
+
+            <Style x:Key="CardContainerStyle" TargetType="GridViewItem" BasedOn="{StaticResource DefaultGridViewItemStyle}">
+                <Setter Property="Margin" Value="6" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="CornerRadius" Value="8" />
+            </Style>
+
+            <Style x:Key="IconButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                <Setter Property="Width" Value="36" />
+                <Setter Property="Height" Value="34" />
+                <Setter Property="Padding" Value="0" />
+            </Style>
+
+            <Style x:Key="SummaryTextStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyTextBlockStyle}">
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Title bar (drag region). -->
+        <Grid x:Name="AppTitleBar" Padding="16,0,0,0" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Image Source="ms-appx:///Assets/SAM.ico" Width="16" Height="16" VerticalAlignment="Center" />
+            <TextBlock
+                Grid.Column="1"
+                Text="Steam Achievement Manager"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                VerticalAlignment="Center" />
+        </Grid>
+
+        <!-- Header: search, actions, summary, sort and filters. -->
+        <Grid Grid.Row="1" Padding="24,4,24,8" RowSpacing="12">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <AutoSuggestBox
+                    x:Name="SearchBox"
+                    MaxWidth="720"
+                    HorizontalAlignment="Stretch"
+                    PlaceholderText="Search games or App ID"
+                    QueryIcon="Find"
+                    UpdateTextOnSelect="False"
+                    Text="{x:Bind ViewModel.SearchText, Mode=OneWay}"
+                    AutomationProperties.Name="Search games or App ID"
+                    ToolTipService.ToolTip="Search games or App ID (Ctrl+F)"
+                    TextChanged="OnSearchTextChanged"
+                    QuerySubmitted="OnSearchQuerySubmitted"
+                    PreviewKeyDown="OnSearchPreviewKeyDown" />
+                <Button
+                    Grid.Column="1"
+                    Style="{StaticResource IconButtonStyle}"
+                    Command="{x:Bind ViewModel.RefreshCommand}"
+                    AutomationProperties.Name="Refresh library"
+                    ToolTipService.ToolTip="Refresh library (F5)">
+                    <FontIcon Glyph="&#xE72C;" FontSize="16" />
+                </Button>
+                <Button
+                    Grid.Column="2"
+                    Style="{StaticResource IconButtonStyle}"
+                    Click="OnSettingsClick"
+                    AutomationProperties.Name="Settings"
+                    ToolTipService.ToolTip="Settings">
+                    <FontIcon Glyph="&#xE713;" FontSize="16" />
+                </Button>
+            </Grid>
+
+            <Grid Grid.Row="1" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Summary. -->
+                <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                    <Grid VerticalAlignment="Center">
+                        <controls:Skeleton
+                            Width="90"
+                            Height="14"
+                            Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
+                        <TextBlock
+                            Text="{x:Bind ViewModel.CountText, Mode=OneWay}"
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            VerticalAlignment="Center"
+                            Visibility="{x:Bind vm:LibraryFormat.CollapsedIf(ViewModel.IsLoading), Mode=OneWay}" />
+                    </Grid>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Spacing="16"
+                        Visibility="{x:Bind vm:LibraryFormat.CollapsedIf(ViewModel.IsSummaryReady), Mode=OneWay}">
+                        <controls:Skeleton Width="90" Height="14" />
+                        <controls:Skeleton Width="70" Height="14" />
+                        <controls:Skeleton Width="90" Height="14" />
+                    </StackPanel>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Spacing="16"
+                        Visibility="{x:Bind ViewModel.IsSummaryReady, Mode=OneWay}">
+                        <StackPanel Orientation="Horizontal" Spacing="6" ToolTipService.ToolTip="{x:Bind ViewModel.CompletionDetail, Mode=OneWay}">
+                            <FontIcon Glyph="&#xE9D5;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.CompletionText, Mode=OneWay}" Style="{StaticResource SummaryTextStyle}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="6" ToolTipService.ToolTip="Games with every achievement unlocked">
+                            <FontIcon Glyph="&#xE7C1;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.PerfectText, Mode=OneWay}" Style="{StaticResource SummaryTextStyle}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="6" ToolTipService.ToolTip="Total playtime">
+                            <FontIcon Glyph="&#xE823;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.TotalPlaytimeText, Mode=OneWay}" Style="{StaticResource SummaryTextStyle}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <ProgressRing
+                        Width="16"
+                        Height="16"
+                        IsActive="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}"
+                        Visibility="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}"
+                        AutomationProperties.Name="Refreshing library"
+                        ToolTipService.ToolTip="Refreshing library…" />
+                </StackPanel>
+
+                <!-- Sort and filters. -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <ComboBox
+                        Width="170"
+                        SelectedIndex="{x:Bind ViewModel.SortIndex, Mode=TwoWay}"
+                        AutomationProperties.Name="Sort by"
+                        ToolTipService.ToolTip="Sort by">
+                        <x:String>Name</x:String>
+                        <x:String>App ID</x:String>
+                        <x:String>Recently played</x:String>
+                        <x:String>Playtime</x:String>
+                        <x:String>Completion %</x:String>
+                    </ComboBox>
+                    <ToggleButton
+                        Width="36"
+                        Height="32"
+                        Padding="0"
+                        IsChecked="{x:Bind ViewModel.SortDescending, Mode=TwoWay}"
+                        AutomationProperties.Name="Sort descending"
+                        ToolTipService.ToolTip="{x:Bind ViewModel.SortDirectionLabel, Mode=OneWay}">
+                        <FontIcon Glyph="{x:Bind ViewModel.SortDirectionGlyph, Mode=OneWay}" FontSize="14" />
+                    </ToggleButton>
+                    <ToggleButton
+                        Width="36"
+                        Height="32"
+                        Padding="0"
+                        IsChecked="{x:Bind ViewModel.PinFavorites, Mode=TwoWay}"
+                        AutomationProperties.Name="Pin favorites to top"
+                        ToolTipService.ToolTip="Pin favorites to top">
+                        <FontIcon Glyph="&#xE718;" FontSize="14" />
+                    </ToggleButton>
+                    <DropDownButton AutomationProperties.Name="Filters" ToolTipService.ToolTip="Filters">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon Glyph="&#xE71C;" FontSize="14" />
+                            <TextBlock Text="Filters" />
+                            <InfoBadge
+                                Value="{x:Bind ViewModel.ActiveFilterBadge, Mode=OneWay}"
+                                Visibility="{x:Bind ViewModel.HasActiveFilters, Mode=OneWay}"
+                                VerticalAlignment="Center" />
+                        </StackPanel>
+                        <DropDownButton.Flyout>
+                            <Flyout Placement="BottomEdgeAlignedRight">
+                                <StackPanel Width="300" Spacing="16">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Show" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                        <CheckBox Content="Games" IsChecked="{x:Bind ViewModel.ShowGames, Mode=TwoWay}" />
+                                        <CheckBox Content="Demos" IsChecked="{x:Bind ViewModel.ShowDemos, Mode=TwoWay}" />
+                                        <CheckBox Content="Mods" IsChecked="{x:Bind ViewModel.ShowMods, Mode=TwoWay}" />
+                                        <CheckBox Content="Junk" IsChecked="{x:Bind ViewModel.ShowJunk, Mode=TwoWay}" />
+                                    </StackPanel>
+                                    <ToggleSwitch Header="Favorites only" IsOn="{x:Bind ViewModel.FavoritesOnly, Mode=TwoWay}" />
+                                    <ComboBox
+                                        Header="Achievements"
+                                        HorizontalAlignment="Stretch"
+                                        SelectedIndex="{x:Bind ViewModel.CompletionFilterIndex, Mode=TwoWay}">
+                                        <x:String>All</x:String>
+                                        <x:String>Has achievements</x:String>
+                                        <x:String>Not started</x:String>
+                                        <x:String>In progress</x:String>
+                                        <x:String>Perfect</x:String>
+                                    </ComboBox>
+                                    <StackPanel Spacing="8">
+                                        <ComboBox
+                                            Header="Last played"
+                                            HorizontalAlignment="Stretch"
+                                            SelectedIndex="{x:Bind ViewModel.LastPlayedFilterIndex, Mode=TwoWay}">
+                                            <x:String>Any time</x:String>
+                                            <x:String>Today</x:String>
+                                            <x:String>Past 7 days</x:String>
+                                            <x:String>Past 30 days</x:String>
+                                            <x:String>This year</x:String>
+                                            <x:String>Never played</x:String>
+                                            <x:String>Custom range</x:String>
+                                        </ComboBox>
+                                        <Grid ColumnSpacing="8" Visibility="{x:Bind ViewModel.IsCustomRange, Mode=OneWay}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <CalendarDatePicker
+                                                Header="From"
+                                                PlaceholderText="Any"
+                                                HorizontalAlignment="Stretch"
+                                                Date="{x:Bind ViewModel.CustomFrom, Mode=TwoWay}" />
+                                            <CalendarDatePicker
+                                                Grid.Column="1"
+                                                Header="To"
+                                                PlaceholderText="Any"
+                                                HorizontalAlignment="Stretch"
+                                                Date="{x:Bind ViewModel.CustomTo, Mode=TwoWay}" />
+                                        </Grid>
+                                    </StackPanel>
+                                    <Button
+                                        Content="Reset filters"
+                                        HorizontalAlignment="Right"
+                                        Command="{x:Bind ViewModel.ResetFiltersCommand}"
+                                        IsEnabled="{x:Bind ViewModel.HasActiveFilters, Mode=OneWay}" />
+                                </StackPanel>
+                            </Flyout>
+                        </DropDownButton.Flyout>
+                    </DropDownButton>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <!-- Notices. -->
+        <StackPanel Grid.Row="2" Padding="24,0,24,0" Spacing="8">
+            <ProgressBar
+                IsIndeterminate="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}"
+                Opacity="{x:Bind vm:LibraryFormat.OpacityIf(ViewModel.IsRefreshing), Mode=OneWay}"
+                AutomationProperties.Name="Refreshing library" />
+            <InfoBar
+                Title="Couldn't load your library"
+                Message="{x:Bind ViewModel.LoadError, Mode=OneWay}"
+                Severity="Error"
+                IsOpen="{x:Bind ViewModel.IsLoadErrorOpen, Mode=TwoWay}"
+                Visibility="{x:Bind ViewModel.IsLoadErrorOpen, Mode=OneWay}">
+                <InfoBar.ActionButton>
+                    <Button Content="Retry" Command="{x:Bind ViewModel.RefreshCommand}" />
+                </InfoBar.ActionButton>
+            </InfoBar>
+            <InfoBar
+                Title="Couldn't refresh"
+                Message="{x:Bind ViewModel.RefreshWarning, Mode=OneWay}"
+                Severity="Warning"
+                IsOpen="{x:Bind ViewModel.IsRefreshWarningOpen, Mode=TwoWay}"
+                Visibility="{x:Bind ViewModel.IsRefreshWarningOpen, Mode=OneWay}">
+                <InfoBar.ActionButton>
+                    <Button Content="Retry" Command="{x:Bind ViewModel.RefreshCommand}" />
+                </InfoBar.ActionButton>
+            </InfoBar>
+            <InfoBar
+                Message="{x:Bind ViewModel.AccountNoticeMessage, Mode=OneWay}"
+                Severity="Informational"
+                IsOpen="{x:Bind ViewModel.IsAccountNoticeOpen, Mode=TwoWay}"
+                Visibility="{x:Bind ViewModel.IsAccountNoticeOpen, Mode=OneWay}" />
+            <InfoBar
+                Title="{x:Bind ViewModel.NoticeTitle, Mode=OneWay}"
+                Message="{x:Bind ViewModel.NoticeMessage, Mode=OneWay}"
+                Severity="{x:Bind ViewModel.NoticeSeverity, Mode=OneWay}"
+                IsOpen="{x:Bind ViewModel.IsNoticeOpen, Mode=TwoWay}"
+                Visibility="{x:Bind ViewModel.IsNoticeOpen, Mode=OneWay}" />
+        </StackPanel>
+
+        <!-- Content. -->
+        <Grid Grid.Row="3">
+            <!-- Loading: skeleton cards shaped like real ones. -->
+            <GridView
+                ItemsSource="{x:Bind SkeletonItems}"
+                Padding="18,8,18,18"
+                SelectionMode="None"
+                IsHitTestVisible="False"
+                IsTabStop="False"
+                ItemContainerStyle="{StaticResource CardContainerStyle}"
+                Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
+                AutomationProperties.Name="Loading games">
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsWrapGrid Orientation="Horizontal" HorizontalAlignment="Center" />
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="x:Int32">
+                        <Border
+                            Width="276"
+                            Background="{ThemeResource CardBackgroundBrush}"
+                            BorderBrush="{ThemeResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="{StaticResource CardCornerRadius}">
+                            <StackPanel>
+                                <controls:Skeleton Height="129" CornerRadius="7,7,0,0" />
+                                <StackPanel Padding="12,10,12,12" Spacing="6">
+                                    <controls:Skeleton Width="170" Height="16" HorizontalAlignment="Left" />
+                                    <Grid Height="34">
+                                        <StackPanel Spacing="6" VerticalAlignment="Center">
+                                            <controls:Skeleton Height="4" CornerRadius="2" />
+                                            <controls:Skeleton Width="110" Height="12" HorizontalAlignment="Left" />
+                                        </StackPanel>
+                                    </Grid>
+                                    <controls:Skeleton Width="140" Height="12" HorizontalAlignment="Left" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+
+            <GridView
+                x:Name="GamesGrid"
+                ItemsSource="{x:Bind ViewModel.Games, Mode=OneWay}"
+                Padding="18,8,18,18"
+                SelectionMode="None"
+                IsItemClickEnabled="True"
+                ItemClick="OnGameClick"
+                ContainerContentChanging="OnContainerContentChanging"
+                ItemContainerStyle="{StaticResource CardContainerStyle}"
+                Visibility="{x:Bind ViewModel.IsGridVisible, Mode=OneWay}"
+                AutomationProperties.Name="Games">
+                <GridView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <ItemsWrapGrid Orientation="Horizontal" HorizontalAlignment="Center" />
+                    </ItemsPanelTemplate>
+                </GridView.ItemsPanel>
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:GameCardViewModel">
+                        <library:GameCard Card="{x:Bind}" AutomationProperties.Name="{x:Bind Name, Mode=OneWay}" />
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+
+            <!-- No matches. -->
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="12"
+                Visibility="{x:Bind ViewModel.IsNoMatches, Mode=OneWay}">
+                <FontIcon Glyph="&#xE721;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                <TextBlock Text="No games match" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+                <TextBlock
+                    Text="Try a different search or loosen your filters."
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    HorizontalAlignment="Center" />
+                <Button
+                    Content="Clear search and filters"
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource AccentButtonStyle}"
+                    Command="{x:Bind ViewModel.ClearSearchAndFiltersCommand}" />
+            </StackPanel>
+
+            <!-- Library empty. -->
+            <StackPanel
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Spacing="12"
+                Visibility="{x:Bind ViewModel.IsLibraryEmpty, Mode=OneWay}">
+                <FontIcon Glyph="&#xE7FC;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                <TextBlock Text="No games found" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+                <TextBlock
+                    Text="None of the games in SAM's list are owned by this Steam account. Search for an App ID to add one."
+                    TextWrapping="Wrap"
+                    MaxWidth="420"
+                    TextAlignment="Center"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <Button Content="Refresh" HorizontalAlignment="Center" Command="{x:Bind ViewModel.RefreshCommand}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
 </Window>
