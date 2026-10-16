@@ -12,10 +12,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: microsoft/setup-msbuild@v2
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
       - name: Build
-        run: msbuild SAM.sln -restore -p:Configuration=Release -v:minimal -nologo
+        run: dotnet build SAM.sln -c Release -v:minimal -nologo
 
       - name: Upload build
         uses: actions/upload-artifact@v4

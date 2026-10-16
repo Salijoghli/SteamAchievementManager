@@ -25,11 +25,13 @@ This is a modified fork of [gibbed/SteamAchievementManager](https://github.com/g
 
 ## Building
 
-Requires Windows with the Visual Studio 2022 Build Tools (MSBuild) and the .NET SDK. Run:
+Requires Windows and the [.NET SDK](https://dotnet.microsoft.com/download) 8 or newer. Run:
 
 ```powershell
 .\build.ps1
 ```
+
+or `dotnet build SAM.sln -c Release`.
 
 Release builds are written to `upload\`. Every push to `master` is also built by GitHub Actions, and the executables can be downloaded from the run's artifacts.
 
