@@ -26,10 +26,10 @@ namespace SAM.API.Types
 {
     // Steamworks UserStatsReceived_t (callback 1101):
     //   uint64 m_nGameID; EResult m_eResult; CSteamID m_steamIDUser;
-    // Windows builds of the Steam API pack callback structs to 8 bytes, so m_steamIDUser
-    // (a 64-bit CSteamID) sits at offset 16, not 12: GameId @0, Result @8, SteamIdUser @16,
-    // 24 bytes in total. Pack = 1 would read SteamIdUser from the padding at offset 12.
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    // steamclient64.dll delivers it with 4-byte packing: GameId @0, Result @8, SteamIdUser @12
+    // (20 bytes). Verified against a live callback; the public headers' 8-byte packing (which
+    // would put SteamIdUser @16) does not match what the client sends.
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct UserStatsReceived
     {
         public ulong GameId;

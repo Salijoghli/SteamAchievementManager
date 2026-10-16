@@ -15,7 +15,7 @@ using Windows.System;
 namespace SAM.App.Views;
 
 /// <summary>Achievement and stat manager for one game.</summary>
-public sealed partial class GameWindow : Window
+public sealed partial class GameWindow : Window, ILaunchPresetTarget
 {
     /// <summary>A launch pre-set waiting for the next successful load: true = unlock all, false = lock all.</summary>
     private bool? _queuedPreset;

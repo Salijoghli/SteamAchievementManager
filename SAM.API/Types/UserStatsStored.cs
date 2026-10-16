@@ -26,9 +26,9 @@ namespace SAM.API.Types
 {
     // Steamworks UserStatsStored_t (callback 1102):
     //   uint64 m_nGameID; EResult m_eResult;
-    // Packed to 8 bytes like every Steam callback struct on Windows: GameId @0, Result @8,
-    // 16 bytes in total (Pack = 1 has the same field offsets but a 12-byte size).
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    // 4-byte packing, as steamclient64.dll sends callbacks (see UserStatsReceived): GameId @0,
+    // Result @8, 12 bytes in total.
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct UserStatsStored
     {
         public ulong GameId;
