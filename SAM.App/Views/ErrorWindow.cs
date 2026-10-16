@@ -12,7 +12,7 @@ public sealed class ErrorWindow : Window
         this.Title = "Steam Achievement Manager";
         this.SystemBackdrop = new MicaBackdrop();
         this.AppWindow.Resize(new Windows.Graphics.SizeInt32(560, 320));
-        this.AppWindow.SetIcon("Assets/SAM.ico");
+        this.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "SAM.ico"));
 
         var close = new Button
         {

@@ -17,6 +17,15 @@ public sealed class ImageCache(AppCache cache, HttpClient http)
     private readonly Dictionary<string, Download> _downloads = new(StringComparer.Ordinal);
     private readonly ConcurrentDictionary<string, byte> _failedUrls = new(StringComparer.Ordinal);
 
+    // Local file (full path) -> the URL it was served for, so Invalidate can skip that URL.
+    private readonly ConcurrentDictionary<string, string> _urlsByPath = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Downloads smaller than this from Steam's store header URLs are its grey "no image"
+    /// placeholder (about 1.4 KB, served with HTTP 200), not real header art.
+    /// </summary>
+    private const int PlaceholderMaxBytes = 2048;
+
     /// <summary>
     /// Tries each URL in order and returns the local file path of the first that's cached or
     /// downloads successfully, or null if none work. Failed URLs are remembered for the session.
@@ -40,9 +49,18 @@ public sealed class ImageCache(AppCache cache, HttpClient http)
             }
 
             var path = this.GetCachePath(url);
-            if (File.Exists(path))
+            var cached = new FileInfo(path);
+            if (cached.Exists)
             {
-                return path;
+                if (cached.Length < PlaceholderMaxBytes && IsStoreHeaderUrl(url))
+                {
+                    // A placeholder cached before this check existed.
+                    TryDelete(path);
+                    this._failedUrls.TryAdd(url, 0);
+                    continue;
+                }
+
+                return this.Remember(path, url);
             }
 
             try
@@ -50,7 +68,7 @@ public sealed class ImageCache(AppCache cache, HttpClient http)
                 var result = await this.DownloadSharedAsync(url, path, cancellationToken).ConfigureAwait(false);
                 if (result != null)
                 {
-                    return result;
+                    return this.Remember(result, url);
                 }
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -61,6 +79,45 @@ public sealed class ImageCache(AppCache cache, HttpClient http)
 
         return null;
     }
+
+    /// <summary>
+    /// Forgets a cached file that turned out to be unusable (e.g. it can't be decoded): deletes
+    /// it and skips its URL for the rest of the session, so the next launch downloads it again.
+    /// </summary>
+    public void Invalidate(string localPath)
+    {
+        if (string.IsNullOrEmpty(localPath))
+        {
+            return;
+        }
+
+        var fullPath = Path.GetFullPath(localPath);
+        var imagesDirectory = Path.GetFullPath(cache.ImagesDirectory);
+        if (string.Equals(Path.GetDirectoryName(fullPath), imagesDirectory.TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase) == false)
+        {
+            return; // not one of ours
+        }
+
+        if (this._urlsByPath.TryGetValue(fullPath, out var url))
+        {
+            this._failedUrls.TryAdd(url, 0);
+        }
+
+        Diagnostics.Log($"Discarding undecodable cached image {fullPath}");
+        TryDelete(fullPath);
+    }
+
+    private string Remember(string path, string url)
+    {
+        this._urlsByPath[Path.GetFullPath(path)] = url;
+        return path;
+    }
+
+    /// <summary>True for Steam store header art URLs (…/store_item_assets/…/header*.jpg).</summary>
+    internal static bool IsStoreHeaderUrl(string url) =>
+        Uri.TryCreate(url, UriKind.Absolute, out var uri) &&
+        uri.AbsolutePath.Contains("/store_item_assets/", StringComparison.OrdinalIgnoreCase) &&
+        Path.GetFileName(uri.AbsolutePath).StartsWith("header", StringComparison.OrdinalIgnoreCase);
 
     internal string GetCachePath(string url) => Path.Combine(cache.ImagesDirectory, GetCacheFileName(url));
 
@@ -174,8 +231,9 @@ public sealed class ImageCache(AppCache cache, HttpClient http)
                 length = output.Length;
             }
 
-            if (length == 0)
+            if (length == 0 || (length < PlaceholderMaxBytes && IsStoreHeaderUrl(url)))
             {
+                // Steam answers 200 with a ~1.4 KB grey placeholder for missing header art.
                 this._failedUrls.TryAdd(url, 0);
                 return null;
             }

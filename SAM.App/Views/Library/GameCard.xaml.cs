@@ -123,6 +123,13 @@ public sealed partial class GameCard : UserControl
 
     private void OnImageFailed(object sender, ExceptionRoutedEventArgs e)
     {
+        // The cached file can't be decoded (corrupt or not really an image): drop it from the
+        // cache so the next launch downloads it again instead of re-serving it forever.
+        if (this._shownPath != null)
+        {
+            App.Services?.Images.Invalidate(this._shownPath);
+        }
+
         // Remember it so the card doesn't retry the broken file every time it's realized.
         if (this.Card is { } card)
         {

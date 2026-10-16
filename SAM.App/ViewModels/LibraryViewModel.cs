@@ -68,7 +68,7 @@ public sealed partial class LibraryViewModel : ObservableObject
 
         var settings = services.Settings;
         this._initializing = true;
-        this.SortIndex = (int)settings.LibrarySort;
+        this.SortIndex = Enum.IsDefined(settings.LibrarySort) ? (int)settings.LibrarySort : (int)LibrarySort.RecentlyPlayed;
         this.SortDescending = settings.SortDescending;
         this.PinFavorites = settings.PinFavorites;
         this.ShowGames = settings.ShowGames;
