@@ -216,7 +216,7 @@ namespace SAM.Game
                     return false;
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }
@@ -356,7 +356,8 @@ namespace SAM.Game
 
                     default:
                     {
-                        throw new InvalidOperationException("invalid stat type");
+                        // Unknown stat type: skip it rather than failing to load the whole schema.
+                        break;
                     }
                 }
             }
