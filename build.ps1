@@ -17,7 +17,10 @@ if (-not (Get-Command dotnet -ErrorAction SilentlyContinue)) {
     throw 'The .NET SDK is not installed. Get it from https://dotnet.microsoft.com/download'
 }
 
-& dotnet build (Join-Path $PSScriptRoot 'SAM.sln') -c $Configuration -v:minimal -nologo
-if ($LASTEXITCODE -ne 0) {
-    exit $LASTEXITCODE
+# x86 builds the classic WinForms apps (SAM.Picker, SAM.Game); x64 builds the new app (SAM.App).
+foreach ($platform in 'x86', 'x64') {
+    & dotnet build (Join-Path $PSScriptRoot 'SAM.sln') -c $Configuration "-p:Platform=$platform" -v:minimal -nologo
+    if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE
+    }
 }

@@ -2,7 +2,6 @@ name: Build
 
 on:
   push:
-    branches: [master]
   pull_request:
   workflow_dispatch:
 
@@ -16,14 +15,26 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Build
-        run: dotnet build SAM.sln -c Release -v:minimal -nologo
+      - name: Build classic apps (x86)
+        run: dotnet build SAM.sln -c Release -p:Platform=x86 -v:minimal -nologo
 
-      - name: Upload build
+      - name: Build new app (x64)
+        run: dotnet build SAM.sln -c Release -p:Platform=x64 -v:minimal -nologo
+
+      - name: Upload classic apps
+        uses: actions/upload-artifact@v4
+        with:
+          name: SteamAchievementManager-classic
+          path: |
+            LICENSE.txt
+            upload/*.exe
+            upload/*.dll
+
+      - name: Upload new app
         uses: actions/upload-artifact@v4
         with:
           name: SteamAchievementManager
           path: |
             LICENSE.txt
-            upload/*.exe
-            upload/*.dll
+            upload/app/
+            !upload/app/**/*.pdb
