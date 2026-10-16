@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Xml;
 using System.Xml.Linq;
+using Microsoft.UI.Dispatching;
 using SAM.App.Models;
 
 namespace SAM.App.Services;
@@ -21,7 +22,14 @@ public sealed class GameListService(AppCache cache, SteamSession steam, HttpClie
 
     private static readonly TimeSpan MaxListAge = TimeSpan.FromHours(24);
 
+    /// <summary>How many App IDs to check per UI-thread turn during a refresh.</summary>
+    private const int OwnershipChunkSize = 500;
+
     private readonly object _fileLock = new();
+
+    // AppServices creates this service on the UI thread; Steam calls are marshalled back to it
+    // because the UI thread uses the same Steam pipe (callback pump, art lookups).
+    private readonly DispatcherQueue? _dispatcher = DispatcherQueue.GetForCurrentThread();
 
     private string OwnedListPath => Path.Combine(cache.UserCacheDirectory, "games.json");
 
@@ -38,68 +46,131 @@ public sealed class GameListService(AppCache cache, SteamSession steam, HttpClie
 
     /// <summary>
     /// Re-checks ownership against the (possibly re-downloaded) game list and saves the result.
-    /// Runs the ownership checks off the UI thread. If the list can't be downloaded and there's
-    /// no cached copy, throws <see cref="HttpRequestException"/>.
+    /// The download and parsing run off the UI thread; the Steam ownership checks run on the UI
+    /// thread (the one that created this service) in chunks of <see cref="OwnershipChunkSize"/>
+    /// at low priority, so input and rendering keep running between chunks. If the list can't
+    /// be downloaded and there's no cached copy, throws <see cref="HttpRequestException"/>.
     /// </summary>
     /// <remarks>Throws <see cref="OperationCanceledException"/> if cancelled.</remarks>
     public async Task<IReadOnlyList<GameEntry>> RefreshAsync(CancellationToken cancellationToken)
     {
         var xmlPath = Path.Combine(cache.SharedDirectory, "games.xml");
         var candidates = await GetGameListAsync(xmlPath, http, cancellationToken).ConfigureAwait(false);
+        var listed = candidates.Select(c => c.AppId).ToHashSet();
 
-        return await Task.Run(
+        List<GameEntry> extras;
+        lock (this._fileLock)
+        {
+            extras = JsonFile.Read<List<GameEntry>>(this.ExtraAppsPath) ?? [];
+        }
+
+        // Manually added games that the community list doesn't know (yet).
+        var unlistedExtras = extras.Where(e => listed.Contains(e.AppId) == false).ToList();
+
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        var owned = new Dictionary<uint, GameEntry>();
+        for (var offset = 0; offset < candidates.Count; offset += OwnershipChunkSize)
+        {
+            var start = offset;
+            await this.RunOnUiThreadAsync(
+                () =>
+                {
+                    var end = Math.Min(start + OwnershipChunkSize, candidates.Count);
+                    for (var i = start; i < end; i++)
+                    {
+                        var (appId, type) = candidates[i];
+                        if (owned.ContainsKey(appId) || steam.OwnsApp(appId) == false)
+                        {
+                            continue;
+                        }
+
+                        var name = steam.GetAppData(appId, "name");
+                        if (string.IsNullOrEmpty(name) == false)
+                        {
+                            owned[appId] = new GameEntry(appId, name, type);
+                        }
+                    }
+                },
+                cancellationToken).ConfigureAwait(false);
+        }
+
+        await this.RunOnUiThreadAsync(
             () =>
             {
-                var owned = new Dictionary<uint, GameEntry>();
-                foreach (var (appId, type) in candidates)
+                foreach (var extra in unlistedExtras)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    if (owned.ContainsKey(appId) || steam.OwnsApp(appId) == false)
+                    if (owned.ContainsKey(extra.AppId) == false && steam.OwnsApp(extra.AppId))
                     {
-                        continue;
+                        owned[extra.AppId] = extra with { Name = steam.GetAppData(extra.AppId, "name") ?? extra.Name };
                     }
-
-                    var name = steam.GetAppData(appId, "name");
-                    if (string.IsNullOrEmpty(name) == false)
-                    {
-                        owned[appId] = new GameEntry(appId, name, type);
-                    }
-                }
-
-                lock (this._fileLock)
-                {
-                    // Keep manually added games that the community list doesn't know about.
-                    var extras = JsonFile.Read<List<GameEntry>>(this.ExtraAppsPath) ?? [];
-                    var keptExtras = new List<GameEntry>();
-                    var listed = candidates.Select(c => c.AppId).ToHashSet();
-                    foreach (var extra in extras)
-                    {
-                        if (listed.Contains(extra.AppId))
-                        {
-                            continue; // now in the community list; handled above
-                        }
-
-                        keptExtras.Add(extra);
-                        if (owned.ContainsKey(extra.AppId) == false && steam.OwnsApp(extra.AppId))
-                        {
-                            owned[extra.AppId] = extra with { Name = steam.GetAppData(extra.AppId, "name") ?? extra.Name };
-                        }
-                    }
-
-                    if (keptExtras.Count != extras.Count)
-                    {
-                        JsonFile.Write(this.ExtraAppsPath, keptExtras);
-                    }
-
-                    var result = owned.Values
-                        .OrderBy(g => g.Name, StringComparer.CurrentCultureIgnoreCase)
-                        .ThenBy(g => g.AppId)
-                        .ToList();
-                    JsonFile.Write(this.OwnedListPath, result);
-                    return (IReadOnlyList<GameEntry>)result;
                 }
             },
             cancellationToken).ConfigureAwait(false);
+
+        Diagnostics.Log(string.Create(
+            CultureInfo.InvariantCulture,
+            $"Checked ownership of {candidates.Count} apps in {stopwatch.ElapsedMilliseconds} ms ({owned.Count} owned)"));
+
+        lock (this._fileLock)
+        {
+            if (unlistedExtras.Count != extras.Count)
+            {
+                // Drop extras that are now in the community list (handled above). Re-read so an
+                // app added by TryAddOwnedApp while the checks ran isn't lost.
+                var current = JsonFile.Read<List<GameEntry>>(this.ExtraAppsPath) ?? [];
+                JsonFile.Write(this.ExtraAppsPath, current.Where(e => listed.Contains(e.AppId) == false).ToList());
+            }
+
+            var result = owned.Values
+                .OrderBy(g => g.Name, StringComparer.CurrentCultureIgnoreCase)
+                .ThenBy(g => g.AppId)
+                .ToList();
+            JsonFile.Write(this.OwnedListPath, result);
+            return result;
+        }
+    }
+
+    /// <summary>
+    /// Runs <paramref name="action"/> on the UI thread at low priority and waits for it, or runs
+    /// it inline when already on the UI thread or there's no dispatcher.
+    /// </summary>
+    private Task RunOnUiThreadAsync(Action action, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (this._dispatcher == null || this._dispatcher.HasThreadAccess)
+        {
+            action();
+            return Task.CompletedTask;
+        }
+
+        var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var queued = this._dispatcher.TryEnqueue(
+            DispatcherQueuePriority.Low,
+            () =>
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    completion.TrySetCanceled(cancellationToken);
+                    return;
+                }
+
+                try
+                {
+                    action();
+                    completion.TrySetResult();
+                }
+                catch (Exception e)
+                {
+                    completion.TrySetException(e);
+                }
+            });
+        if (queued == false)
+        {
+            // The UI thread is shutting down.
+            completion.TrySetCanceled(cancellationToken);
+        }
+
+        return completion.Task;
     }
 
     /// <summary>

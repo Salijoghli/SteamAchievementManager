@@ -47,8 +47,9 @@ public partial class App : Application
             return;
         }
 
-        // One window per game (and one library): if it's already open, focus it and quit.
-        this._instance = SingleInstance.TryClaim(appId);
+        // One window per game (and one library): if it's already open, hand it our arguments
+        // (so "--unlock-all" etc. still apply), focus it and quit.
+        this._instance = SingleInstance.TryClaim(appId, commandLine[1..]);
         if (this._instance == null)
         {
             this.Exit();
@@ -106,10 +107,25 @@ public partial class App : Application
         }
     }
 
+    /// <summary>
+    /// A second "SAM.exe &lt;appid&gt; --unlock-all" (or --lock-all) while this game's window is
+    /// already open: apply the preset to the open window instead of dropping the flag.
+    /// </summary>
+    private static void ApplyForwardedLaunch(Window window, IReadOnlyList<string> arguments)
+    {
+        var flags = arguments.Skip(1).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var unlockAll = flags.Contains("--unlock-all");
+        var lockAll = flags.Contains("--lock-all");
+        if (unlockAll || lockAll)
+        {
+            (window as ILaunchPresetTarget)?.ApplyLaunchPreset(unlockAll, lockAll);
+        }
+    }
+
     private void Show(Window window)
     {
         this._window = window;
-        this._instance?.BringToFrontOnRequest(window);
+        this._instance?.BringToFrontOnRequest(window, arguments => ApplyForwardedLaunch(window, arguments));
         window.Closed += (_, _) =>
         {
             this._instance?.Dispose();
