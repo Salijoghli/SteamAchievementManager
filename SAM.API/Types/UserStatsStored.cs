@@ -24,7 +24,11 @@ using System.Runtime.InteropServices;
 
 namespace SAM.API.Types
 {
-    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    // Steamworks UserStatsStored_t (callback 1102):
+    //   uint64 m_nGameID; EResult m_eResult;
+    // Packed to 8 bytes like every Steam callback struct on Windows: GameId @0, Result @8,
+    // 16 bytes in total (Pack = 1 has the same field offsets but a 12-byte size).
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
     public struct UserStatsStored
     {
         public ulong GameId;

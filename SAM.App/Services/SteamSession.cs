@@ -4,7 +4,26 @@ using SAM.API;
 namespace SAM.App.Services;
 
 /// <summary>Thrown when the app can't talk to the Steam client. The message is user-facing.</summary>
-public sealed class SteamUnavailableException(string message, Exception? inner = null) : Exception(message, inner);
+public class SteamUnavailableException(string message, Exception? inner = null) : Exception(message, inner);
+
+/// <summary>How a <see cref="SteamSession.StoreStatsAsync"/> call failed.</summary>
+public enum SteamStoreFailure
+{
+    /// <summary>StoreStats returned false: nothing was sent, the changes are still staged locally.</summary>
+    Refused,
+
+    /// <summary>Steam's servers answered with an error; the changes weren't stored.</summary>
+    Rejected,
+
+    /// <summary>No answer in time; the upload may still be in progress or retried later.</summary>
+    TimedOut,
+}
+
+/// <summary>Thrown by <see cref="SteamSession.StoreStatsAsync"/>. The message is user-facing.</summary>
+public sealed class SteamStoreException(SteamStoreFailure failure, string message) : SteamUnavailableException(message)
+{
+    public SteamStoreFailure Failure { get; } = failure;
+}
 
 /// <summary>
 /// One connection to the running Steam client, bound to a single App ID for the
@@ -16,7 +35,9 @@ public sealed class SteamSession : IDisposable
     private readonly Client _client;
     private readonly DispatcherQueueTimer _callbackTimer;
     private readonly API.Callbacks.UserStatsReceived _userStatsReceived;
+    private readonly API.Callbacks.UserStatsStored _userStatsStored;
     private TaskCompletionSource<int>? _pendingStatsRequest;
+    private TaskCompletionSource<int>? _pendingStore;
 
     private SteamSession(Client client, uint appId)
     {
@@ -27,7 +48,9 @@ public sealed class SteamSession : IDisposable
         this.Language = client.SteamApps008.GetCurrentGameLanguage() ?? "english";
 
         this._userStatsReceived = client.CreateAndRegisterCallback<API.Callbacks.UserStatsReceived>();
-        this._userStatsReceived.OnRun += p => this._pendingStatsRequest?.TrySetResult(p.Result);
+        this._userStatsReceived.OnRun += this.OnUserStatsReceived;
+        this._userStatsStored = client.CreateAndRegisterCallback<API.Callbacks.UserStatsStored>();
+        this._userStatsStored.OnRun += this.OnUserStatsStored;
 
         this._callbackTimer = DispatcherQueue.GetForCurrentThread().CreateTimer();
         this._callbackTimer.Interval = TimeSpan.FromMilliseconds(100);
@@ -103,25 +126,46 @@ public sealed class SteamSession : IDisposable
     {
         var request = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
         this._pendingStatsRequest = request;
-
-        if (this._client.SteamUserStats.RequestUserStats(this.SteamId) == CallHandle.Invalid)
+        try
         {
-            throw new SteamUnavailableException("Steam refused the request for your stats.");
+            if (this._client.SteamUserStats.RequestUserStats(this.SteamId) == CallHandle.Invalid)
+            {
+                throw new SteamUnavailableException("Steam refused the request for your stats.");
+            }
+
+            var finished = await Task.WhenAny(request.Task, Task.Delay(timeout ?? TimeSpan.FromSeconds(15)));
+            if (finished != request.Task)
+            {
+                throw new SteamUnavailableException("Steam didn't respond with your stats in time.");
+            }
+
+            var result = request.Task.Result;
+            if (result != 1)
+            {
+                throw new SteamUnavailableException(result == 2
+                    ? "Steam returned a generic error. This usually means you don't own the game."
+                    : $"Steam returned error {result} while fetching your stats.");
+            }
+        }
+        finally
+        {
+            // Never leave a stale request behind for a late callback to complete.
+            if (ReferenceEquals(this._pendingStatsRequest, request))
+            {
+                this._pendingStatsRequest = null;
+            }
+        }
+    }
+
+    private void OnUserStatsReceived(API.Types.UserStatsReceived p)
+    {
+        // The callback is broadcast: ignore other games and other users' stats.
+        if (p.GameId != this.AppId || p.SteamIdUser != this.SteamId)
+        {
+            return;
         }
 
-        var finished = await Task.WhenAny(request.Task, Task.Delay(timeout ?? TimeSpan.FromSeconds(15)));
-        if (finished != request.Task)
-        {
-            throw new SteamUnavailableException("Steam didn't respond with your stats in time.");
-        }
-
-        var result = request.Task.Result;
-        if (result != 1)
-        {
-            throw new SteamUnavailableException(result == 2
-                ? "Steam returned a generic error. This usually means you don't own the game."
-                : $"Steam returned error {result} while fetching your stats.");
-        }
+        this._pendingStatsRequest?.TrySetResult(p.Result);
     }
 
     public bool TryGetAchievement(string id, out bool achieved, out DateTimeOffset? unlockTime)
@@ -146,8 +190,67 @@ public sealed class SteamSession : IDisposable
 
     public bool SetStat(string id, float value) => this._client.SteamUserStats.SetStatValue(id, value);
 
-    /// <summary>Uploads pending achievement and stat changes to Steam.</summary>
-    public bool StoreStats() => this._client.SteamUserStats.StoreStats();
+    /// <summary>
+    /// Uploads the staged achievement and stat changes and waits for Steam's servers to
+    /// confirm them (the UserStatsStored callback). StoreStats returning true only means the
+    /// upload was queued. Must be called on the UI thread. Throws <see cref="SteamStoreException"/>
+    /// with a readable message when Steam refuses, rejects or doesn't answer.
+    /// </summary>
+    public async Task StoreStatsAsync(TimeSpan? timeout = null)
+    {
+        var request = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
+        this._pendingStore = request;
+        try
+        {
+            if (this._client.SteamUserStats.StoreStats() == false)
+            {
+                throw new SteamStoreException(SteamStoreFailure.Refused, "Steam refused to store the changes.");
+            }
+
+            var finished = await Task.WhenAny(request.Task, Task.Delay(timeout ?? TimeSpan.FromSeconds(30)));
+            if (finished != request.Task)
+            {
+                throw new SteamStoreException(SteamStoreFailure.TimedOut,
+                    "Steam didn't confirm that the changes were stored. They may still be pending and could " +
+                    "be uploaded later; reload in a moment to see the current state.");
+            }
+
+            var result = request.Task.Result;
+            if (result != 1)
+            {
+                throw new SteamStoreException(SteamStoreFailure.Rejected, DescribeStoreResult(result));
+            }
+        }
+        finally
+        {
+            if (ReferenceEquals(this._pendingStore, request))
+            {
+                this._pendingStore = null;
+            }
+        }
+    }
+
+    private void OnUserStatsStored(API.Types.UserStatsStored p)
+    {
+        if (p.GameId != this.AppId)
+        {
+            return;
+        }
+
+        this._pendingStore?.TrySetResult(p.Result);
+    }
+
+    /// <summary>A readable message for a UserStatsStored EResult other than k_EResultOK.</summary>
+    private static string DescribeStoreResult(int result) => result switch
+    {
+        8 => "Steam's servers rejected the changes because a value broke one of the game's rules " +
+             "(for example a stat limit). Steam reverted them.",
+        2 => "Steam's servers rejected the changes (generic failure).",
+        3 => "Steam couldn't reach its servers.",
+        15 => "Steam's servers denied access.",
+        16 => "Steam's servers timed out.",
+        _ => $"Steam's servers rejected the changes (error {result}).",
+    };
 
     public bool ResetAllStats(bool achievementsToo) => this._client.SteamUserStats.ResetAllStats(achievementsToo);
     #endregion

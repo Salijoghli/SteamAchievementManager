@@ -57,6 +57,9 @@ public sealed partial class GameViewModel : ObservableObject
     public const string MissingSchemaMessage =
         "This game has no achievements or its schema isn't cached by Steam yet. Launch the game once, then reload.";
 
+    /// <summary>Above this many row changes the visible list is replaced in one go (see <see cref="Sync"/>).</summary>
+    private const int MaxIncrementalChanges = 150;
+
     private readonly AppServices _services;
     private readonly List<AchievementViewModel> _achievements = [];
     private IReadOnlyDictionary<string, double>? _percents;
@@ -184,6 +187,36 @@ public sealed partial class GameViewModel : ObservableObject
 
     public bool HasInvalidStats => this.InvalidStatCount > 0;
 
+    /// <summary>
+    /// Pending changes or invalid stat edits: anything closing or reloading would throw away.
+    /// Used by the close and reload prompts (not by the commit count).
+    /// </summary>
+    public bool HasUnsavedChanges => this.HasPending || this.HasInvalidStats;
+
+    /// <summary>Body of the close prompt.</summary>
+    public string UnsavedChangesText
+    {
+        get
+        {
+            var parts = new List<string>();
+            if (this.PendingCount > 0)
+            {
+                parts.Add(this.PendingCount == 1
+                    ? "1 change that hasn't been committed to Steam"
+                    : $"{this.PendingCount} changes that haven't been committed to Steam");
+            }
+
+            if (this.InvalidStatCount > 0)
+            {
+                parts.Add(this.InvalidStatCount == 1
+                    ? "1 stat edit that isn't valid yet"
+                    : $"{this.InvalidStatCount} stat edits that aren't valid yet");
+            }
+
+            return parts.Count == 0 ? "You have no unsaved changes." : $"You have {string.Join(" and ", parts)}.";
+        }
+    }
+
     public string PendingText
     {
         get
@@ -261,7 +294,7 @@ public sealed partial class GameViewModel : ObservableObject
 
     #region Collections
     /// <summary>The filtered, sorted achievements shown in the list.</summary>
-    public ObservableCollection<AchievementViewModel> VisibleAchievements { get; } = [];
+    public BulkObservableCollection<AchievementViewModel> VisibleAchievements { get; } = [];
 
     public ObservableCollection<StatViewModel> Stats { get; } = [];
 
@@ -281,10 +314,26 @@ public sealed partial class GameViewModel : ObservableObject
 
     partial void OnIsStatEditingEnabledChanged(bool value)
     {
-        foreach (var stat in this.Stats)
+        this._suspendPendingUpdates = true;
+        try
         {
-            stat.IsEditingAllowed = value;
+            foreach (var stat in this.Stats)
+            {
+                stat.IsEditingAllowed = value;
+
+                // Turning editing off drops every stat edit, valid or not.
+                if (value == false)
+                {
+                    stat.ResetToOriginal();
+                }
+            }
         }
+        finally
+        {
+            this._suspendPendingUpdates = false;
+        }
+
+        this.UpdatePending();
     }
     #endregion
 
@@ -338,6 +387,11 @@ public sealed partial class GameViewModel : ObservableObject
         catch (TaskCanceledException)
         {
             return;
+        }
+
+        if (ReferenceEquals(this._searchDebounce, cts))
+        {
+            this._searchDebounce = null;
         }
 
         this.ApplyFilter();
@@ -403,10 +457,22 @@ public sealed partial class GameViewModel : ObservableObject
         this.HasNoVisibleAchievements = this.IsLoaded && this.VisibleAchievements.Count == 0;
     }
 
-    /// <summary>Makes <paramref name="target"/> equal to <paramref name="items"/> with minimal changes, so rows animate.</summary>
-    private static void Sync(ObservableCollection<AchievementViewModel> target, List<AchievementViewModel> items)
+    /// <summary>
+    /// Makes <paramref name="target"/> equal to <paramref name="items"/> with minimal changes, so
+    /// rows animate. Like LibraryViewModel.Sync, big changes (thousands of achievements, a new
+    /// sort order) replace the contents in one Reset instead of thousands of row notifications.
+    /// </summary>
+    private static void Sync(BulkObservableCollection<AchievementViewModel> target, List<AchievementViewModel> items)
     {
         var wanted = new HashSet<AchievementViewModel>(items);
+        var removals = target.Count(c => wanted.Contains(c) == false);
+        var insertions = items.Count - (target.Count - removals);
+        if (removals + insertions > MaxIncrementalChanges)
+        {
+            target.ReplaceAll(items);
+            return;
+        }
+
         for (var i = target.Count - 1; i >= 0; i--)
         {
             if (wanted.Contains(target[i]) == false)
@@ -415,22 +481,53 @@ public sealed partial class GameViewModel : ObservableObject
             }
         }
 
+        var moves = 0;
         for (var i = 0; i < items.Count; i++)
         {
-            if (i < target.Count && ReferenceEquals(target[i], items[i]))
+            var item = items[i];
+            if (i < target.Count && ReferenceEquals(target[i], item))
             {
                 continue;
             }
 
-            var existing = target.IndexOf(items[i]);
+            var existing = IndexOf(target, item, i);
             if (existing >= 0)
             {
+                if (++moves > MaxIncrementalChanges)
+                {
+                    target.ReplaceAll(items);
+                    return;
+                }
+
                 target.Move(existing, i);
             }
             else
             {
-                target.Insert(i, items[i]);
+                target.Insert(i, item);
             }
+        }
+    }
+
+    private static int IndexOf(BulkObservableCollection<AchievementViewModel> list, AchievementViewModel item, int start)
+    {
+        for (var i = start; i < list.Count; i++)
+        {
+            if (ReferenceEquals(list[i], item))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary>Applies a search that's still waiting out its debounce, so bulk actions see what's shown.</summary>
+    private void FlushPendingSearch()
+    {
+        if (this._searchDebounce is { IsCancellationRequested: false } debounce)
+        {
+            debounce.Cancel();
+            this.ApplyFilter();
         }
     }
     #endregion
@@ -452,6 +549,19 @@ public sealed partial class GameViewModel : ObservableObject
             return false;
         }
 
+        var ok = await this.LoadCoreAsync();
+        this.LoadCompleted?.Invoke(this, ok);
+        return ok;
+    }
+
+    /// <summary>
+    /// Raised after every load attempt (initial, retry, reload, post-commit), once the view
+    /// model is no longer loading. The argument is true when the load succeeded.
+    /// </summary>
+    public event EventHandler<bool>? LoadCompleted;
+
+    private async Task<bool> LoadCoreAsync()
+    {
         this.IsLoading = true;
         this.IsLoaded = false;
         this.LoadError = null;
@@ -702,23 +812,46 @@ public sealed partial class GameViewModel : ObservableObject
     #endregion
 
     #region Bulk actions
+    // Like the old manager, the toolbar actions apply to the achievements currently shown
+    // (after search and filters), skipping protected ones.
     [RelayCommand(CanExecute = nameof(CanEditAchievements))]
-    private void UnlockAll() => this.SetAll(_ => true);
+    private void UnlockAll() => this.SetAll(this.GetShownAchievements(), _ => true);
 
     [RelayCommand(CanExecute = nameof(CanEditAchievements))]
-    private void LockAll() => this.SetAll(_ => false);
+    private void LockAll() => this.SetAll(this.GetShownAchievements(), _ => false);
 
     [RelayCommand(CanExecute = nameof(CanEditAchievements))]
-    private void Invert() => this.SetAll(a => a.IsChecked == false);
+    private void Invert() => this.SetAll(this.GetShownAchievements(), a => a.IsChecked == false);
 
     private bool CanEditAchievements() => this.IsBusy == false && this.IsLoaded;
 
-    private void SetAll(Func<AchievementViewModel, bool> desired)
+    /// <summary>
+    /// The --unlock-all / --lock-all launch pre-set: checks or unchecks every changeable
+    /// achievement regardless of search and filters. Returns false when not loaded or busy.
+    /// </summary>
+    public bool ApplyLaunchPreset(bool unlockAll)
+    {
+        if (this.CanEditAchievements() == false)
+        {
+            return false;
+        }
+
+        this.SetAll(this._achievements, _ => unlockAll);
+        return true;
+    }
+
+    private List<AchievementViewModel> GetShownAchievements()
+    {
+        this.FlushPendingSearch();
+        return [.. this.VisibleAchievements]; // Snapshot: the Pending filter re-filters afterwards.
+    }
+
+    private void SetAll(IReadOnlyList<AchievementViewModel> targets, Func<AchievementViewModel, bool> desired)
     {
         this._suspendPendingUpdates = true;
         try
         {
-            foreach (var achievement in this._achievements)
+            foreach (var achievement in targets)
             {
                 if (achievement.IsProtected == false)
                 {
@@ -782,8 +915,11 @@ public sealed partial class GameViewModel : ObservableObject
     private static string Plural(int count, string noun) => count == 1 ? $"1 {noun}" : $"{count} {noun}s";
 
     /// <summary>
-    /// Writes the pending changes to Steam like the old manager: SetAchievement for each
-    /// changed achievement, SetStat for each modified stat, then StoreStats. Then reloads.
+    /// Writes the pending changes to Steam: SetAchievement for each changed achievement,
+    /// SetStat for each modified stat, then StoreStats, waiting for Steam's servers to accept
+    /// them. All or nothing: if any Set call fails, or Steam refuses or rejects the store,
+    /// the changes already staged in Steam are undone. Reloads afterwards unless nothing
+    /// reached Steam (then the pending edits stay so the user can retry).
     /// </summary>
     public async Task<GameOperationResult> StoreAsync()
     {
@@ -796,9 +932,10 @@ public sealed partial class GameViewModel : ObservableObject
 
         this.IsWorking = true;
         GameOperationResult result;
+        var reload = true;
         try
         {
-            result = this.Store();
+            (result, reload) = await this.StoreCoreAsync();
         }
         catch (Exception e)
         {
@@ -810,44 +947,147 @@ public sealed partial class GameViewModel : ObservableObject
             this.IsWorking = false;
         }
 
-        await this.LoadAsync();
+        if (reload)
+        {
+            await this.LoadAsync();
+        }
+
         this.ShowStatus(result);
         return result;
     }
 
-    private GameOperationResult Store()
+    /// <summary>A change staged in Steam's local state, and how to put it back.</summary>
+    private sealed record StagedChange(string Id, Func<bool> Undo);
+
+    private async Task<(GameOperationResult Result, bool Reload)> StoreCoreAsync()
     {
         var steam = this._services.Steam;
         var achievements = this._achievements.Where(a => a.IsPending && a.IsProtected == false).ToList();
+        var stats = this.Stats.Where(s => s.IsModified && s.IsReadOnly == false && s.HasError == false).ToList();
+        if (achievements.Count == 0 && stats.Count == 0)
+        {
+            return (new GameOperationResult(false, "Nothing stored", "There are no changes Steam can store."), false);
+        }
+
+        var staged = new List<StagedChange>();
+        string? failure = null;
+        try
+        {
+            foreach (var achievement in achievements)
+            {
+                if (steam.SetAchievement(achievement.Id, achievement.IsChecked) == false)
+                {
+                    failure = $"Steam refused to {(achievement.IsChecked ? "unlock" : "lock")} " +
+                        $"\"{achievement.Name}\" ({achievement.Id}).";
+                    break;
+                }
+
+                var original = achievement.IsAchieved;
+                staged.Add(new StagedChange(achievement.Id, () => steam.SetAchievement(achievement.Id, original)));
+            }
+
+            if (failure == null)
+            {
+                foreach (var stat in stats)
+                {
+                    if (SetStatValue(steam, stat, stat.Value) == false)
+                    {
+                        failure = $"Steam refused the new value for the stat \"{stat.DisplayName}\" ({stat.Id}).";
+                        break;
+                    }
+
+                    var original = stat.OriginalValue;
+                    staged.Add(new StagedChange(stat.Id, () => SetStatValue(steam, stat, original)));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log($"Setting achievements/stats for app {this.AppId} failed", e);
+            failure = $"Something went wrong while preparing the changes: {e.Message}";
+        }
+
+        if (failure != null)
+        {
+            // Nothing was uploaded. Undo what's staged so a later StoreStats (from here, the
+            // game or Steam) can't upload half of the changes, and keep the edits for a retry.
+            return (this.FailAndUndo(steam, staged, failure), false);
+        }
+
+        try
+        {
+            await steam.StoreStatsAsync();
+        }
+        catch (SteamStoreException e) when (e.Failure is SteamStoreFailure.Refused or SteamStoreFailure.Rejected)
+        {
+            // Refused: nothing was sent, the edits stay. Rejected: Steam's servers didn't
+            // take them; reload to show what Steam has now.
+            return (this.FailAndUndo(steam, staged, e.Message), e.Failure == SteamStoreFailure.Rejected);
+        }
+
+        // Stored: the rows are no longer pending, so closing during the reload doesn't warn.
         foreach (var achievement in achievements)
         {
-            if (steam.SetAchievement(achievement.Id, achievement.IsChecked) == false)
-            {
-                return new GameOperationResult(false, "Couldn't store changes",
-                    $"An error occurred while setting the state for {achievement.Id}, aborting store.");
-            }
+            achievement.MarkCommitted();
         }
 
-        var stats = this.Stats.Where(s => s.IsModified && s.IsProtected == false && s.HasError == false).ToList();
         foreach (var stat in stats)
         {
-            var ok = stat.IsInteger
-                ? steam.SetStat(stat.Id, (int)stat.Value)
-                : steam.SetStat(stat.Id, (float)stat.Value);
+            stat.MarkCommitted();
+        }
+
+        this.UpdatePending();
+
+        var parts = new List<string>();
+        if (achievements.Count > 0)
+        {
+            parts.Add(Plural(achievements.Count, "achievement"));
+        }
+
+        if (stats.Count > 0)
+        {
+            parts.Add(Plural(stats.Count, "stat"));
+        }
+
+        return (new GameOperationResult(true, "Changes stored", $"Stored {string.Join(" and ", parts)}."), true);
+    }
+
+    private static bool SetStatValue(SteamSession steam, StatViewModel stat, double value) => stat.IsInteger
+        ? steam.SetStat(stat.Id, (int)value)
+        : steam.SetStat(stat.Id, (float)value);
+
+    /// <summary>Undoes the staged changes (newest first) and builds the failure message.</summary>
+    private GameOperationResult FailAndUndo(SteamSession steam, List<StagedChange> staged, string failure)
+    {
+        var notUndone = new List<string>();
+        for (var i = staged.Count - 1; i >= 0; i--)
+        {
+            bool ok;
+            try
+            {
+                ok = staged[i].Undo();
+            }
+            catch (Exception e)
+            {
+                Diagnostics.Log($"Undoing the staged change to {staged[i].Id} for app {this.AppId} failed", e);
+                ok = false;
+            }
+
             if (ok == false)
             {
-                return new GameOperationResult(false, "Couldn't store changes",
-                    $"An error occurred while setting the value for {stat.Id}, aborting store.");
+                notUndone.Add(staged[i].Id);
             }
         }
 
-        if (steam.StoreStats() == false)
+        var message = $"Nothing was stored. {failure}";
+        if (notUndone.Count > 0)
         {
-            return new GameOperationResult(false, "Couldn't store changes", "Steam refused to store the changes.");
+            notUndone.Reverse();
+            message += $" SAM couldn't undo the change already made to {string.Join(", ", notUndone)}; " +
+                "Steam may upload it the next time this game's stats are stored.";
         }
 
-        return new GameOperationResult(true, "Changes stored",
-            $"Stored {Plural(achievements.Count, "achievement")} and {Plural(stats.Count, "stat")}.");
+        return new GameOperationResult(false, "Couldn't store changes", message);
     }
 
     /// <summary>Resets every stat for this game (and optionally its achievements) on Steam, then reloads.</summary>
@@ -878,4 +1118,23 @@ public sealed partial class GameViewModel : ObservableObject
         return result;
     }
     #endregion
+}
+
+/// <summary>An <see cref="ObservableCollection{T}"/> whose contents can be swapped with a single Reset notification.</summary>
+public sealed class BulkObservableCollection<T> : ObservableCollection<T>
+{
+    public void ReplaceAll(IEnumerable<T> items)
+    {
+        this.CheckReentrancy();
+        this.Items.Clear();
+        foreach (var item in items)
+        {
+            this.Items.Add(item);
+        }
+
+        this.OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(this.Count)));
+        this.OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("Item[]"));
+        this.OnCollectionChanged(new System.Collections.Specialized.NotifyCollectionChangedEventArgs(
+            System.Collections.Specialized.NotifyCollectionChangedAction.Reset));
+    }
 }

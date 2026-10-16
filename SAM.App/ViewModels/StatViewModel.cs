@@ -18,7 +18,8 @@ public sealed record StatUsage(string AchievementName, double TargetValue);
 /// One stat row. <see cref="EditValue"/> is what the user typed; it's validated and only
 /// copied to <see cref="Value"/> (the value that gets stored) when valid, mirroring the
 /// rules of the old manager: protected stats can't change, integer stats take whole numbers,
-/// increment-only stats can't go below their original value, plus the schema's min/max.
+/// increment-only stats can't go below their original value, plus the schema's min/max and
+/// max change. Average-rate stats are read-only (Steam can't set them through SetStat).
 /// </summary>
 public sealed partial class StatViewModel : ObservableObject
 {
@@ -51,6 +52,15 @@ public sealed partial class StatViewModel : ObservableObject
 
     public bool IsIncrementOnly => this.Definition.IncrementOnly;
 
+    /// <summary>
+    /// Average-rate stats are updated with UpdateAvgRateStat from the game's play sessions;
+    /// writing them with SetStat(float) fails, so they're shown read-only.
+    /// </summary>
+    public bool IsAverageRate => this.Definition.Kind == StatKind.AverageRate;
+
+    /// <summary>Protected or average-rate: shown but never written.</summary>
+    public bool IsReadOnly => this.IsProtected || this.IsAverageRate;
+
     public string KindText => this.Definition.Kind switch
     {
         StatKind.Integer => "Integer",
@@ -73,13 +83,22 @@ public sealed partial class StatViewModel : ObservableObject
                 parts.Add($"range {Format(this.Definition.MinValue)} – {Format(this.Definition.MaxValue)}");
             }
 
+            if (this.Definition.MaxChange > 0)
+            {
+                parts.Add($"max change {Format(this.Definition.MaxChange)}");
+            }
+
             return string.Join(" · ", parts);
         }
     }
 
-    public string ProtectedText => "Protected — only the game's servers can change this stat";
+    /// <summary>Why the stat can't be edited (shown when <see cref="IsReadOnly"/>).</summary>
+    public string ProtectedText => this.IsProtected
+        ? "Protected — only the game's servers can change this stat"
+        : "Average rate — Steam only updates these from the game's play sessions, so they can't be edited here";
 
-    public double OriginalValue { get; }
+    /// <summary>The value Steam reported when loaded (or last committed).</summary>
+    public double OriginalValue { get; private set; }
 
     public string OriginalValueText => "Was " + Format(this.OriginalValue);
 
@@ -103,7 +122,7 @@ public sealed partial class StatViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(CanEdit))]
     private bool _isEditingAllowed;
 
-    public bool CanEdit => this.IsEditingAllowed && this.IsProtected == false;
+    public bool CanEdit => this.IsEditingAllowed && this.IsReadOnly == false;
 
     public bool IsModified => this.IsInteger
         ? (long)this.Value != (long)this.OriginalValue
@@ -133,19 +152,57 @@ public sealed partial class StatViewModel : ObservableObject
 
     partial void OnValueChanged(double value) => this._changed();
 
+    /// <summary>
+    /// Puts the original value back and clears any error. The original came from Steam, so
+    /// it's always accepted, even if it's outside the schema's limits.
+    /// </summary>
     [RelayCommand]
-    private void ResetToOriginal() => this.EditValue = this.OriginalValue;
+    public void ResetToOriginal()
+    {
+        this.Error = null;
+        this.Value = this.OriginalValue;
+        this.EditValue = this.OriginalValue; // Validate accepts the original unconditionally.
+        this._changed();
+    }
+
+    /// <summary>
+    /// Records that <see cref="Value"/> was stored on Steam, so the stat stops counting as
+    /// modified (e.g. while the post-commit reload runs).
+    /// </summary>
+    public void MarkCommitted()
+    {
+        if (this.OriginalValue.Equals(this.Value))
+        {
+            return;
+        }
+
+        this.OriginalValue = this.Value;
+        this.OnPropertyChanged(nameof(this.OriginalValue));
+        this.OnPropertyChanged(nameof(this.OriginalValueText));
+        this.OnPropertyChanged(nameof(this.IsModified));
+    }
 
     private string? Validate(double value)
     {
+        // The original value came from Steam; going back to it is always allowed.
+        if (value.Equals(this.OriginalValue))
+        {
+            return null;
+        }
+
         if (double.IsNaN(value) || double.IsInfinity(value))
         {
             return "Enter a number.";
         }
 
-        if (this.IsProtected && value.Equals(this.OriginalValue) == false)
+        if (this.IsProtected)
         {
             return "This stat is protected and can't be changed.";
+        }
+
+        if (this.IsAverageRate)
+        {
+            return "Average-rate stats can't be changed here.";
         }
 
         if (this.IsInteger)
@@ -181,6 +238,13 @@ public sealed partial class StatViewModel : ObservableObject
         if (this.IsIncrementOnly && value < this.OriginalValue)
         {
             return $"This stat can only increase; it can't go below {Format(this.OriginalValue)}.";
+        }
+
+        // Steam rejects a store that changes a stat by more than its "maxchange" at once.
+        if (this.Definition.MaxChange > 0 && Math.Abs(value - this.OriginalValue) > this.Definition.MaxChange)
+        {
+            return $"This stat can change by at most {Format(this.Definition.MaxChange)} at a time " +
+                $"(from {Format(this.OriginalValue)}).";
         }
 
         return null;

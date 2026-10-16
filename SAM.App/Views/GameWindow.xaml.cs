@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using SAM.App.Services;
 using SAM.App.ViewModels;
+using Windows.Globalization.NumberFormatting;
 using Windows.Graphics;
 using Windows.System;
 
@@ -16,9 +17,9 @@ namespace SAM.App.Views;
 /// <summary>Achievement and stat manager for one game.</summary>
 public sealed partial class GameWindow : Window
 {
-    private readonly bool _unlockAllOnOpen;
-    private readonly bool _lockAllOnOpen;
-    private bool _firstLoadDone;
+    /// <summary>A launch pre-set waiting for the next successful load: true = unlock all, false = lock all.</summary>
+    private bool? _queuedPreset;
+    private bool _loadStarted;
     private bool _dialogOpen;
     private bool _closeConfirmed;
 
@@ -32,14 +33,13 @@ public sealed partial class GameWindow : Window
     public GameWindow(AppServices services, uint appId, bool unlockAllOnOpen = false, bool lockAllOnOpen = false)
     {
         this.ViewModel = new GameViewModel(services, appId);
-        this._unlockAllOnOpen = unlockAllOnOpen;
-        this._lockAllOnOpen = lockAllOnOpen && unlockAllOnOpen == false;
+        this._queuedPreset = ToPreset(unlockAllOnOpen, lockAllOnOpen);
 
         this.InitializeComponent();
 
         this.Title = this.ViewModel.GameName;
         this.SystemBackdrop = new MicaBackdrop();
-        this.AppWindow.SetIcon("Assets/SAM.ico");
+        this.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "SAM.ico"));
         this.ExtendsContentIntoTitleBar = true;
         this.SetTitleBar(this.AppTitleBar);
         this.ApplyTheme(services.Settings.Theme);
@@ -48,9 +48,17 @@ public sealed partial class GameWindow : Window
         this.AppWindow.Closing += this.OnAppWindowClosing;
         this.ViewModel.CommitRequested += async (_, _) => await this.ConfirmAndCommitAsync();
         this.ViewModel.PropertyChanged += this.OnViewModelPropertyChanged;
+        this.ViewModel.LoadCompleted += this.OnLoadCompleted;
         this.AchievementList.AddHandler(UIElement.KeyDownEvent, new KeyEventHandler(this.OnAchievementListKeyDown), true);
 
-        this.Root.Loaded += async (_, _) => await this.LoadAsync();
+        this.Root.Loaded += async (_, _) =>
+        {
+            if (this._loadStarted == false)
+            {
+                this._loadStarted = true;
+                await this.ViewModel.LoadAsync();
+            }
+        };
     }
 
     public GameViewModel ViewModel { get; }
@@ -58,33 +66,61 @@ public sealed partial class GameWindow : Window
     /// <summary>Placeholder rows shown while loading.</summary>
     public int[] SkeletonRows { get; } = Enumerable.Range(0, 8).ToArray();
 
-    private async Task LoadAsync()
+    #region Launch pre-set
+    /// <summary>
+    /// Applies a --unlock-all / --lock-all request from another launch of this game: checks
+    /// (or unchecks) every changeable achievement, ignoring search and filters, and opens the
+    /// commit confirmation. Nothing is stored unless the user confirms. If the window is
+    /// still loading (or the last load failed) the request is queued for the next successful
+    /// load; if a dialog is open it's ignored. <paramref name="unlockAll"/> wins when both are set.
+    /// </summary>
+    public void ApplyLaunchPreset(bool unlockAll, bool lockAll)
     {
-        var ok = await this.ViewModel.LoadAsync();
-        if (ok == false || this._firstLoadDone)
+        if (ToPreset(unlockAll, lockAll) is not { } preset || this._dialogOpen)
         {
             return;
         }
 
-        this._firstLoadDone = true;
-        if (this._unlockAllOnOpen || this._lockAllOnOpen)
-        {
-            if (this._unlockAllOnOpen)
-            {
-                this.ViewModel.UnlockAllCommand.Execute(null);
-            }
-            else
-            {
-                this.ViewModel.LockAllCommand.Execute(null);
-            }
+        // Runs now if loaded and idle, otherwise after the next successful load.
+        this._queuedPreset = preset;
+        this.TryRunQueuedPreset();
+    }
 
-            // Nothing is stored unless the user confirms.
-            if (this.ViewModel.HasPending)
-            {
-                await this.ConfirmAndCommitAsync();
-            }
+    private static bool? ToPreset(bool unlockAll, bool lockAll) => unlockAll ? true : lockAll ? false : null;
+
+    private void OnLoadCompleted(object? sender, bool success)
+    {
+        if (success)
+        {
+            // Let the load (and whoever awaited it) finish before opening the dialog.
+            this.DispatcherQueue.TryEnqueue(this.TryRunQueuedPreset);
         }
     }
+
+    /// <summary>
+    /// Runs the queued pre-set once the content is loaded and nothing is in progress, so it
+    /// survives a failed first load (Retry / F5) and requests that arrive mid-load.
+    /// </summary>
+    private async void TryRunQueuedPreset()
+    {
+        if (this._queuedPreset is not { } unlockAll || this.ViewModel.IsLoaded == false || this.ViewModel.IsBusy)
+        {
+            return; // Stays queued for the next successful load.
+        }
+
+        this._queuedPreset = null;
+        if (this._dialogOpen || this.ViewModel.ApplyLaunchPreset(unlockAll) == false)
+        {
+            return;
+        }
+
+        // Nothing is stored unless the user confirms.
+        if (this.ViewModel.HasPending)
+        {
+            await this.ConfirmAndCommitAsync();
+        }
+    }
+    #endregion
 
     #region Window setup
     private void ApplyTheme(string theme)
@@ -131,6 +167,11 @@ public sealed partial class GameWindow : Window
         if (e.PropertyName == nameof(GameViewModel.IsLoaded))
         {
             this.UpdatePanels();
+        }
+        else if (e.PropertyName == nameof(GameViewModel.IsBusy) && this._queuedPreset != null && this.ViewModel.IsBusy == false)
+        {
+            // E.g. a pre-set requested while a commit was being stored.
+            this.DispatcherQueue.TryEnqueue(this.TryRunQueuedPreset);
         }
     }
 
@@ -208,6 +249,8 @@ public sealed partial class GameWindow : Window
 
     private void OnCommitAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
+        // A value typed into a stat box only counts once committed; it may enable (or block) the commit.
+        this.CommitFocusedNumberBox();
         if (this.ViewModel.CommitCommand.CanExecute(null))
         {
             this.ViewModel.CommitCommand.Execute(null);
@@ -230,7 +273,8 @@ public sealed partial class GameWindow : Window
 
     private async Task ReloadAsync()
     {
-        if (this.ViewModel.HasPending &&
+        this.CommitFocusedNumberBox();
+        if (this.ViewModel.HasUnsavedChanges &&
             await this.ShowDialogAsync(
                 "Discard pending changes?",
                 "Reloading replaces your pending changes with the current state from Steam.",
@@ -306,8 +350,60 @@ public sealed partial class GameWindow : Window
         }
     }
 
+    /// <summary>
+    /// A NumberBox only commits typed text on focus loss or Enter, which for Ctrl+S happens
+    /// after the commit summary is built. Parse the focused box's text now, with the box's own
+    /// parser, and push it into Value (and so through the TwoWay binding into the stat's
+    /// validation) so the summary matches what gets written. Unparsable text is left alone:
+    /// the box reverts it on focus loss, so the stored value doesn't change.
+    /// </summary>
+    private void CommitFocusedNumberBox()
+    {
+        if (this.Content.XamlRoot is not { } root ||
+            FocusManager.GetFocusedElement(root) is not TextBox textBox)
+        {
+            return;
+        }
+
+        NumberBox? numberBox = null;
+        for (DependencyObject? element = textBox; element != null; element = VisualTreeHelper.GetParent(element))
+        {
+            if (element is NumberBox box)
+            {
+                numberBox = box;
+                break;
+            }
+        }
+
+        if (numberBox == null)
+        {
+            return;
+        }
+
+        var text = textBox.Text.Trim();
+        double value;
+        if (text.Length == 0)
+        {
+            value = double.NaN; // What NumberBox does with an empty box.
+        }
+        else if (numberBox.NumberFormatter is INumberParser parser && parser.ParseDouble(text) is { } parsed)
+        {
+            value = parsed;
+        }
+        else
+        {
+            return;
+        }
+
+        if (value.Equals(numberBox.Value) == false)
+        {
+            numberBox.Value = value;
+        }
+    }
+
     private async Task ConfirmAndCommitAsync()
     {
+        this.CommitFocusedNumberBox();
         if (this.ViewModel.CanCommit() == false)
         {
             return;
@@ -375,7 +471,8 @@ public sealed partial class GameWindow : Window
 
     private async void OnAppWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
     {
-        if (this._closeConfirmed || this.ViewModel.HasPending == false)
+        this.CommitFocusedNumberBox();
+        if (this._closeConfirmed || this.ViewModel.HasUnsavedChanges == false)
         {
             return;
         }
@@ -383,9 +480,7 @@ public sealed partial class GameWindow : Window
         args.Cancel = true;
         if (await this.ShowDialogAsync(
                 "Discard uncommitted changes?",
-                this.ViewModel.PendingCount == 1
-                    ? "You have 1 change that hasn't been committed to Steam."
-                    : $"You have {this.ViewModel.PendingCount} changes that haven't been committed to Steam.",
+                this.ViewModel.UnsavedChangesText,
                 "Discard",
                 closeText: "Cancel",
                 defaultButton: ContentDialogButton.Close) == ContentDialogResult.Primary)

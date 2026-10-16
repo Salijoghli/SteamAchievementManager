@@ -66,8 +66,8 @@ public sealed partial class AchievementViewModel : ObservableObject
 
     public bool CanChange => this.IsProtected == false;
 
-    /// <summary>State reported by Steam when loaded.</summary>
-    public bool IsAchieved { get; }
+    /// <summary>State reported by Steam when loaded (or last committed).</summary>
+    public bool IsAchieved { get; private set; }
 
     public DateTimeOffset? UnlockTime { get; }
 
@@ -88,6 +88,23 @@ public sealed partial class AchievementViewModel : ObservableObject
     public string PendingText => this.IsPending == false ? "" : this.IsChecked ? "Will unlock" : "Will lock";
 
     partial void OnIsCheckedChanged(bool value) => this._changed();
+
+    /// <summary>
+    /// Records that the desired state was stored on Steam, so the row stops counting as
+    /// pending (e.g. while the post-commit reload runs). Doesn't notify the owner.
+    /// </summary>
+    public void MarkCommitted()
+    {
+        if (this.IsAchieved == this.IsChecked)
+        {
+            return;
+        }
+
+        this.IsAchieved = this.IsChecked;
+        this.OnPropertyChanged(nameof(this.IsAchieved));
+        this.OnPropertyChanged(nameof(this.IsPending));
+        this.OnPropertyChanged(nameof(this.PendingText));
+    }
 
     #region Hidden description
     [ObservableProperty]
