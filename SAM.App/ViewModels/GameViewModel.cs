@@ -512,6 +512,15 @@ public sealed partial class GameViewModel : ObservableObject
                 this._achievements.Add(vm);
             }
 
+            // Achievements whose unlock is driven by a stat ("progress" blocks in the schema),
+            // shown under each stat as "Used by".
+            var usagesByStat = schema.Achievements
+                .Where(a => a.ProgressStatId != null && a.ProgressMax.HasValue)
+                .ToLookup(
+                    a => a.ProgressStatId!,
+                    a => new StatUsage(a.Name, a.ProgressMax!.Value),
+                    StringComparer.OrdinalIgnoreCase);
+
             this.Stats.Clear();
             foreach (var definition in schema.Stats)
             {
@@ -540,10 +549,16 @@ public sealed partial class GameViewModel : ObservableObject
                     value = floatValue;
                 }
 
-                this.Stats.Add(new StatViewModel(definition, value, this.UpdatePending)
+                var stat = new StatViewModel(definition, value, this.UpdatePending)
                 {
                     IsEditingAllowed = this.IsStatEditingEnabled,
-                });
+                };
+                foreach (var usage in usagesByStat[definition.Id].OrderBy(u => u.TargetValue))
+                {
+                    stat.UsedBy.Add(usage);
+                }
+
+                this.Stats.Add(stat);
             }
         }
         finally

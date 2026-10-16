@@ -8,7 +8,7 @@ namespace SAM.App;
 /// <summary>
 /// Entry point. Without arguments the app opens the game library; with a numeric
 /// App ID (<c>SAM.exe 21690</c>) it opens the achievement manager for that game, and
-/// <c>SAM.exe 21690 --unlock-all</c> opens it with all achievements pre-selected.
+/// <c>SAM.exe 21690 --unlock-all</c> (or <c>--lock-all</c>) opens it with every achievement pre-set.
 /// Each game runs in its own process because Steam binds a client connection to
 /// one App ID for the lifetime of the process.
 /// </summary>
@@ -51,13 +51,13 @@ public partial class App : Application
             return;
         }
 
-        // "SAM.exe <appid> --unlock-all" opens the game with every achievement pre-selected
-        // for unlocking; the user still confirms before anything is committed.
-        var unlockAll = commandLine.Skip(2).Contains("--unlock-all", StringComparer.OrdinalIgnoreCase);
+        // "SAM.exe <appid> --unlock-all" / "--lock-all" open the game with every achievement
+        // pre-set; the user still confirms before anything is committed.
+        var flags = commandLine.Skip(2).ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         this.Show(appId == 0
             ? new LibraryWindow(Services)
-            : new GameWindow(Services, appId, unlockAll));
+            : new GameWindow(Services, appId, flags.Contains("--unlock-all"), flags.Contains("--lock-all")));
     }
 
     private void Show(Window window)
