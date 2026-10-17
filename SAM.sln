@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SAM.API", "SAM.API\SAM.API.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAM.App", "SAM.App\SAM.App.csproj", "{8B93D2B7-5951-4ABA-AC6E-488EA8CFD65B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAM.App.Tests", "SAM.App.Tests\SAM.App.Tests.csproj", "{7EAC42FE-458E-4FBB-A135-FAAFDA5E4145}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,10 @@ Global
 		{8B93D2B7-5951-4ABA-AC6E-488EA8CFD65B}.Debug|x64.Build.0 = Debug|x64
 		{8B93D2B7-5951-4ABA-AC6E-488EA8CFD65B}.Release|x64.ActiveCfg = Release|x64
 		{8B93D2B7-5951-4ABA-AC6E-488EA8CFD65B}.Release|x64.Build.0 = Release|x64
+		{7EAC42FE-458E-4FBB-A135-FAAFDA5E4145}.Debug|x64.ActiveCfg = Debug|x64
+		{7EAC42FE-458E-4FBB-A135-FAAFDA5E4145}.Debug|x64.Build.0 = Debug|x64
+		{7EAC42FE-458E-4FBB-A135-FAAFDA5E4145}.Release|x64.ActiveCfg = Release|x64
+		{7EAC42FE-458E-4FBB-A135-FAAFDA5E4145}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
