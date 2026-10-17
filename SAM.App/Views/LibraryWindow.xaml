@@ -51,6 +51,7 @@
             <RowDefinition Height="48" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -68,8 +69,48 @@
                 VerticalAlignment="Center" />
         </Grid>
 
+        <!-- Page switcher: the library and the pages next to it. -->
+        <SelectorBar
+            x:Name="PageSelector"
+            Grid.Row="1"
+            Margin="16,0,16,4"
+            MaxWidth="{StaticResource ContentMaxWidth}"
+            HorizontalAlignment="Stretch"
+            SelectionChanged="OnPageSelectionChanged">
+            <SelectorBarItem x:Name="LibraryPageItem" Text="Library" Tag="library" IsSelected="True">
+                <SelectorBarItem.Icon>
+                    <FontIcon Glyph="&#xE8F1;" />
+                </SelectorBarItem.Icon>
+            </SelectorBarItem>
+            <SelectorBarItem Text="Stats" Tag="stats">
+                <SelectorBarItem.Icon>
+                    <FontIcon Glyph="&#xE9D2;" />
+                </SelectorBarItem.Icon>
+            </SelectorBarItem>
+            <SelectorBarItem Text="Activity" Tag="activity">
+                <SelectorBarItem.Icon>
+                    <FontIcon Glyph="&#xE7C1;" />
+                </SelectorBarItem.Icon>
+            </SelectorBarItem>
+            <SelectorBarItem Text="History" Tag="history">
+                <SelectorBarItem.Icon>
+                    <FontIcon Glyph="&#xE81C;" />
+                </SelectorBarItem.Icon>
+            </SelectorBarItem>
+        </SelectorBar>
+
+        <!-- Non-library pages (Stats, Activity, History) replace the library rows below. -->
+        <ContentControl
+            x:Name="PageHost"
+            Grid.Row="2"
+            Grid.RowSpan="3"
+            HorizontalContentAlignment="Stretch"
+            VerticalContentAlignment="Stretch"
+            IsTabStop="False"
+            Visibility="Collapsed" />
+
         <!-- Header: search, actions, summary, sort and filters. -->
-        <Grid Grid.Row="1" Padding="24,4,24,8" RowSpacing="12" MaxWidth="{StaticResource ContentMaxWidth}">
+        <Grid x:Name="LibraryHeader" Grid.Row="2" Padding="24,4,24,8" RowSpacing="12" MaxWidth="{StaticResource ContentMaxWidth}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -271,7 +312,7 @@
         </Grid>
 
         <!-- Notices. -->
-        <StackPanel Grid.Row="2" Padding="24,0,24,0" Spacing="8" MaxWidth="{StaticResource ContentMaxWidth}">
+        <StackPanel x:Name="LibraryNotices" Grid.Row="3" Padding="24,0,24,0" Spacing="8" MaxWidth="{StaticResource ContentMaxWidth}">
             <ProgressBar
                 IsIndeterminate="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}"
                 Opacity="{x:Bind vm:LibraryFormat.OpacityIf(ViewModel.IsRefreshing), Mode=OneWay}"
@@ -310,7 +351,7 @@
         </StackPanel>
 
         <!-- Content. -->
-        <Grid Grid.Row="3" MaxWidth="{StaticResource ContentMaxWidth}" SizeChanged="OnContentSizeChanged">
+        <Grid x:Name="LibraryContent" Grid.Row="4" MaxWidth="{StaticResource ContentMaxWidth}" SizeChanged="OnContentSizeChanged">
             <!-- Loading: skeleton cards shaped like real ones. -->
             <GridView
                 x:Name="SkeletonGrid"

@@ -25,7 +25,32 @@ public sealed class AppServices
         this.Images = new ImageCache(this.Cache, http);
         this.Art = new GameArt(steam);
         this.Games = new GameListService(this.Cache, steam, http);
+
+        this.Backups = new BackupService(this.Cache);
+        this.History = new HistoryService(this.Cache);
+        this.Notes = new NotesStore(this.Cache);
+        this.Collections = new CollectionsService(steam, this.Cache);
+        this.Installed = new InstalledGamesService(steam);
+        this.Timeline = new TimelineService(steam, this.Schemas);
+        this.Updates = new UpdateService(http, settings);
+        this.Notifications = new NotificationService(settings);
     }
+
+    public BackupService Backups { get; }
+
+    public HistoryService History { get; }
+
+    public NotesStore Notes { get; }
+
+    public CollectionsService Collections { get; }
+
+    public InstalledGamesService Installed { get; }
+
+    public TimelineService Timeline { get; }
+
+    public UpdateService Updates { get; }
+
+    public NotificationService Notifications { get; }
 
     public SteamSession Steam { get; }
 

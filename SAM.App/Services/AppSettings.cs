@@ -54,6 +54,47 @@ public sealed class AppSettings
     /// </summary>
     public string Language { get; set; } = "en-US";
 
+    #region Library view
+    /// <summary>"Grid" (cards) or "List" (compact table).</summary>
+    public string LibraryViewMode { get; set; } = "Grid";
+
+    public bool InstalledOnly { get; set; }
+
+    /// <summary>Show games the user has hidden.</summary>
+    public bool ShowHidden { get; set; }
+
+    /// <summary>
+    /// Selected collection filter: null for all games, "steam:&lt;id&gt;" for a Steam collection,
+    /// "custom:&lt;id&gt;" for a SAM collection.
+    /// </summary>
+    public string? CollectionFilter { get; set; }
+
+    /// <summary>Selected smart list: null/"" for none, or one of "almost-perfect", "never-started", "rarest-owned".</summary>
+    public string? SmartList { get; set; }
+    #endregion
+
+    #region Game window
+    /// <summary>Blur hidden achievements' descriptions until clicked.</summary>
+    public bool SpoilerProtection { get; set; } = true;
+
+    /// <summary>Snapshot a game's achievements and stats before every commit.</summary>
+    public bool BackupBeforeCommit { get; set; } = true;
+    #endregion
+
+    #region App
+    /// <summary>Closing the library window hides it to the system tray instead of exiting.</summary>
+    public bool MinimizeToTray { get; set; }
+
+    /// <summary>Show Windows notifications (e.g. when a background task unlocks achievements).</summary>
+    public bool ShowNotifications { get; set; } = true;
+
+    /// <summary>Check GitHub for a newer release on startup.</summary>
+    public bool CheckForUpdates { get; set; } = true;
+
+    /// <summary>Release tag the user chose to skip, e.g. "v8.1.0".</summary>
+    public string? SkippedUpdateVersion { get; set; }
+    #endregion
+
     public static AppSettings Load() => JsonFile.Read<AppSettings>(FilePath) ?? new AppSettings();
 
     public void Save() => JsonFile.Write(FilePath, this);

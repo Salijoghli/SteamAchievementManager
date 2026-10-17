@@ -22,8 +22,11 @@ public sealed partial class LibraryWindow : Window
     private readonly DispatcherQueueTimer _searchDebounce;
     private bool _isSettingsOpen;
 
+    private readonly AppServices _services;
+
     public LibraryWindow(AppServices services)
     {
+        this._services = services;
         this.ViewModel = new LibraryViewModel(services);
         this.InitializeComponent();
 
@@ -263,6 +266,48 @@ public sealed partial class LibraryWindow : Window
         {
             card.OpenCommand.Execute(null);
         }
+    }
+    #endregion
+
+    #region Pages
+    private readonly Dictionary<string, UIElement> _pages = [];
+
+    /// <summary>Switches between the library and the Stats/Activity/History pages (created on first use).</summary>
+    private void OnPageSelectionChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
+    {
+        // The initially selected item raises this during InitializeComponent, before the
+        // elements declared after the SelectorBar exist; the library is shown by default anyway.
+        if (this.LibraryHeader == null || this.PageHost == null)
+        {
+            return;
+        }
+
+        var tag = sender.SelectedItem?.Tag as string ?? "library";
+        var isLibrary = tag == "library";
+
+        this.LibraryHeader.Visibility = isLibrary ? Visibility.Visible : Visibility.Collapsed;
+        this.LibraryNotices.Visibility = isLibrary ? Visibility.Visible : Visibility.Collapsed;
+        this.LibraryContent.Visibility = isLibrary ? Visibility.Visible : Visibility.Collapsed;
+        this.PageHost.Visibility = isLibrary ? Visibility.Collapsed : Visibility.Visible;
+
+        if (isLibrary)
+        {
+            this.PageHost.Content = null;
+            return;
+        }
+
+        if (this._pages.TryGetValue(tag, out var page) == false)
+        {
+            page = tag switch
+            {
+                "stats" => new Pages.StatsPage(this._services, this.ViewModel),
+                "activity" => new Pages.ActivityPage(this._services, this.ViewModel),
+                _ => new Pages.HistoryPage(this._services, this.ViewModel),
+            };
+            this._pages[tag] = page;
+        }
+
+        this.PageHost.Content = page;
     }
     #endregion
 
