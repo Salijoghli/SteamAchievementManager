@@ -1,7 +1,292 @@
 <UserControl
     x:Class="SAM.App.Views.Pages.ActivityPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- TODO(pages): placeholder. -->
-    <TextBlock Text="Activity" Margin="24" />
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:SAM.App.Controls"
+    xmlns:game="using:SAM.App.Views.Game"
+    xmlns:pages="using:SAM.App.ViewModels.Pages"
+    xmlns:vm="using:SAM.App.ViewModels">
+
+    <UserControl.Resources>
+        <CollectionViewSource x:Name="DaysSource" IsSourceGrouped="True" />
+
+        <Style x:Key="RowContainerStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="Margin" Value="0,0,0,2" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="MinHeight" Value="0" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid MaxWidth="2400" Padding="24,4,24,0" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Filters. -->
+        <Grid ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" MaxWidth="420" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <AutoSuggestBox
+                PlaceholderText="Filter by game or achievement"
+                QueryIcon="Find"
+                Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                AutomationProperties.Name="Filter by game or achievement" />
+            <ComboBox
+                Grid.Column="1"
+                MinWidth="140"
+                ItemsSource="{x:Bind ViewModel.RangeOptions}"
+                SelectedIndex="{x:Bind ViewModel.RangeIndex, Mode=TwoWay}"
+                AutomationProperties.Name="Date range" />
+            <TextBlock
+                Grid.Column="2"
+                Margin="8,0,0,0"
+                Text="{x:Bind ViewModel.CountText, Mode=OneWay}"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                VerticalAlignment="Center"
+                TextTrimming="CharacterEllipsis" />
+            <ProgressRing
+                Grid.Column="3"
+                Width="16"
+                Height="16"
+                IsActive="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}"
+                AutomationProperties.Name="Refreshing" />
+            <Button
+                Grid.Column="4"
+                Command="{x:Bind ViewModel.RefreshCommand}"
+                ToolTipService.ToolTip="Re-read your unlocks"
+                AutomationProperties.Name="Refresh activity">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <FontIcon Glyph="&#xE72C;" FontSize="14" />
+                    <TextBlock Text="Refresh" />
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- Loading skeleton. -->
+        <StackPanel
+            Grid.Row="1"
+            Spacing="2"
+            Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
+            AutomationProperties.Name="Loading activity">
+            <controls:Skeleton Width="120" Height="16" Margin="12,8,0,10" HorizontalAlignment="Left" />
+            <Grid Padding="12,6" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <controls:Skeleton Width="40" Height="40" />
+                <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                    <controls:Skeleton Width="220" Height="14" HorizontalAlignment="Left" />
+                    <controls:Skeleton Width="360" Height="12" HorizontalAlignment="Left" />
+                </StackPanel>
+            </Grid>
+            <Grid Padding="12,6" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <controls:Skeleton Width="40" Height="40" />
+                <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                    <controls:Skeleton Width="180" Height="14" HorizontalAlignment="Left" />
+                    <controls:Skeleton Width="300" Height="12" HorizontalAlignment="Left" />
+                </StackPanel>
+            </Grid>
+            <Grid Padding="12,6" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <controls:Skeleton Width="40" Height="40" />
+                <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                    <controls:Skeleton Width="250" Height="14" HorizontalAlignment="Left" />
+                    <controls:Skeleton Width="340" Height="12" HorizontalAlignment="Left" />
+                </StackPanel>
+            </Grid>
+            <controls:Skeleton Width="100" Height="16" Margin="12,18,0,10" HorizontalAlignment="Left" />
+            <Grid Padding="12,6" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <controls:Skeleton Width="40" Height="40" />
+                <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                    <controls:Skeleton Width="200" Height="14" HorizontalAlignment="Left" />
+                    <controls:Skeleton Width="280" Height="12" HorizontalAlignment="Left" />
+                </StackPanel>
+            </Grid>
+            <Grid Padding="12,6" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <controls:Skeleton Width="40" Height="40" />
+                <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                    <controls:Skeleton Width="160" Height="14" HorizontalAlignment="Left" />
+                    <controls:Skeleton Width="320" Height="12" HorizontalAlignment="Left" />
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+
+        <!-- The feed. -->
+        <ListView
+            x:Name="Feed"
+            Grid.Row="1"
+            Margin="-12,0,-12,0"
+            Padding="0,0,0,24"
+            SelectionMode="None"
+            ItemContainerStyle="{StaticResource RowContainerStyle}"
+            ContainerContentChanging="OnContainerContentChanging"
+            Visibility="{x:Bind ViewModel.IsListVisible, Mode=OneWay}"
+            AutomationProperties.Name="Recent unlocks">
+            <ListView.GroupStyle>
+                <GroupStyle HidesIfEmpty="True">
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate x:DataType="pages:ActivityDayGroup">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="{x:Bind Title}" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                <TextBlock
+                                    Text="{x:Bind CountText}"
+                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                    VerticalAlignment="Bottom"
+                                    Style="{StaticResource CaptionTextBlockStyle}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </ListView.GroupStyle>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="pages:UnlockItemViewModel">
+                    <Grid
+                        ColumnSpacing="12"
+                        AutomationProperties.Name="{x:Bind Name}"
+                        AutomationProperties.HelpText="{x:Bind GameName}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border
+                            Width="40"
+                            Height="40"
+                            CornerRadius="4"
+                            VerticalAlignment="Top"
+                            Margin="0,2,0,0"
+                            Background="{ThemeResource SubtleFillColorSecondaryBrush}">
+                            <Grid>
+                                <FontIcon
+                                    Glyph="&#xE734;"
+                                    FontSize="16"
+                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                    Visibility="{x:Bind IsIconMissing, Mode=OneWay}" />
+                                <Image Source="{x:Bind IconSource, Mode=OneWay}" Stretch="UniformToFill" />
+                            </Grid>
+                        </Border>
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="{x:Bind Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                            <TextBlock
+                                Text="{x:Bind Description}"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                TextTrimming="CharacterEllipsis"
+                                ToolTipService.ToolTip="{x:Bind Description}"
+                                Visibility="{x:Bind HasDescription}" />
+                            <HyperlinkButton
+                                Padding="0"
+                                Margin="0,2,0,0"
+                                FontSize="12"
+                                HorizontalAlignment="Left"
+                                Command="{x:Bind OpenGameCommand}"
+                                ToolTipService.ToolTip="{x:Bind OpenGameLabel}"
+                                AutomationProperties.Name="{x:Bind OpenGameLabel}">
+                                <TextBlock Text="{x:Bind GameName}" TextTrimming="CharacterEllipsis" />
+                            </HyperlinkButton>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="4">
+                            <Border
+                                Padding="6,1,6,2"
+                                CornerRadius="8"
+                                HorizontalAlignment="Right"
+                                Background="{x:Bind game:GameFormat.RarityBrush(Rarity), Mode=OneWay}"
+                                Visibility="{x:Bind HasRarity, Mode=OneWay}"
+                                ToolTipService.ToolTip="{x:Bind RarityToolTip, Mode=OneWay}"
+                                AutomationProperties.Name="{x:Bind RarityToolTip, Mode=OneWay}">
+                                <TextBlock FontSize="11" FontWeight="SemiBold" Foreground="White">
+                                    <Run Text="{x:Bind RarityTierText, Mode=OneWay}" />
+                                    <Run Text="·" />
+                                    <Run Text="{x:Bind RarityText, Mode=OneWay}" />
+                                </TextBlock>
+                            </Border>
+                            <TextBlock
+                                Text="{x:Bind TimeText}"
+                                HorizontalAlignment="Right"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                ToolTipService.ToolTip="{x:Bind DateTimeText}" />
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <!-- Couldn't read the timeline. -->
+        <StackPanel
+            Grid.Row="1"
+            Margin="0,64,0,0"
+            HorizontalAlignment="Center"
+            Spacing="12"
+            Visibility="{x:Bind ViewModel.HasError, Mode=OneWay}">
+            <FontIcon Glyph="&#xE783;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+            <TextBlock Text="Couldn't load your activity" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock
+                Text="{x:Bind ViewModel.Error, Mode=OneWay}"
+                TextWrapping="Wrap"
+                MaxWidth="420"
+                TextAlignment="Center"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <Button Content="Try again" HorizontalAlignment="Center" Command="{x:Bind ViewModel.RefreshCommand}" />
+        </StackPanel>
+
+        <!-- No unlocks at all. -->
+        <StackPanel
+            Grid.Row="1"
+            Margin="0,64,0,0"
+            HorizontalAlignment="Center"
+            Spacing="12"
+            Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay}">
+            <FontIcon Glyph="&#xE81C;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+            <TextBlock Text="No unlocks yet" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock
+                Text="Achievements you unlock show up here, newest first. Steam keeps unlock times for games you've played on this PC."
+                TextWrapping="Wrap"
+                MaxWidth="420"
+                TextAlignment="Center"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        </StackPanel>
+
+        <!-- Filters hide everything. -->
+        <StackPanel
+            Grid.Row="1"
+            Margin="0,64,0,0"
+            HorizontalAlignment="Center"
+            Spacing="12"
+            Visibility="{x:Bind ViewModel.IsNoMatches, Mode=OneWay}">
+            <FontIcon Glyph="&#xE721;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+            <TextBlock Text="No unlocks match" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock
+                Text="Try a different search or a longer date range."
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                HorizontalAlignment="Center" />
+            <Button
+                Content="Clear filters"
+                HorizontalAlignment="Center"
+                Style="{StaticResource AccentButtonStyle}"
+                Command="{x:Bind ViewModel.ClearFiltersCommand}" />
+        </StackPanel>
+    </Grid>
 </UserControl>
