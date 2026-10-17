@@ -1,0 +1,48 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build
+        run: dotnet build SAM.sln -c Release -p:Platform=x64 -v:minimal -nologo
+
+      - name: Test
+        if: hashFiles('SAM.App.Tests/SAM.App.Tests.csproj') != ''
+        run: dotnet test SAM.App.Tests -c Release -p:Platform=x64 --no-build -v:minimal -nologo
+
+      - name: Package
+        id: package
+        shell: pwsh
+        run: |
+          $tag = '${{ github.ref_name }}'
+          $zip = "SteamAchievementManager-$tag.zip"
+          $staging = Join-Path $env:RUNNER_TEMP 'release'
+          New-Item -ItemType Directory -Force $staging | Out-Null
+          Copy-Item -Path upload\* -Destination $staging -Recurse -Exclude *.pdb
+          Get-ChildItem $staging -Recurse -Filter *.pdb | Remove-Item -Force
+          Copy-Item LICENSE.txt, README.md $staging
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          # ZipFile (not Compress-Archive) so entry paths use '/' and extract correctly everywhere.
+          [IO.Compression.ZipFile]::CreateFromDirectory($staging, (Join-Path $PWD $zip), 'Optimal', $false)
+          "zip=$zip" >> $env:GITHUB_OUTPUT
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.package.outputs.zip }}
+          generate_release_notes: true
