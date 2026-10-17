@@ -286,6 +286,44 @@ public sealed partial class GameViewModel : ObservableObject
     }
     #endregion
 
+    #region Autopilot warning
+    private bool _autopilotCheckFailed;
+    private bool _wasRunningUnderAutopilot;
+
+    /// <summary>True while an Autopilot worker holds this game (commits here may conflict with it).</summary>
+    [ObservableProperty]
+    private bool _isAutopilotWarningOpen;
+
+    /// <summary>
+    /// Re-checks whether Autopilot is running this game: opens the warning when it starts doing
+    /// so (a dismissed warning stays closed until then) and closes it when it stops. Never throws.
+    /// </summary>
+    public void CheckAutopilot()
+    {
+        bool running;
+        try
+        {
+            running = Services.Autopilot.AutopilotEngine.IsGameRunningUnderAutopilot(this.AppId);
+        }
+        catch (Exception e)
+        {
+            if (this._autopilotCheckFailed == false)
+            {
+                this._autopilotCheckFailed = true;
+                Diagnostics.Log($"Couldn't check whether Autopilot is running app {this.AppId}", e);
+            }
+
+            running = false;
+        }
+
+        if (running != this._wasRunningUnderAutopilot)
+        {
+            this._wasRunningUnderAutopilot = running;
+            this.IsAutopilotWarningOpen = running;
+        }
+    }
+    #endregion
+
     #region Collections
     /// <summary>The filtered, sorted achievements shown in the list.</summary>
     public BulkObservableCollection<AchievementViewModel> VisibleAchievements { get; } = [];
