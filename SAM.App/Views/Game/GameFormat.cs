@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using SAM.App.ViewModels;
 
@@ -19,6 +20,32 @@ public static class GameFormat
 
     public static string ProtectedTooltip(bool isProtected) =>
         isProtected ? "Protected — only the game's servers can change this" : "Locked or unlocked state to commit";
+
+    /// <summary>
+    /// A flyout presenter style that follows <paramref name="theme"/>: flyouts open in a popup,
+    /// so they don't inherit the window root's (or a dialog's) requested theme.
+    /// </summary>
+    public static Style ThemedFlyoutPresenterStyle(ElementTheme theme) =>
+        ThemedStyle(typeof(FlyoutPresenter), "DefaultFlyoutPresenterStyle", theme);
+
+    /// <summary>Like <see cref="ThemedFlyoutPresenterStyle"/>, for a MenuFlyout.</summary>
+    public static Style ThemedMenuFlyoutPresenterStyle(ElementTheme theme) =>
+        ThemedStyle(typeof(MenuFlyoutPresenter), "DefaultMenuFlyoutPresenterStyle", theme);
+
+    private static Style ThemedStyle(Type targetType, string basedOnKey, ElementTheme theme)
+    {
+        var style = new Style(targetType);
+        if (Application.Current.Resources.TryGetValue(basedOnKey, out var basedOn) && basedOn is Style b)
+        {
+            style.BasedOn = b;
+        }
+
+        style.Setters.Add(new Setter(FrameworkElement.RequestedThemeProperty, theme));
+        return style;
+    }
+
+    /// <summary>True when the window's state can be changed (loaded and not loading or storing).</summary>
+    public static bool IsIdle(bool isLoaded, bool isBusy) => isLoaded && isBusy == false;
 
     /// <summary>The App.xaml rarity tier brush.</summary>
     public static Brush RarityBrush(AchievementRarity rarity)

@@ -245,6 +245,15 @@
                         Click="OnReloadClick"
                         IsEnabled="{x:Bind game:GameFormat.Not(ViewModel.IsBusy), Mode=OneWay}"
                         ToolTipService.ToolTip="Reload from Steam (F5)" />
+                    <AppBarButton
+                        Label="Backups"
+                        Click="OnBackupsClick"
+                        IsEnabled="{x:Bind game:GameFormat.IsIdle(ViewModel.IsLoaded, ViewModel.IsBusy), Mode=OneWay}"
+                        ToolTipService.ToolTip="Create, restore and delete backups of this game's achievements and stats">
+                        <AppBarButton.Icon>
+                            <FontIcon Glyph="&#xE78C;" />
+                        </AppBarButton.Icon>
+                    </AppBarButton>
                     <AppBarSeparator />
                     <AppBarElementContainer VerticalAlignment="Center">
                         <Button
@@ -259,6 +268,24 @@
                         </Button>
                     </AppBarElementContainer>
                     <CommandBar.SecondaryCommands>
+                        <AppBarToggleButton
+                            Label="Spoiler protection"
+                            IsChecked="{x:Bind ViewModel.IsSpoilerProtectionOn, Mode=OneWay}"
+                            Click="OnSpoilerProtectionClick"
+                            ToolTipService.ToolTip="Mask hidden achievements' descriptions until you click them">
+                            <AppBarToggleButton.Icon>
+                                <FontIcon Glyph="&#xED1A;" />
+                            </AppBarToggleButton.Icon>
+                        </AppBarToggleButton>
+                        <AppBarButton
+                            Label="Reveal all hidden"
+                            Command="{x:Bind ViewModel.RevealAllHiddenCommand}"
+                            ToolTipService.ToolTip="Show every hidden achievement's description">
+                            <AppBarButton.Icon>
+                                <FontIcon Glyph="&#xE7B3;" />
+                            </AppBarButton.Icon>
+                        </AppBarButton>
+                        <AppBarSeparator />
                         <AppBarButton
                             Label="Reset all stats…"
                             Click="OnResetAllStats"
@@ -337,6 +364,7 @@
                             <ComboBoxItem Content="Locked" />
                             <ComboBoxItem Content="Unlocked" />
                             <ComboBoxItem Content="Pending changes" />
+                            <ComboBoxItem Content="Has notes" />
                         </ComboBox>
                         <ComboBox
                             Grid.Column="2"
@@ -422,6 +450,7 @@
                         ItemsSource="{x:Bind ViewModel.VisibleAchievements}"
                         SelectionMode="None"
                         ContainerContentChanging="OnAchievementContainerContentChanging"
+                        ContextRequested="OnAchievementContextRequested"
                         AutomationProperties.Name="Achievements">
                         <ListView.ItemContainerTransitions>
                             <TransitionCollection>
@@ -439,12 +468,19 @@
                         </ListView.ItemContainerStyle>
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="vm:AchievementViewModel">
-                                <Border Style="{StaticResource CardStyle}" Padding="0,10,14,10">
+                                <!-- Right-click / Shift+F10 opens the row menu (guides, note); see OnAchievementContextRequested. -->
+                                <Border
+                                    Style="{StaticResource CardStyle}"
+                                    Padding="0,10,14,10"
+                                    PointerEntered="OnRowPointerEntered"
+                                    PointerExited="OnRowPointerExited"
+                                    PointerCanceled="OnRowPointerExited">
                                     <Grid ColumnSpacing="14">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="4" />
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
@@ -506,9 +542,41 @@
                                                 Style="{StaticResource BodyTextBlockStyle}"
                                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                                 TextWrapping="Wrap"
+                                                Visibility="{x:Bind game:GameFormat.Collapsed(IsSpoilerMasked), Mode=OneWay}"
                                                 PointerEntered="OnDescriptionPointerEntered"
                                                 PointerExited="OnDescriptionPointerExited"
                                                 Tapped="OnDescriptionTapped" />
+                                            <!-- Spoiler mask: WinUI can't blur text, so the description isn't
+                                                 rendered at all (nothing leaks to screen readers or selection);
+                                                 a frosted acrylic pill stands in until it's clicked. -->
+                                            <Border
+                                                HorizontalAlignment="Left"
+                                                Padding="10,3"
+                                                CornerRadius="4"
+                                                Background="{ThemeResource AcrylicInAppFillColorDefaultBrush}"
+                                                BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
+                                                BorderThickness="1"
+                                                Visibility="{x:Bind IsSpoilerMasked, Mode=OneWay}"
+                                                ToolTipService.ToolTip="Click to reveal the description"
+                                                AutomationProperties.Name="Hidden achievement description, click to reveal"
+                                                Tapped="OnDescriptionTapped">
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <FontIcon Glyph="&#xED1A;" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                    <TextBlock
+                                                        Text="{x:Bind DisplayDescription, Mode=OneWay}"
+                                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                </StackPanel>
+                                            </Border>
+                                            <StackPanel Orientation="Horizontal" Spacing="6" Visibility="{x:Bind HasNote, Mode=OneWay}">
+                                                <FontIcon Glyph="&#xE70B;" FontSize="12" Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                                                <TextBlock
+                                                    Text="{x:Bind NotePreview, Mode=OneWay}"
+                                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    TextTrimming="CharacterEllipsis"
+                                                    MaxLines="1" />
+                                            </StackPanel>
                                             <TextBlock
                                                 Text="{x:Bind UnlockTimeText}"
                                                 Style="{StaticResource CaptionTextBlockStyle}"
@@ -516,8 +584,46 @@
                                                 Visibility="{x:Bind HasUnlockTimeText}" />
                                         </StackPanel>
 
+                                        <!-- Row actions: guides (on hover) and the note button (on hover, or
+                                             filled when there's a note). The row menu offers both by keyboard. -->
+                                        <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                            <Button
+                                                Style="{StaticResource SubtleButtonStyle}"
+                                                Padding="6"
+                                                IsTabStop="False"
+                                                Opacity="{x:Bind ActionOpacity, Mode=OneWay}"
+                                                Click="OnGuideButtonClick"
+                                                ToolTipService.ToolTip="Find a guide"
+                                                AutomationProperties.Name="Find a guide">
+                                                <FontIcon Glyph="&#xE721;" FontSize="14" />
+                                            </Button>
+                                            <Grid>
+                                                <Button
+                                                    Style="{StaticResource SubtleButtonStyle}"
+                                                    Padding="6"
+                                                    IsTabStop="False"
+                                                    Opacity="{x:Bind ActionOpacity, Mode=OneWay}"
+                                                    Visibility="{x:Bind HasNoNote, Mode=OneWay}"
+                                                    Click="OnNoteButtonClick"
+                                                    ToolTipService.ToolTip="Add a note"
+                                                    AutomationProperties.Name="Add a note">
+                                                    <FontIcon Glyph="&#xE70B;" FontSize="14" />
+                                                </Button>
+                                                <Button
+                                                    Style="{StaticResource AccentButtonStyle}"
+                                                    Padding="6"
+                                                    IsTabStop="False"
+                                                    Visibility="{x:Bind HasNote, Mode=OneWay}"
+                                                    Click="OnNoteButtonClick"
+                                                    ToolTipService.ToolTip="Edit note"
+                                                    AutomationProperties.Name="Edit note">
+                                                    <FontIcon Glyph="&#xE70B;" FontSize="14" />
+                                                </Button>
+                                            </Grid>
+                                        </StackPanel>
+
                                         <!-- Rarity. -->
-                                        <Grid Grid.Column="3" MinWidth="110" VerticalAlignment="Center">
+                                        <Grid Grid.Column="4" MinWidth="110" VerticalAlignment="Center">
                                             <StackPanel
                                                 Spacing="6"
                                                 HorizontalAlignment="Right"
@@ -546,7 +652,7 @@
 
                                         <!-- The tooltip sits on a wrapper because disabled controls don't show one. -->
                                         <Border
-                                            Grid.Column="4"
+                                            Grid.Column="5"
                                             Background="Transparent"
                                             VerticalAlignment="Center"
                                             ToolTipService.ToolTip="{x:Bind game:GameFormat.ProtectedTooltip(IsProtected)}">

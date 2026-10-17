@@ -1,22 +1,31 @@
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using Microsoft.UI;
+using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using SAM.App.Models;
 using SAM.App.Services;
 using SAM.App.ViewModels;
+using SAM.App.Views.Game;
 using Windows.Globalization.NumberFormatting;
 using Windows.Graphics;
 using Windows.System;
+using Windows.UI.Core;
 
 namespace SAM.App.Views;
 
 /// <summary>Achievement and stat manager for one game.</summary>
 public sealed partial class GameWindow : Window, ILaunchPresetTarget
 {
+    private readonly AppServices _services;
+
     /// <summary>A launch pre-set waiting for the next successful load: true = unlock all, false = lock all.</summary>
     private bool? _queuedPreset;
     private bool _loadStarted;
@@ -32,6 +41,7 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
     /// </param>
     public GameWindow(AppServices services, uint appId, bool unlockAllOnOpen = false, bool lockAllOnOpen = false)
     {
+        this._services = services;
         this.ViewModel = new GameViewModel(services, appId);
         this._queuedPreset = ToPreset(unlockAllOnOpen, lockAllOnOpen);
 
@@ -233,6 +243,200 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
 
     private void OnSearchTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args) =>
         this.ViewModel.SearchText = sender.Text;
+
+    private void OnRowPointerEntered(object sender, PointerRoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is AchievementViewModel achievement)
+        {
+            achievement.IsRowHovered = true;
+        }
+    }
+
+    private void OnRowPointerExited(object sender, PointerRoutedEventArgs e)
+    {
+        if ((sender as FrameworkElement)?.DataContext is AchievementViewModel achievement)
+        {
+            achievement.IsRowHovered = false;
+        }
+    }
+
+    private void OnSpoilerProtectionClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is AppBarToggleButton toggle)
+        {
+            this.ViewModel.IsSpoilerProtectionOn = toggle.IsChecked == true;
+        }
+    }
+
+    /// <summary>Right-click or Shift+F10 / the context menu key on a row: guides and note.</summary>
+    private void OnAchievementContextRequested(UIElement sender, ContextRequestedEventArgs args)
+    {
+        // Find the row the request came from (a ListViewItem when it came from the keyboard).
+        AchievementViewModel? achievement = null;
+        FrameworkElement? target = null;
+        for (var element = args.OriginalSource as DependencyObject; element != null && element != sender;
+             element = VisualTreeHelper.GetParent(element))
+        {
+            if (element is ListViewItem { Content: AchievementViewModel item } container)
+            {
+                achievement = item;
+                target = container;
+                break;
+            }
+        }
+
+        if (achievement == null || target == null)
+        {
+            return;
+        }
+
+        var menu = this.CreateAchievementMenu(achievement, includeNote: true);
+        if (args.TryGetPosition(target, out var point))
+        {
+            menu.ShowAt(target, new FlyoutShowOptions { Position = point });
+        }
+        else
+        {
+            menu.ShowAt(target);
+        }
+
+        args.Handled = true;
+    }
+
+    private void OnGuideButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: AchievementViewModel achievement } button)
+        {
+            this.CreateAchievementMenu(achievement, includeNote: false).ShowAt(button);
+        }
+    }
+
+    private MenuFlyout CreateAchievementMenu(AchievementViewModel achievement, bool includeNote)
+    {
+        var menu = new MenuFlyout
+        {
+            MenuFlyoutPresenterStyle = GameFormat.ThemedMenuFlyoutPresenterStyle(this.Root.ActualTheme),
+        };
+        var steamGuide = new MenuFlyoutItem { Text = "Find a guide on Steam", Icon = new FontIcon { Glyph = "" } };
+        steamGuide.Click += (_, _) => this.OpenUrl(this.ViewModel.GetSteamGuideUrl(achievement));
+        var webSearch = new MenuFlyoutItem { Text = "Search the web", Icon = new FontIcon { Glyph = "" } };
+        webSearch.Click += (_, _) => this.OpenUrl(this.ViewModel.GetWebSearchUrl(achievement));
+        menu.Items.Add(steamGuide);
+        menu.Items.Add(webSearch);
+
+        if (includeNote)
+        {
+            menu.Items.Add(new MenuFlyoutSeparator());
+            var note = new MenuFlyoutItem
+            {
+                Text = achievement.HasNote ? "Edit note…" : "Add note…",
+                Icon = new FontIcon { Glyph = "" },
+            };
+            note.Click += (_, _) =>
+            {
+                if (this.AchievementList.ContainerFromItem(achievement) is FrameworkElement container)
+                {
+                    this.ShowNoteFlyout(container, achievement);
+                }
+            };
+            menu.Items.Add(note);
+
+            if (achievement.IsHidden)
+            {
+                var reveal = new MenuFlyoutItem
+                {
+                    Text = achievement.IsRevealed ? "Hide description" : "Reveal description",
+                    Icon = new FontIcon { Glyph = "" },
+                };
+                reveal.Click += (_, _) => achievement.IsRevealed = !achievement.IsRevealed;
+                menu.Items.Add(reveal);
+            }
+        }
+
+        return menu;
+    }
+
+    private async void OpenUrl(string url)
+    {
+        try
+        {
+            if (await Launcher.LaunchUriAsync(new Uri(url)) == false)
+            {
+                this.ViewModel.ShowStatus(new GameOperationResult(false, "Couldn't open the browser", url));
+            }
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log($"Couldn't open {url}", e);
+            this.ViewModel.ShowStatus(new GameOperationResult(false, "Couldn't open the browser", e.Message));
+        }
+    }
+    #endregion
+
+    #region Notes
+    private void OnNoteButtonClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { DataContext: AchievementViewModel achievement } button)
+        {
+            this.ShowNoteFlyout(button, achievement);
+        }
+    }
+
+    /// <summary>
+    /// Opens the note editor for <paramref name="achievement"/>. The note is saved when the
+    /// flyout closes (Ctrl+Enter saves and closes); an empty note is deleted.
+    /// </summary>
+    private void ShowNoteFlyout(FrameworkElement target, AchievementViewModel achievement)
+    {
+        var box = new TextBox
+        {
+            Header = achievement.Name,
+            Text = achievement.Note ?? "",
+            PlaceholderText = "Tips, requirements, reminders…",
+            AcceptsReturn = true,
+            TextWrapping = TextWrapping.Wrap,
+            Width = 340,
+            MinHeight = 120,
+            MaxHeight = 260,
+        };
+        ScrollViewer.SetVerticalScrollBarVisibility(box, ScrollBarVisibility.Auto);
+        AutomationProperties.SetName(box, $"Note for {achievement.Name}");
+
+        var panel = new StackPanel { Spacing = 8 };
+        panel.Children.Add(box);
+        panel.Children.Add(new TextBlock
+        {
+            Text = "Saved when closed · Ctrl+Enter to save and close · clear the text to delete the note",
+            Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"],
+            Opacity = 0.7,
+            TextWrapping = TextWrapping.Wrap,
+            MaxWidth = 340,
+        });
+
+        var flyout = new Flyout
+        {
+            Content = panel,
+            Placement = FlyoutPlacementMode.BottomEdgeAlignedRight,
+            FlyoutPresenterStyle = GameFormat.ThemedFlyoutPresenterStyle(this.Root.ActualTheme),
+        };
+
+        box.PreviewKeyDown += (_, e) =>
+        {
+            if (e.Key == VirtualKey.Enter &&
+                InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control).HasFlag(CoreVirtualKeyStates.Down))
+            {
+                e.Handled = true;
+                flyout.Hide();
+            }
+        };
+        flyout.Opened += (_, _) =>
+        {
+            box.Focus(FocusState.Programmatic);
+            box.Select(box.Text.Length, 0);
+        };
+        flyout.Closed += (_, _) => this.ViewModel.SetNote(achievement, box.Text);
+        flyout.ShowAt(target);
+    }
     #endregion
 
     #region Keyboard accelerators
@@ -301,15 +505,8 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
         bool destructive = false,
         ContentDialogButton defaultButton = ContentDialogButton.Primary)
     {
-        if (this._dialogOpen || this.Content.XamlRoot == null)
-        {
-            return ContentDialogResult.None;
-        }
-
         var dialog = new ContentDialog
         {
-            XamlRoot = this.Content.XamlRoot,
-            RequestedTheme = this.Root.ActualTheme,
             Title = title,
             Content = content is string text ? new TextBlock { Text = text, TextWrapping = TextWrapping.Wrap } : content,
             PrimaryButtonText = primaryText,
@@ -339,6 +536,19 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
             dialog.Resources["AccentButtonForegroundPressed"] = white;
         }
 
+        return await this.ShowDialogAsync(dialog);
+    }
+
+    /// <summary>Shows <paramref name="dialog"/> in this window's theme; returns None if another dialog is open.</summary>
+    private async Task<ContentDialogResult> ShowDialogAsync(ContentDialog dialog)
+    {
+        if (this._dialogOpen || this.Content.XamlRoot == null)
+        {
+            return ContentDialogResult.None;
+        }
+
+        dialog.XamlRoot = this.Content.XamlRoot;
+        dialog.RequestedTheme = this.Root.ActualTheme;
         this._dialogOpen = true;
         try
         {
@@ -424,9 +634,129 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
 
         if (await this.ShowDialogAsync("Commit changes?", content, "Commit") == ContentDialogResult.Primary)
         {
-            await this.ViewModel.StoreAsync();
+            await this.ViewModel.StoreAsync(CommitSource.Manual, this.ConfirmCommitWithoutBackupAsync);
         }
     }
+
+    /// <summary>Asked when the automatic backup before a commit fails. True = commit anyway.</summary>
+    private async Task<bool> ConfirmCommitWithoutBackupAsync(string reason) =>
+        await this.ShowDialogAsync(
+            "Couldn't create a backup",
+            $"Couldn't create a backup ({reason}). Commit anyway?",
+            "Commit anyway",
+            closeText: "Cancel",
+            defaultButton: ContentDialogButton.Close) == ContentDialogResult.Primary;
+    #endregion
+
+    #region Backups
+    private async void OnBackupsClick(object sender, RoutedEventArgs e)
+    {
+        this.CommitFocusedNumberBox();
+        if (GameFormat.IsIdle(this.ViewModel.IsLoaded, this.ViewModel.IsBusy) == false)
+        {
+            return;
+        }
+
+        var dialog = new BackupsDialog(new GameBackupsViewModel(this._services, this.ViewModel));
+        await this.ShowDialogAsync(dialog);
+
+        // Only one ContentDialog can be open at a time, so the restore runs after it closed.
+        if (dialog.RestoreRequested is { } snapshot)
+        {
+            await this.RestoreAsync(snapshot);
+        }
+    }
+
+    /// <summary>
+    /// Stages <paramref name="snapshot"/> as pending changes and asks before committing it
+    /// (with a "Before restore" backup and history source Restore). Cancelling drops the
+    /// staged changes again.
+    /// </summary>
+    private async Task RestoreAsync(GameSnapshot snapshot)
+    {
+        if (GameFormat.IsIdle(this.ViewModel.IsLoaded, this.ViewModel.IsBusy) == false)
+        {
+            return;
+        }
+
+        if (this.ViewModel.HasUnsavedChanges &&
+            await this.ShowDialogAsync(
+                "Discard pending changes?",
+                "Restoring a backup replaces your pending changes.",
+                "Discard and continue",
+                closeText: "Cancel") != ContentDialogResult.Primary)
+        {
+            return;
+        }
+
+        var notRestorable = this.ViewModel.StageRestore(snapshot);
+        var when = snapshot.CreatedAt.ToLocalTime().ToString("d MMM yyyy, HH:mm", CultureInfo.CurrentCulture);
+
+        var content = new StackPanel { Spacing = 8 };
+        if (this.ViewModel.CanCommit())
+        {
+            content.Children.Add(new TextBlock
+            {
+                Text = this.ViewModel.GetCommitSummary(),
+                TextWrapping = TextWrapping.Wrap,
+                Style = (Style)Application.Current.Resources["BodyStrongTextBlockStyle"],
+            });
+            content.Children.Add(new TextBlock
+            {
+                Text = $"This restores the backup from {when}. Unlock dates can't be restored: Steam sets the " +
+                    "date of every achievement unlocked now to the current time. The changes are written to " +
+                    "your Steam account right away, after a \"Before restore\" backup of the current state.",
+                TextWrapping = TextWrapping.Wrap,
+            });
+        }
+        else
+        {
+            content.Children.Add(new TextBlock
+            {
+                Text = $"Nothing to restore: everything that can be changed already matches the backup from {when}.",
+                TextWrapping = TextWrapping.Wrap,
+            });
+        }
+
+        if (notRestorable.Count > 0)
+        {
+            content.Children.Add(new TextBlock
+            {
+                Text = "Can't be restored:",
+                Style = (Style)Application.Current.Resources["BodyStrongTextBlockStyle"],
+                Margin = new Thickness(0, 4, 0, 0),
+            });
+            content.Children.Add(new ScrollViewer
+            {
+                MaxHeight = 160,
+                Content = new TextBlock
+                {
+                    Text = string.Join(Environment.NewLine, notRestorable.Select(line => "• " + line)),
+                    TextWrapping = TextWrapping.Wrap,
+                    Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"],
+                },
+            });
+        }
+
+        if (this.ViewModel.CanCommit() == false)
+        {
+            this.ViewModel.DiscardChanges();
+            await this.ShowDialogAsync("Restore backup", content, "OK", closeText: "");
+            return;
+        }
+
+        if (await this.ShowDialogAsync("Restore backup?", content, "Restore") == ContentDialogResult.Primary)
+        {
+            await this.ViewModel.StoreAsync(CommitSource.Restore, this.ConfirmCommitWithoutBackupAsync);
+        }
+        else
+        {
+            this.ViewModel.DiscardChanges();
+        }
+    }
+    #endregion
+
+    #region Reset and close
 
     private async void OnResetAllStats(object sender, RoutedEventArgs e)
     {

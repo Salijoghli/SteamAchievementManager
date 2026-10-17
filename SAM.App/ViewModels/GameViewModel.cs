@@ -21,6 +21,7 @@ public enum AchievementStateFilter
     Locked,
     Unlocked,
     Pending,
+    HasNotes,
 }
 
 /// <summary>Index order of the unlock date filter ComboBox.</summary>
@@ -84,6 +85,7 @@ public sealed partial class GameViewModel : ObservableObject
         }
 
         this.GameName = string.IsNullOrWhiteSpace(name) ? $"App {appId}" : name;
+        this._isSpoilerProtectionOn = services.Settings.SpoilerProtection;
     }
 
     public uint AppId { get; }
@@ -429,6 +431,7 @@ public sealed partial class GameViewModel : ObservableObject
                 AchievementStateFilter.Locked => a.IsAchieved == false,
                 AchievementStateFilter.Unlocked => a.IsAchieved,
                 AchievementStateFilter.Pending => a.IsPending,
+                AchievementStateFilter.HasNotes => a.HasNote,
                 _ => true,
             } &&
             (dateRange == null || (a.IsAchieved && dateRange.Value.Contains(a.UnlockTime))) &&
@@ -602,6 +605,7 @@ public sealed partial class GameViewModel : ObservableObject
     private void Populate(GameSchema schema)
     {
         var steam = this._services.Steam;
+        var notes = this.LoadNotes();
         this._suspendPendingUpdates = true;
         try
         {
@@ -619,6 +623,8 @@ public sealed partial class GameViewModel : ObservableObject
                 var vm = new AchievementViewModel(
                     definition, index++, achieved, unlockTime, this.AppId, this._services.Images, this.OnAchievementChanged);
                 this.ApplyPercent(vm);
+                vm.IsSpoilerProtectionOn = this.IsSpoilerProtectionOn;
+                vm.Note = notes.GetValueOrDefault(definition.Id);
                 this._achievements.Add(vm);
             }
 
@@ -881,6 +887,276 @@ public sealed partial class GameViewModel : ObservableObject
     }
     #endregion
 
+    #region Spoiler protection
+    /// <summary>
+    /// Mirrors <see cref="AppSettings.SpoilerProtection"/>: hidden achievements' descriptions
+    /// stay masked until clicked. Changing it updates every row and saves the setting.
+    /// </summary>
+    [ObservableProperty]
+    private bool _isSpoilerProtectionOn;
+
+    partial void OnIsSpoilerProtectionOnChanged(bool value)
+    {
+        foreach (var achievement in this._achievements)
+        {
+            achievement.IsSpoilerProtectionOn = value;
+        }
+
+        this._services.Settings.SpoilerProtection = value;
+        try
+        {
+            // Other windows (e.g. the library, in another process) may have saved settings
+            // since this one started; merge into the file instead of overwriting it with a
+            // stale copy.
+            var latest = AppSettings.Load();
+            latest.SpoilerProtection = value;
+            latest.Save();
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log("Couldn't save the spoiler protection setting", e);
+        }
+    }
+
+    /// <summary>Reveals every hidden achievement's description.</summary>
+    [RelayCommand]
+    private void RevealAllHidden()
+    {
+        foreach (var achievement in this._achievements)
+        {
+            if (achievement.IsHidden)
+            {
+                achievement.IsRevealed = true;
+            }
+        }
+    }
+    #endregion
+
+    #region Notes
+    /// <summary>The notes for this game's achievements, by achievement ID. Empty if they can't be read.</summary>
+    private Dictionary<string, string> LoadNotes()
+    {
+        var notes = new Dictionary<string, string>(StringComparer.Ordinal);
+        try
+        {
+            foreach (var id in this._services.Notes.GetIds(this.AppId))
+            {
+                if (this._services.Notes.Get(this.AppId, id) is { } note && string.IsNullOrWhiteSpace(note) == false)
+                {
+                    notes[id] = note;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log($"Couldn't read the achievement notes for app {this.AppId}", e);
+        }
+
+        return notes;
+    }
+
+    /// <summary>Saves (or, when empty, deletes) the note for <paramref name="achievement"/>.</summary>
+    public void SetNote(AchievementViewModel achievement, string? text)
+    {
+        var note = string.IsNullOrWhiteSpace(text) ? null : text.TrimEnd();
+        if (string.Equals(note, achievement.Note, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        try
+        {
+            this._services.Notes.Set(this.AppId, achievement.Id, note);
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log($"Couldn't save the note for achievement {achievement.Id} of app {this.AppId}", e);
+            this.ShowStatus(new GameOperationResult(false, "Couldn't save the note", e.Message));
+            return;
+        }
+
+        achievement.Note = note;
+        if ((AchievementStateFilter)this.StateFilterIndex == AchievementStateFilter.HasNotes ||
+            this.SearchText.Trim().Length > 0)
+        {
+            this.ApplyFilter();
+        }
+    }
+    #endregion
+
+    #region Guides
+    /// <summary>Steam Community guides for this game, searched by the achievement's name.</summary>
+    public string GetSteamGuideUrl(AchievementViewModel achievement) =>
+        $"https://steamcommunity.com/app/{this.AppId}/guides/?searchText={Uri.EscapeDataString(achievement.Name)}&browsefilter=trend";
+
+    /// <summary>A web search for a guide to the achievement.</summary>
+    public string GetWebSearchUrl(AchievementViewModel achievement) =>
+        "https://www.google.com/search?q=" +
+        Uri.EscapeDataString($"{this.GameName} {achievement.Name} achievement guide");
+    #endregion
+
+    #region Backups and restore
+    /// <summary>Reason recorded on the automatic backup before a normal commit.</summary>
+    public const string BeforeCommitReason = "Before commit";
+
+    /// <summary>Reason recorded on the automatic backup before restoring a backup.</summary>
+    public const string BeforeRestoreReason = "Before restore";
+
+    /// <summary>Reason recorded on a backup the user asked for.</summary>
+    public const string ManualReason = "Manual";
+
+    /// <summary>
+    /// A snapshot of the state Steam reported at the last load or commit (not the pending
+    /// edits): every achievement's unlocked state and time, and every stat's value.
+    /// </summary>
+    public GameSnapshot CreateSnapshot(string reason) => new()
+    {
+        AppId = this.AppId,
+        GameName = this.GameName,
+        CreatedAt = DateTimeOffset.Now,
+        Reason = reason,
+        Achievements = this._achievements
+            .Select(a => new AchievementSnapshotEntry(a.Id, a.IsAchieved, a.IsAchieved ? a.UnlockTime : null))
+            .ToList(),
+        Stats = this.Stats.Select(s => new StatSnapshotEntry(s.Id, s.Definition.Kind, s.OriginalValue)).ToList(),
+    };
+
+    /// <summary>Saves a snapshot of the current Steam state. Throws if the backup can't be saved.</summary>
+    public GameSnapshot SaveBackup(string reason)
+    {
+        if (this.IsLoaded == false)
+        {
+            throw new InvalidOperationException("The game's achievements aren't loaded.");
+        }
+
+        return this._services.Backups.Save(this.CreateSnapshot(reason));
+    }
+
+    /// <summary>Puts every achievement and stat back to the state Steam reported (drops all pending edits).</summary>
+    public void DiscardChanges()
+    {
+        this._suspendPendingUpdates = true;
+        try
+        {
+            foreach (var achievement in this._achievements)
+            {
+                achievement.IsChecked = achievement.IsAchieved;
+            }
+
+            foreach (var stat in this.Stats)
+            {
+                if (stat.IsModified || stat.HasError)
+                {
+                    stat.ResetToOriginal();
+                }
+            }
+        }
+        finally
+        {
+            this._suspendPendingUpdates = false;
+        }
+
+        this.UpdatePending();
+        if ((AchievementStateFilter)this.StateFilterIndex == AchievementStateFilter.Pending)
+        {
+            this.ApplyFilter();
+        }
+    }
+
+    /// <summary>
+    /// Stages <paramref name="snapshot"/> as pending edits: drops any other pending edits, then
+    /// sets every unprotected achievement and every editable stat in the snapshot to its saved
+    /// state. Achievements and stats missing from the snapshot keep their current state; ones
+    /// no longer in the schema are ignored. Returns what couldn't be restored (protected,
+    /// read-only, or a stat value the schema's rules no longer allow), one line each.
+    /// Nothing is written to Steam; commit with <see cref="StoreAsync"/> or undo with
+    /// <see cref="DiscardChanges"/>.
+    /// </summary>
+    public IReadOnlyList<string> StageRestore(GameSnapshot snapshot)
+    {
+        this.DiscardChanges();
+
+        var notRestorable = new List<string>();
+        var savedAchievements = snapshot.Achievements
+            .GroupBy(a => a.Id, StringComparer.Ordinal)
+            .ToDictionary(g => g.Key, g => g.Last(), StringComparer.Ordinal);
+        var savedStats = snapshot.Stats
+            .GroupBy(s => s.Id, StringComparer.Ordinal)
+            .ToDictionary(g => g.Key, g => g.Last(), StringComparer.Ordinal);
+
+        // Stat edits only count while editing is allowed; restoring is an explicit request to edit.
+        if (this.Stats.Any(s => s.IsReadOnly == false &&
+                savedStats.TryGetValue(s.Id, out var saved) && SameStatValue(s, saved.Value, s.OriginalValue) == false))
+        {
+            this.IsStatEditingEnabled = true;
+        }
+
+        this._suspendPendingUpdates = true;
+        try
+        {
+            foreach (var achievement in this._achievements)
+            {
+                if (savedAchievements.TryGetValue(achievement.Id, out var saved) == false ||
+                    saved.Achieved == achievement.IsAchieved)
+                {
+                    continue;
+                }
+
+                if (achievement.IsProtected)
+                {
+                    notRestorable.Add($"Achievement \"{achievement.Name}\" (protected) — " +
+                        (saved.Achieved ? "was unlocked in the backup" : "was locked in the backup"));
+                    continue;
+                }
+
+                achievement.IsChecked = saved.Achieved;
+            }
+
+            foreach (var stat in this.Stats)
+            {
+                if (savedStats.TryGetValue(stat.Id, out var saved) == false ||
+                    SameStatValue(stat, saved.Value, stat.OriginalValue))
+                {
+                    continue;
+                }
+
+                if (stat.IsReadOnly)
+                {
+                    notRestorable.Add($"Stat \"{stat.DisplayName}\" ({(stat.IsProtected ? "protected" : "average rate")}) — " +
+                        $"{FormatStatValue(saved.Value)} in the backup");
+                    continue;
+                }
+
+                stat.EditValue = stat.IsInteger ? Math.Round(saved.Value) : (float)saved.Value;
+                if (stat.HasError)
+                {
+                    notRestorable.Add($"Stat \"{stat.DisplayName}\" — {stat.Error}");
+                    stat.ResetToOriginal();
+                }
+            }
+        }
+        finally
+        {
+            this._suspendPendingUpdates = false;
+        }
+
+        this.UpdatePending();
+        if ((AchievementStateFilter)this.StateFilterIndex == AchievementStateFilter.Pending)
+        {
+            this.ApplyFilter();
+        }
+
+        return notRestorable;
+    }
+
+    /// <summary>Compares stat values the way the stat is stored (int or float).</summary>
+    private static bool SameStatValue(StatViewModel stat, double a, double b) => stat.IsInteger
+        ? (long)Math.Round(a) == (long)Math.Round(b)
+        : ((float)a).Equals((float)b);
+
+    private static string FormatStatValue(double value) => value.ToString("G7", CultureInfo.CurrentCulture);
+    #endregion
+
     #region Commit and reset
     /// <summary>"Unlock 3 achievements, lock 1 achievement and change 2 stats."</summary>
     public string GetCommitSummary()
@@ -921,7 +1197,21 @@ public sealed partial class GameViewModel : ObservableObject
     /// the changes already staged in Steam are undone. Reloads afterwards unless nothing
     /// reached Steam (then the pending edits stay so the user can retry).
     /// </summary>
-    public async Task<GameOperationResult> StoreAsync()
+    /// <param name="source">Recorded in the commit history (<see cref="CommitSource"/>).</param>
+    /// <param name="confirmWithoutBackup">
+    /// Asked, with the reason, when the automatic backup can't be saved; returning true
+    /// commits anyway. When null (or it returns false) the commit is cancelled with nothing
+    /// staged, so a commit never goes through silently without a backup.
+    /// </param>
+    /// <remarks>
+    /// Before staging anything, a snapshot of the current Steam state is saved when
+    /// <see cref="AppSettings.BackupBeforeCommit"/> is on (reason "Before commit"), and always
+    /// for a restore (reason "Before restore"). Every attempt that reaches Steam is appended to
+    /// the commit history, whether it succeeded or not.
+    /// </remarks>
+    public async Task<GameOperationResult> StoreAsync(
+        string source = CommitSource.Manual,
+        Func<string, Task<bool>>? confirmWithoutBackup = null)
     {
         if (this.CanCommit() == false)
         {
@@ -933,18 +1223,51 @@ public sealed partial class GameViewModel : ObservableObject
         this.IsWorking = true;
         GameOperationResult result;
         var reload = true;
+        CommitRecord? record = null;
         try
         {
-            (result, reload) = await this.StoreCoreAsync();
-        }
-        catch (Exception e)
-        {
-            Diagnostics.Log($"Storing stats for app {this.AppId} failed", e);
-            result = new GameOperationResult(false, "Couldn't store changes", e.Message);
+            if (await this.BackUpBeforeCommitAsync(source, confirmWithoutBackup) == false)
+            {
+                // Nothing staged, nothing sent; the edits stay for a retry.
+                return new GameOperationResult(false, "Nothing stored", "The commit was cancelled because no backup could be created.");
+            }
+
+            var achievements = this._achievements.Where(a => a.IsPending && a.IsProtected == false).ToList();
+            var stats = this.Stats.Where(s => s.IsModified && s.IsReadOnly == false && s.HasError == false).ToList();
+            if (achievements.Count > 0 || stats.Count > 0)
+            {
+                // Captured before the store: MarkCommitted overwrites the originals.
+                record = new CommitRecord(
+                    DateTimeOffset.Now,
+                    this.AppId,
+                    this.GameName,
+                    achievements.Where(a => a.IsChecked).Select(a => a.Id).ToList(),
+                    achievements.Where(a => a.IsChecked == false).Select(a => a.Id).ToList(),
+                    stats.Select(s => new StatChange(s.Id, s.OriginalValue, s.Value)).ToList(),
+                    source,
+                    false,
+                    null);
+            }
+
+            try
+            {
+                (result, reload) = await this.StoreCoreAsync(achievements, stats);
+            }
+            catch (Exception e)
+            {
+                // E.g. a timeout: the upload may or may not have happened, so reload.
+                Diagnostics.Log($"Storing stats for app {this.AppId} failed", e);
+                result = new GameOperationResult(false, "Couldn't store changes", e.Message);
+            }
         }
         finally
         {
             this.IsWorking = false;
+        }
+
+        if (record != null)
+        {
+            this.AppendHistory(record with { Time = DateTimeOffset.Now, Succeeded = result.Success, Message = result.Message });
         }
 
         if (reload)
@@ -956,14 +1279,63 @@ public sealed partial class GameViewModel : ObservableObject
         return result;
     }
 
+    /// <summary>
+    /// Saves the automatic backup when one is due. Returns false when it couldn't be saved and
+    /// the user didn't choose to commit anyway.
+    /// </summary>
+    private async Task<bool> BackUpBeforeCommitAsync(string source, Func<string, Task<bool>>? confirmWithoutBackup)
+    {
+        var isRestore = source == CommitSource.Restore;
+        if (isRestore == false && this._services.Settings.BackupBeforeCommit == false)
+        {
+            return true;
+        }
+
+        try
+        {
+            this.SaveBackup(isRestore ? BeforeRestoreReason : BeforeCommitReason);
+            return true;
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log($"Couldn't back up app {this.AppId} before committing", e);
+            if (confirmWithoutBackup == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                return await confirmWithoutBackup(e.Message);
+            }
+            catch (Exception confirmError)
+            {
+                Diagnostics.Log("Asking to commit without a backup failed", confirmError);
+                return false;
+            }
+        }
+    }
+
+    private void AppendHistory(CommitRecord record)
+    {
+        try
+        {
+            this._services.History.Append(record);
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log($"Couldn't add the commit for app {this.AppId} to the history", e);
+        }
+    }
+
     /// <summary>A change staged in Steam's local state, and how to put it back.</summary>
     private sealed record StagedChange(string Id, Func<bool> Undo);
 
-    private async Task<(GameOperationResult Result, bool Reload)> StoreCoreAsync()
+    private async Task<(GameOperationResult Result, bool Reload)> StoreCoreAsync(
+        List<AchievementViewModel> achievements,
+        List<StatViewModel> stats)
     {
         var steam = this._services.Steam;
-        var achievements = this._achievements.Where(a => a.IsPending && a.IsProtected == false).ToList();
-        var stats = this.Stats.Where(s => s.IsModified && s.IsReadOnly == false && s.HasError == false).ToList();
         if (achievements.Count == 0 && stats.Count == 0)
         {
             return (new GameOperationResult(false, "Nothing stored", "There are no changes Steam can store."), false);
