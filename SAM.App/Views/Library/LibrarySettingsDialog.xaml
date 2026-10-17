@@ -23,7 +23,7 @@
             </StackPanel>
 
             <StackPanel Spacing="8">
-                <TextBlock Text="Cache" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                <TextBlock Text="Library" Style="{StaticResource BodyStrongTextBlockStyle}" />
                 <ToggleSwitch
                     Header="Keep cached data for other Steam accounts"
                     IsOn="{x:Bind ViewModel.KeepOtherAccountsCache, Mode=TwoWay}" />
@@ -59,6 +59,60 @@
                             </Flyout>
                         </Button.Flyout>
                     </Button>
+                </Grid>
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="Game window" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                <ToggleSwitch
+                    Header="Spoiler protection for hidden achievements"
+                    IsOn="{x:Bind ViewModel.SpoilerProtection, Mode=TwoWay}" />
+                <TextBlock
+                    Text="Hidden achievements' descriptions stay blurred until you click them."
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextWrapping="Wrap"
+                    Margin="0,-8,0,0" />
+                <ToggleSwitch
+                    Header="Back up before every commit"
+                    IsOn="{x:Bind ViewModel.BackupBeforeCommit, Mode=TwoWay}" />
+                <TextBlock
+                    Text="Saves a game's achievements and stats before changes are stored, so you can restore them later."
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextWrapping="Wrap"
+                    Margin="0,-8,0,0" />
+            </StackPanel>
+
+            <StackPanel Spacing="8">
+                <TextBlock Text="App" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                <ToggleSwitch
+                    Header="Close to system tray"
+                    IsOn="{x:Bind ViewModel.MinimizeToTray, Mode=TwoWay}" />
+                <ToggleSwitch
+                    Header="Show notifications"
+                    IsOn="{x:Bind ViewModel.ShowNotifications, Mode=TwoWay}" />
+                <ToggleSwitch
+                    Header="Check for updates on startup"
+                    IsOn="{x:Bind ViewModel.CheckForUpdates, Mode=TwoWay}" />
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center" Spacing="2">
+                        <TextBlock x:Name="VersionText" />
+                        <TextBlock
+                            x:Name="UpdateStatusText"
+                            Style="{StaticResource CaptionTextBlockStyle}"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            TextWrapping="Wrap"
+                            Visibility="Collapsed" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                        <ProgressRing x:Name="UpdateProgress" Width="16" Height="16" IsActive="False" Visibility="Collapsed" />
+                        <Button x:Name="CheckNowButton" Content="Check now" Click="OnCheckNowClick" />
+                    </StackPanel>
                 </Grid>
             </StackPanel>
 

@@ -9,50 +9,7 @@
     PointerCanceled="OnPointerExited"
     PointerCaptureLost="OnPointerExited">
 
-    <UserControl.ContextFlyout>
-        <MenuFlyout>
-            <MenuFlyoutItem Text="Open" Command="{x:Bind Card.OpenCommand, Mode=OneWay}">
-                <MenuFlyoutItem.Icon>
-                    <FontIcon Glyph="&#xE8A7;" />
-                </MenuFlyoutItem.Icon>
-            </MenuFlyoutItem>
-            <MenuFlyoutSeparator />
-            <MenuFlyoutItem Text="Unlock all achievements…" Command="{x:Bind Card.UnlockAllCommand, Mode=OneWay}">
-                <MenuFlyoutItem.Icon>
-                    <FontIcon Glyph="&#xE785;" />
-                </MenuFlyoutItem.Icon>
-            </MenuFlyoutItem>
-            <MenuFlyoutItem Text="Lock all achievements…" Command="{x:Bind Card.LockAllCommand, Mode=OneWay}">
-                <MenuFlyoutItem.Icon>
-                    <FontIcon Glyph="&#xE72E;" />
-                </MenuFlyoutItem.Icon>
-            </MenuFlyoutItem>
-            <MenuFlyoutSeparator />
-            <MenuFlyoutItem Text="{x:Bind Card.FavoriteLabel, Mode=OneWay}" Command="{x:Bind Card.ToggleFavoriteCommand, Mode=OneWay}">
-                <MenuFlyoutItem.Icon>
-                    <FontIcon Glyph="{x:Bind Card.FavoriteGlyph, Mode=OneWay}" />
-                </MenuFlyoutItem.Icon>
-            </MenuFlyoutItem>
-            <MenuFlyoutItem Text="Copy App ID" Command="{x:Bind Card.CopyAppIdCommand, Mode=OneWay}">
-                <MenuFlyoutItem.Icon>
-                    <FontIcon Glyph="&#xE8C8;" />
-                </MenuFlyoutItem.Icon>
-            </MenuFlyoutItem>
-            <MenuFlyoutSeparator />
-            <MenuFlyoutItem Text="Open store page" Command="{x:Bind Card.OpenStorePageCommand, Mode=OneWay}">
-                <MenuFlyoutItem.Icon>
-                    <FontIcon Glyph="&#xE719;" />
-                </MenuFlyoutItem.Icon>
-            </MenuFlyoutItem>
-            <MenuFlyoutItem Text="Open community achievements page" Command="{x:Bind Card.OpenAchievementsPageCommand, Mode=OneWay}">
-                <MenuFlyoutItem.Icon>
-                    <FontIcon Glyph="&#xE774;" />
-                </MenuFlyoutItem.Icon>
-            </MenuFlyoutItem>
-        </MenuFlyout>
-    </UserControl.ContextFlyout>
-
-    <Grid x:Name="CardRoot">
+    <Grid x:Name="CardRoot" Opacity="{x:Bind Card.CardOpacity, Mode=OneWay}">
     <Border
         Background="{ThemeResource CardBackgroundBrush}"
         BorderBrush="{ThemeResource CardBorderBrush}"
@@ -126,6 +83,41 @@
                     </ToggleButton.Resources>
                     <FontIcon Glyph="{x:Bind Card.FavoriteGlyph, Mode=OneWay}" FontSize="14" />
                 </ToggleButton>
+
+                <!-- Installed badge. -->
+                <Border
+                    Margin="8,8,0,0"
+                    Padding="8,2,8,3"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    CornerRadius="10"
+                    Background="#99000000"
+                    Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.IsInstalled), Mode=OneWay}">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <FontIcon Glyph="&#xE73E;" FontSize="10" Foreground="White" />
+                        <TextBlock Text="Installed" FontSize="11" Foreground="White" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Play / Install, shown on hover. -->
+                <Button
+                    x:Name="PlayButton"
+                    Margin="8,0,0,8"
+                    Padding="10,4,12,5"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    CornerRadius="14"
+                    Opacity="0"
+                    IsHitTestVisible="False"
+                    Style="{StaticResource AccentButtonStyle}"
+                    Command="{x:Bind Card.PlayCommand, Mode=OneWay}"
+                    AutomationProperties.Name="{x:Bind Card.PlayLabel, Mode=OneWay}"
+                    ToolTipService.ToolTip="{x:Bind Card.PlayLabel, Mode=OneWay}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <FontIcon Glyph="{x:Bind Card.PlayGlyph, Mode=OneWay}" FontSize="12" />
+                        <TextBlock Text="{x:Bind Card.PlayLabel, Mode=OneWay}" FontSize="12" />
+                    </StackPanel>
+                </Button>
             </Grid>
 
             <StackPanel Grid.Row="1" Padding="12,10,12,12" Spacing="6">
@@ -155,17 +147,41 @@
                                 Maximum="100"
                                 Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.HasAchievements), Mode=OneWay}" />
                         </Grid>
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <FontIcon
-                                Glyph="&#xE7C1;"
-                                FontSize="12"
-                                Foreground="{ThemeResource SystemFillColorSuccessBrush}"
-                                Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.IsPerfect), Mode=OneWay}" />
-                            <TextBlock
-                                Text="{x:Bind Card.ProgressText, Mode=OneWay}"
-                                Style="{StaticResource CaptionTextBlockStyle}"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                        </StackPanel>
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <FontIcon
+                                    Glyph="&#xE7C1;"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                                    Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.IsPerfect), Mode=OneWay}" />
+                                <TextBlock
+                                    Text="{x:Bind Card.ProgressText, Mode=OneWay}"
+                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    TextTrimming="CharacterEllipsis" />
+                            </StackPanel>
+                            <!-- Smart list badge, e.g. "3 left" or "Rarest 0.4%". -->
+                            <Grid Grid.Column="1" Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.HasSmartBadge), Mode=OneWay}">
+                                <controls:Skeleton
+                                    Width="72"
+                                    Height="14"
+                                    Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.IsSmartBadgeLoading), Mode=OneWay}" />
+                                <Border
+                                    Padding="6,0,6,1"
+                                    CornerRadius="8"
+                                    Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                    Visibility="{x:Bind vm:LibraryFormat.CollapsedIf(Card.IsSmartBadgeLoading), Mode=OneWay}">
+                                    <TextBlock
+                                        Text="{x:Bind Card.SmartBadge, Mode=OneWay}"
+                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                        Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                                </Border>
+                            </Grid>
+                        </Grid>
                     </StackPanel>
                 </Grid>
 
