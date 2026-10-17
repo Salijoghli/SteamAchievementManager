@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Windowing;
@@ -307,7 +308,7 @@ public sealed partial class LibraryWindow : Window
         items.Clear();
 
         var current = this.ViewModel.CollectionFilter;
-        var all = this.CollectionItem("All games", null);
+        var all = this.CollectionItem(Strings.Get("Library_CollectionsAllGames"), null);
         items.Add(all);
         var anyChecked = false;
 
@@ -329,12 +330,12 @@ public sealed partial class LibraryWindow : Window
             }
         }
 
-        AddGroup("Steam collections", this.ViewModel.SteamCollections);
-        AddGroup("SAM collections", this.ViewModel.CustomCollections);
+        AddGroup(Strings.Get("Library_CollectionsSteamGroup"), this.ViewModel.SteamCollections);
+        AddGroup(Strings.Get("Library_CollectionsSamGroup"), this.ViewModel.CustomCollections);
         all.IsChecked = anyChecked == false;
 
         items.Add(new MenuFlyoutSeparator());
-        var manage = new MenuFlyoutItem { Text = "Manage collections…", Icon = new FontIcon { Glyph = "" } };
+        var manage = new MenuFlyoutItem { Text = Strings.Get("Library_CollectionsManage"), Icon = new FontIcon { Glyph = "" } };
         manage.Click += this.OnManageCollectionsClick;
         items.Add(manage);
     }
@@ -351,7 +352,7 @@ public sealed partial class LibraryWindow : Window
         var items = this.SmartListMenu.Items;
         items.Clear();
 
-        var none = new RadioMenuFlyoutItem { Text = "None", GroupName = "LibrarySmartList", IsChecked = this.ViewModel.SmartList == null };
+        var none = new RadioMenuFlyoutItem { Text = Strings.Get("Library_SmartListNone"), GroupName = "LibrarySmartList", IsChecked = this.ViewModel.SmartList == null };
         none.Click += (_, _) => this.ViewModel.SmartList = null;
         items.Add(none);
         items.Add(new MenuFlyoutSeparator());
@@ -397,7 +398,7 @@ public sealed partial class LibraryWindow : Window
     #region Export
     private async void OnExportLibraryClick(object sender, RoutedEventArgs e)
     {
-        var path = await this.PickCsvPathAsync($"SAM library {DateTime.Now:yyyy-MM-dd}");
+        var path = await this.PickCsvPathAsync(Strings.Format("Library_ExportLibraryFileName", DateTime.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)));
         if (path != null)
         {
             await this.ViewModel.ExportLibraryAsync(path);
@@ -406,7 +407,7 @@ public sealed partial class LibraryWindow : Window
 
     private async void OnExportAchievementsClick(object sender, RoutedEventArgs e)
     {
-        var path = await this.PickCsvPathAsync($"SAM achievements {DateTime.Now:yyyy-MM-dd}");
+        var path = await this.PickCsvPathAsync(Strings.Format("Library_ExportAchievementsFileName", DateTime.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)));
         if (path != null)
         {
             await this.ViewModel.ExportAchievementsAsync(path);
@@ -423,7 +424,7 @@ public sealed partial class LibraryWindow : Window
                 SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
                 SuggestedFileName = suggestedName,
             };
-            picker.FileTypeChoices.Add("CSV (comma separated)", new List<string> { ".csv" });
+            picker.FileTypeChoices.Add(Strings.Get("Library_CsvFileType"), new List<string> { ".csv" });
 
             // Unpackaged apps must tell the picker which window owns it.
             WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(this));
@@ -433,7 +434,7 @@ public sealed partial class LibraryWindow : Window
         catch (Exception ex)
         {
             Diagnostics.Log("Save picker failed", ex);
-            this.ViewModel.ShowNotice("Couldn't choose a file", ex.Message, InfoBarSeverity.Error);
+            this.ViewModel.ShowNotice(Strings.Get("Library_ChooseFileFailed"), ex.Message, InfoBarSeverity.Error);
             return null;
         }
     }

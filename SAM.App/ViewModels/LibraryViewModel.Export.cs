@@ -24,7 +24,7 @@ public sealed partial class LibraryViewModel
             return;
         }
 
-        this.BeginExport("Exporting your library…");
+        this.BeginExport(Strings.Get("Export_ExportingLibrary"));
         try
         {
             var rows = this._master.Values
@@ -41,7 +41,7 @@ public sealed partial class LibraryViewModel
                     c.IsFavorite))
                 .ToList();
             await Task.Run(() => CsvExport.WriteLibraryAsync(path, rows));
-            this.EndExport(path, $"Exported {LibraryFormat.Count(rows.Count)} games to {Path.GetFileName(path)}.");
+            this.EndExport(path, Strings.Plural("Export_LibraryDone", rows.Count, Path.GetFileName(path)));
         }
         catch (Exception e)
         {
@@ -60,7 +60,7 @@ public sealed partial class LibraryViewModel
             return;
         }
 
-        this.BeginExport("Reading achievements…");
+        this.BeginExport(Strings.Get("Export_ReadingAchievements"));
         try
         {
             var entries = this._master.Values.Select(c => new GameEntry(c.AppId, c.Name, c.Type)).ToList();
@@ -71,11 +71,11 @@ public sealed partial class LibraryViewModel
             {
                 timeout.CancelAfter(ExportPercentTimeout);
                 var done = 0;
-                this.ExportProgressText = $"Fetching global unlock percentages (0 of {LibraryFormat.Count(appIds.Count)} games)…";
+                this.ExportProgressText = Strings.Plural("Export_FetchingPercentages", appIds.Count, LibraryFormat.Count(0));
                 await this.FetchPercentsAsync(appIds, timeout.Token, _ =>
                 {
                     done++;
-                    this.ExportProgressText = $"Fetching global unlock percentages ({LibraryFormat.Count(done)} of {LibraryFormat.Count(appIds.Count)} games)…";
+                    this.ExportProgressText = Strings.Plural("Export_FetchingPercentages", appIds.Count, LibraryFormat.Count(done));
                 });
             }
 
@@ -89,11 +89,11 @@ public sealed partial class LibraryViewModel
                     : r)
                 .ToList();
 
-            this.ExportProgressText = "Writing the file…";
+            this.ExportProgressText = Strings.Get("Export_WritingFile");
             await Task.Run(() => CsvExport.WriteAchievementsAsync(path, filled));
             this.EndExport(
                 path,
-                $"Exported {LibraryFormat.Count(filled.Count)} achievements from {LibraryFormat.Count(appIds.Count)} games to {Path.GetFileName(path)}.");
+                Strings.Plural("Export_AchievementsDone", filled.Count, Strings.Plural("Export_FromGames", appIds.Count), Path.GetFileName(path)));
         }
         catch (Exception e)
         {
@@ -125,7 +125,7 @@ public sealed partial class LibraryViewModel
         }
 
         Diagnostics.Log("CSV export failed", e);
-        this.ShowNotice("Couldn't export", e.Message, InfoBarSeverity.Error);
+        this.ShowNotice(Strings.Get("Export_Failed"), e.Message, InfoBarSeverity.Error);
     }
 
     [RelayCommand]
@@ -194,26 +194,26 @@ public sealed partial class LibraryViewModel
             var update = await this._services.Updates.CheckAsync(this._lifetime.Token);
             if (update == null)
             {
-                return $"You're up to date (version {CurrentVersionText}).";
+                return Strings.Format("Update_UpToDate", CurrentVersionText);
             }
 
             this.ShowUpdate(update);
-            return $"Version {update.Version} is available.";
+            return Strings.Format("Update_AvailableStatus", update.Version);
         }
         catch (Exception e)
         {
             Diagnostics.Log("Update check failed", e);
-            return "Couldn't check for updates.";
+            return Strings.Get("Update_CheckFailed");
         }
     }
 
     private void ShowUpdate(UpdateInfo update)
     {
         this._update = update;
-        this.UpdateTitle = $"Version {update.Version} is available";
+        this.UpdateTitle = Strings.Format("Update_AvailableTitle", update.Version);
         this.UpdateMessage = string.IsNullOrWhiteSpace(update.Title) || update.Title == update.Version
-            ? $"You have version {CurrentVersionText}."
-            : $"{update.Title}. You have version {CurrentVersionText}.";
+            ? Strings.Format("Update_YouHave", CurrentVersionText)
+            : Strings.Format("Update_YouHaveWithTitle", update.Title, CurrentVersionText);
         this.IsUpdateOpen = true;
     }
 

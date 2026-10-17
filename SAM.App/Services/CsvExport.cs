@@ -11,15 +11,21 @@ namespace SAM.App.Services;
 /// </summary>
 public static class CsvExport
 {
-    private static readonly string[] LibraryHeader =
+    // Column headers are in the UI language (the files are for reading in a spreadsheet); the
+    // values stay culture-invariant.
+    private static string[] LibraryHeader =>
     [
-        "App ID", "Name", "Type", "Achievements Unlocked", "Achievements Total", "Completion %",
-        "Playtime (hours)", "Last Played", "Installed", "Favorite",
+        Strings.Get("Export_ColumnAppId"), Strings.Get("Export_ColumnName"), Strings.Get("Export_ColumnType"),
+        Strings.Get("Export_ColumnAchievementsUnlocked"), Strings.Get("Export_ColumnAchievementsTotal"),
+        Strings.Get("Export_ColumnCompletion"), Strings.Get("Export_ColumnPlaytimeHours"), Strings.Get("Export_ColumnLastPlayed"),
+        Strings.Get("Export_ColumnInstalled"), Strings.Get("Export_ColumnFavorite"),
     ];
 
-    private static readonly string[] AchievementsHeader =
+    private static string[] AchievementsHeader =>
     [
-        "App ID", "Game", "Achievement ID", "Name", "Description", "Unlocked", "Unlock Time", "Global Unlock %",
+        Strings.Get("Export_ColumnAppId"), Strings.Get("Export_ColumnGame"), Strings.Get("Export_ColumnAchievementId"),
+        Strings.Get("Export_ColumnName"), Strings.Get("Export_ColumnDescription"), Strings.Get("Export_ColumnUnlocked"),
+        Strings.Get("Export_ColumnUnlockTime"), Strings.Get("Export_ColumnGlobalPercent"),
     ];
 
     /// <summary>Writes one row per game to <paramref name="path"/>, replacing it if it exists.</summary>

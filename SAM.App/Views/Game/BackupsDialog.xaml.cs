@@ -50,7 +50,7 @@ public sealed partial class BackupsDialog : ContentDialog
         };
         var confirm = new Button
         {
-            Content = "Delete",
+            Content = Strings.Get("Common_Delete"),
             HorizontalAlignment = HorizontalAlignment.Right,
             Style = (Style)Application.Current.Resources["AccentButtonStyle"],
         };
@@ -63,7 +63,7 @@ public sealed partial class BackupsDialog : ContentDialog
         var panel = new StackPanel { Width = 240, Spacing = 12 };
         panel.Children.Add(new TextBlock
         {
-            Text = $"Delete the backup from {item.DateText}? This can't be undone.",
+            Text = Strings.Format("Backups_DeleteConfirm", item.DateText),
             TextWrapping = TextWrapping.Wrap,
         });
         panel.Children.Add(confirm);

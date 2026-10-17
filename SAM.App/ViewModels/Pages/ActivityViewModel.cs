@@ -15,7 +15,7 @@ public sealed class ActivityDayGroup(string title, IEnumerable<UnlockItemViewMod
 {
     public string Title { get; } = title;
 
-    public string CountText => this.Count == 1 ? "1 unlock" : $"{LibraryFormat.Count(this.Count)} unlocks";
+    public string CountText => Strings.Plural("Pages_Unlocks", this.Count);
 
     /// <summary>What screen readers announce for the group header.</summary>
     public override string ToString() => $"{this.Title}, {this.CountText}";
@@ -46,7 +46,13 @@ public sealed partial class ActivityViewModel : ObservableObject
     }
 
     /// <summary>Date range choices, in <see cref="RangeIndex"/> order.</summary>
-    public IReadOnlyList<string> RangeOptions { get; } = ["Last 7 days", "Last 30 days", "Last 90 days", "All time"];
+    public IReadOnlyList<string> RangeOptions { get; } =
+    [
+        Strings.Get("Activity_RangeLast7Days"),
+        Strings.Get("Activity_RangeLast30Days"),
+        Strings.Get("Activity_RangeLast90Days"),
+        Strings.Get("Activity_RangeAllTime"),
+    ];
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsListVisible), nameof(IsEmpty), nameof(IsNoMatches))]
@@ -148,8 +154,8 @@ public sealed partial class ActivityViewModel : ObservableObject
         {
             Diagnostics.Log("Activity: couldn't load the unlock timeline", e);
             error = e is NotImplementedException
-                ? "Unlock history isn't available in this build yet."
-                : $"Couldn't read your unlock history. {e.Message}";
+                ? Strings.Get("Pages_TimelineUnavailable")
+                : Strings.Format("Pages_TimelineError", e.Message);
         }
         finally
         {
@@ -202,9 +208,8 @@ public sealed partial class ActivityViewModel : ObservableObject
         this.Groups = groups;
         this.CountText = this.Error != null ? ""
             : this.ShownCount == this.TotalCount ? Unlocks(this.TotalCount)
-            : $"{LibraryFormat.Count(this.ShownCount)} of {Unlocks(this.TotalCount)}";
+            : Strings.Plural("Activity_ShownOfTotal", this.TotalCount, LibraryFormat.Count(this.ShownCount));
     }
 
-    private static string Unlocks(int count) =>
-        count == 1 ? "1 unlock" : $"{count.ToString("N0", CultureInfo.CurrentCulture)} unlocks";
+    private static string Unlocks(int count) => Strings.Plural("Pages_Unlocks", count);
 }

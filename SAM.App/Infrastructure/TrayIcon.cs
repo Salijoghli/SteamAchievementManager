@@ -168,9 +168,9 @@ public sealed class TrayIcon : IDisposable
 
         try
         {
-            AppendMenu(menu, MfString, OpenCommand, "Open library");
+            AppendMenu(menu, MfString, OpenCommand, Strings.Get("Tray_OpenLibrary"));
             AppendMenu(menu, MfSeparator, 0, null);
-            AppendMenu(menu, MfString, ExitCommand, "Exit");
+            AppendMenu(menu, MfString, ExitCommand, Strings.Get("Tray_Exit"));
             SetMenuDefaultItem(menu, OpenCommand, 0);
 
             GetCursorPos(out var point);

@@ -32,16 +32,15 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <AutoSuggestBox
-                PlaceholderText="Filter by game"
+                x:Uid="History_Search"
                 QueryIcon="Find"
-                Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                AutomationProperties.Name="Filter by game" />
+                Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <ComboBox
                 Grid.Column="1"
                 MinWidth="150"
                 ItemsSource="{x:Bind ViewModel.SourceOptions}"
                 SelectedIndex="{x:Bind ViewModel.SourceIndex, Mode=TwoWay}"
-                AutomationProperties.Name="Source" />
+                x:Uid="History_Source" />
             <TextBlock
                 Grid.Column="2"
                 Margin="8,0,0,0"
@@ -54,15 +53,14 @@
                 Width="16"
                 Height="16"
                 IsActive="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}"
-                AutomationProperties.Name="Refreshing" />
+                x:Uid="Pages_Refreshing" />
             <Button
                 Grid.Column="4"
                 Command="{x:Bind ViewModel.RefreshCommand}"
-                ToolTipService.ToolTip="Re-read the commit history"
-                AutomationProperties.Name="Refresh history">
+                x:Uid="History_RefreshButton">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <FontIcon Glyph="&#xE72C;" FontSize="14" />
-                    <TextBlock Text="Refresh" />
+                    <TextBlock x:Uid="Pages_RefreshLabel" />
                 </StackPanel>
             </Button>
         </Grid>
@@ -86,7 +84,7 @@
                 TextWrapping="Wrap"
                 VerticalAlignment="Center"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                Text="Looking for backups? Each game's backups are in its own window. Click a game's name below to open it, then restore from there." />
+                x:Uid="History_BackupsHint" />
         </Grid>
 
         <!-- Loading skeleton. -->
@@ -94,7 +92,7 @@
             Grid.Row="2"
             Spacing="4"
             Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
-            AutomationProperties.Name="Loading history">
+            x:Uid="History_Loading">
             <Border Padding="16,12" CornerRadius="{StaticResource CardCornerRadius}" Background="{ThemeResource CardBackgroundBrush}">
                 <StackPanel Spacing="6">
                     <controls:Skeleton Width="200" Height="14" HorizontalAlignment="Left" />
@@ -123,7 +121,7 @@
             SelectionMode="None"
             ItemContainerStyle="{StaticResource RowContainerStyle}"
             Visibility="{x:Bind ViewModel.IsListVisible, Mode=OneWay}"
-            AutomationProperties.Name="Commit history">
+            x:Uid="History_List">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="pages:HistoryItemViewModel">
                     <Expander
@@ -176,8 +174,8 @@
                                     Background="{ThemeResource SubtleFillColorSecondaryBrush}"
                                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                                     BorderThickness="1"
-                                    ToolTipService.ToolTip="Where this commit came from">
-                                    <TextBlock Text="{x:Bind Source}" FontSize="12" />
+                                    x:Uid="History_SourceBadge">
+                                    <TextBlock Text="{x:Bind SourceText}" FontSize="12" />
                                 </Border>
                                 <StackPanel Grid.Column="3" VerticalAlignment="Center" MinWidth="96" ToolTipService.ToolTip="{x:Bind FullTimeText}">
                                     <TextBlock Text="{x:Bind DateText}" HorizontalAlignment="Right" Style="{StaticResource CaptionTextBlockStyle}" />
@@ -192,7 +190,7 @@
 
                         <StackPanel Spacing="12">
                             <TextBlock
-                                Text="No achievement or stat changes were recorded for this commit."
+                                x:Uid="History_NoChangesRecorded"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Visibility="{x:Bind pages:PageFormat.Collapsed(HasChanges)}" />
                             <ItemsControl ItemsSource="{x:Bind Details, Mode=OneWay}" IsTabStop="False">
@@ -212,7 +210,7 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                             <StackPanel Spacing="2" Visibility="{x:Bind HasFailureMessage}">
-                                <TextBlock Text="Error" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                <TextBlock x:Uid="History_ErrorLabel" Style="{StaticResource BodyStrongTextBlockStyle}" />
                                 <TextBlock
                                     Text="{x:Bind Message}"
                                     TextWrapping="Wrap"
@@ -233,14 +231,14 @@
             Spacing="12"
             Visibility="{x:Bind ViewModel.HasError, Mode=OneWay}">
             <FontIcon Glyph="&#xE783;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-            <TextBlock Text="Couldn't load the history" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock x:Uid="History_ErrorTitle" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
             <TextBlock
                 Text="{x:Bind ViewModel.Error, Mode=OneWay}"
                 TextWrapping="Wrap"
                 MaxWidth="420"
                 TextAlignment="Center"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            <Button Content="Try again" HorizontalAlignment="Center" Command="{x:Bind ViewModel.RefreshCommand}" />
+            <Button x:Uid="Pages_TryAgain" HorizontalAlignment="Center" Command="{x:Bind ViewModel.RefreshCommand}" />
         </StackPanel>
 
         <!-- Nothing committed yet. -->
@@ -251,9 +249,9 @@
             Spacing="12"
             Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay}">
             <FontIcon Glyph="&#xE81C;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-            <TextBlock Text="No commits yet" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock x:Uid="History_EmptyTitle" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
             <TextBlock
-                Text="Whenever you save achievement or stat changes in SAM, the commit shows up here with what changed and whether it worked."
+                x:Uid="History_EmptyBody"
                 TextWrapping="Wrap"
                 MaxWidth="440"
                 TextAlignment="Center"
@@ -268,13 +266,13 @@
             Spacing="12"
             Visibility="{x:Bind ViewModel.IsNoMatches, Mode=OneWay}">
             <FontIcon Glyph="&#xE721;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-            <TextBlock Text="No commits match" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock x:Uid="History_NoMatchesTitle" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
             <TextBlock
-                Text="Try a different game or source."
+                x:Uid="History_NoMatchesBody"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                 HorizontalAlignment="Center" />
             <Button
-                Content="Clear filters"
+                x:Uid="Pages_ClearFilters"
                 HorizontalAlignment="Center"
                 Style="{StaticResource AccentButtonStyle}"
                 Command="{x:Bind ViewModel.ClearFiltersCommand}" />

@@ -49,7 +49,7 @@ public sealed partial class UnlockItemViewModel : ObservableObject
 
     public string DateTimeText => this.LocalTime.ToString("g", CultureInfo.CurrentCulture);
 
-    public string OpenGameLabel => $"Open {this.GameName}";
+    public string OpenGameLabel => Strings.Format("Pages_OpenGame", this.GameName);
 
     [ObservableProperty]
     private ImageSource? _iconSource;
@@ -67,11 +67,22 @@ public sealed partial class UnlockItemViewModel : ObservableObject
 
     public string RarityText => this.GlobalPercent is { } p ? FormatPercent(p) : "";
 
-    public string RarityTierText => this.Rarity == AchievementRarity.Unknown ? "" : this.Rarity.ToString();
+    public string RarityTierText => RarityName(this.Rarity);
 
     public string RarityToolTip => this.GlobalPercent is { } p
-        ? $"{this.RarityTierText}: {FormatPercent(p)} of players have this achievement"
+        ? Strings.Format("Pages_RarityToolTip", this.RarityTierText, FormatPercent(p))
         : "";
+
+    /// <summary>The localized rarity tier name ("Rare"), or "" when unknown.</summary>
+    public static string RarityName(AchievementRarity rarity) => rarity switch
+    {
+        AchievementRarity.Common => Strings.Get("Pages_RarityCommon"),
+        AchievementRarity.Uncommon => Strings.Get("Pages_RarityUncommon"),
+        AchievementRarity.Rare => Strings.Get("Pages_RarityRare"),
+        AchievementRarity.Epic => Strings.Get("Pages_RarityEpic"),
+        AchievementRarity.Legendary => Strings.Get("Pages_RarityLegendary"),
+        _ => "",
+    };
 
     /// <summary>Percent with enough precision for rare achievements ("0.04%", "3.2%", "48%").</summary>
     public static string FormatPercent(double percent) => percent switch

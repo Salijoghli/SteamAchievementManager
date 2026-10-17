@@ -41,6 +41,9 @@ public sealed class CommandLine
     /// <summary>Exit code: the game's window is open in SAM; nothing was changed.</summary>
     public const int ExitBusy = 3;
 
+    /// <summary>Internal option used to restart the library: <c>--restart-after=&lt;pid&gt;</c>.</summary>
+    public const string RestartAfterOption = "--restart-after=";
+
     /// <summary>Usage text printed by <c>--help</c>.</summary>
     public const string Usage =
         """
@@ -105,6 +108,12 @@ public sealed class CommandLine
     /// <summary><c>--no-backup</c>: skip the backup before committing.</summary>
     public bool NoBackup { get; private init; }
 
+    /// <summary>
+    /// Set by the Settings dialog's "Restart now" (<c>--restart-after=&lt;pid&gt;</c>): the process to
+    /// wait for before claiming the single-instance lock. 0 when absent.
+    /// </summary>
+    public int RestartAfterProcessId { get; private init; }
+
     /// <summary>Why the arguments are invalid (when <see cref="Mode"/> is <see cref="LaunchMode.Invalid"/>).</summary>
     public string? Error { get; private init; }
 
@@ -119,6 +128,18 @@ public sealed class CommandLine
             .Where(a => a.StartsWith("----", StringComparison.Ordinal) == false &&
                         string.Equals(a, "-Embedding", StringComparison.OrdinalIgnoreCase) == false)
             .ToList();
+
+        var restartAfter = 0;
+        var restart = args.FindIndex(a => a.StartsWith(RestartAfterOption, StringComparison.OrdinalIgnoreCase));
+        if (restart >= 0)
+        {
+            int.TryParse(args[restart][RestartAfterOption.Length..], NumberStyles.None, CultureInfo.InvariantCulture, out restartAfter);
+            args.RemoveAt(restart);
+            if (args.Count == 0)
+            {
+                return new CommandLine { Mode = LaunchMode.Library, RestartAfterProcessId = restartAfter };
+            }
+        }
 
         if (args.Any(IsHelp))
         {

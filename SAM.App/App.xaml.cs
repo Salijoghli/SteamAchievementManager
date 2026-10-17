@@ -82,6 +82,12 @@ public partial class App : Application
         var arguments = Environment.GetCommandLineArgs()[1..];
         var command = CommandLine.Parse(arguments);
 
+        // Command-line output stays English whatever the UI language, so scripts see stable text.
+        if (command.Mode is LaunchMode.Help or LaunchMode.Invalid or LaunchMode.Commit)
+        {
+            ApplyLanguage("en-US");
+        }
+
         switch (command.Mode)
         {
             case LaunchMode.Help:
@@ -118,6 +124,13 @@ public partial class App : Application
 
         var appId = command.AppId;
 
+        // "Restart now" in Settings: let the old library exit before claiming the single instance,
+        // otherwise this launch would just be forwarded to it.
+        if (command.RestartAfterProcessId != 0)
+        {
+            WaitForExit(command.RestartAfterProcessId);
+        }
+
         // One window per game (and one library): if it's already open, hand it our arguments
         // (so "--unlock-all" etc. still apply), focus it and quit.
         this._instance = SingleInstance.TryClaim(appId, arguments);
@@ -133,7 +146,7 @@ public partial class App : Application
         }
         catch (SteamUnavailableException e)
         {
-            this.Show(new ErrorWindow("Can't connect to Steam", e.Message));
+            this.Show(new ErrorWindow(Strings.Get("App_CantConnectToSteam"), e.Message));
             return;
         }
 
@@ -154,9 +167,58 @@ public partial class App : Application
     }
 
     /// <summary>
-    /// Formats dates and numbers in the app's language instead of the Windows region format,
-    /// so they match the (English) UI text. WinUI controls such as date pickers follow
-    /// PrimaryLanguageOverride.
+    /// Starts a new SAM library (e.g. after the UI language changed) and closes this process. The
+    /// new process waits for this one to exit (<see cref="CommandLine.RestartAfterOption"/>) so the
+    /// single-instance check doesn't hand the launch back to us. Call on the UI thread.
+    /// </summary>
+    public static void Restart()
+    {
+        if (CurrentApp is not { } app || Environment.ProcessPath is not { } path)
+        {
+            return;
+        }
+
+        try
+        {
+            var arguments = CommandLine.RestartAfterOption + Environment.ProcessId.ToString(CultureInfo.InvariantCulture);
+            Process.Start(new ProcessStartInfo(path, arguments) { UseShellExecute = false })?.Dispose();
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log("Couldn't restart SAM", e);
+            return;
+        }
+
+        app._exiting = true;
+        app._window?.Close();
+        app.Exit();
+    }
+
+    /// <summary>Waits (up to 15 seconds) for the process <paramref name="processId"/> to exit.</summary>
+    private static void WaitForExit(int processId)
+    {
+        try
+        {
+            using var process = Process.GetProcessById(processId);
+            if (process.WaitForExit(TimeSpan.FromSeconds(15)) == false)
+            {
+                Diagnostics.Log($"Restart: process {processId} is still running; continuing anyway");
+            }
+        }
+        catch (ArgumentException)
+        {
+            // Already exited.
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log($"Restart: couldn't wait for process {processId}", e);
+        }
+    }
+
+    /// <summary>
+    /// Shows UI text (see <see cref="Strings"/> and x:Uid) and formats dates and numbers in the app's
+    /// language instead of the Windows display language and region format, so they match. The
+    /// resource system and WinUI controls such as date pickers follow PrimaryLanguageOverride.
     /// </summary>
     private static void ApplyLanguage(string language)
     {
@@ -295,9 +357,7 @@ public partial class App : Application
         if (this._trayHintShown == false)
         {
             this._trayHintShown = true;
-            Services?.Notifications.Show(
-                "SAM is still running in the tray",
-                "Click the tray icon to open the library, or right-click it and choose Exit to quit.");
+            Services?.Notifications.Show(Strings.Get("App_TrayHintTitle"), Strings.Get("App_TrayHintMessage"));
         }
     }
 

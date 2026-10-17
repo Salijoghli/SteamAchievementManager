@@ -34,16 +34,15 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <AutoSuggestBox
-                PlaceholderText="Filter by game or achievement"
+                x:Uid="Activity_Search"
                 QueryIcon="Find"
-                Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                AutomationProperties.Name="Filter by game or achievement" />
+                Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <ComboBox
                 Grid.Column="1"
                 MinWidth="140"
                 ItemsSource="{x:Bind ViewModel.RangeOptions}"
                 SelectedIndex="{x:Bind ViewModel.RangeIndex, Mode=TwoWay}"
-                AutomationProperties.Name="Date range" />
+                x:Uid="Activity_Range" />
             <TextBlock
                 Grid.Column="2"
                 Margin="8,0,0,0"
@@ -56,15 +55,14 @@
                 Width="16"
                 Height="16"
                 IsActive="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}"
-                AutomationProperties.Name="Refreshing" />
+                x:Uid="Pages_Refreshing" />
             <Button
                 Grid.Column="4"
                 Command="{x:Bind ViewModel.RefreshCommand}"
-                ToolTipService.ToolTip="Re-read your unlocks"
-                AutomationProperties.Name="Refresh activity">
+                x:Uid="Activity_RefreshButton">
                 <StackPanel Orientation="Horizontal" Spacing="8">
                     <FontIcon Glyph="&#xE72C;" FontSize="14" />
-                    <TextBlock Text="Refresh" />
+                    <TextBlock x:Uid="Pages_RefreshLabel" />
                 </StackPanel>
             </Button>
         </Grid>
@@ -74,7 +72,7 @@
             Grid.Row="1"
             Spacing="2"
             Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
-            AutomationProperties.Name="Loading activity">
+            x:Uid="Activity_Loading">
             <controls:Skeleton Width="120" Height="16" Margin="12,8,0,10" HorizontalAlignment="Left" />
             <Grid Padding="12,6" ColumnSpacing="12">
                 <Grid.ColumnDefinitions>
@@ -144,7 +142,7 @@
             ItemContainerStyle="{StaticResource RowContainerStyle}"
             ContainerContentChanging="OnContainerContentChanging"
             Visibility="{x:Bind ViewModel.IsListVisible, Mode=OneWay}"
-            AutomationProperties.Name="Recent unlocks">
+            x:Uid="Activity_Feed">
             <ListView.GroupStyle>
                 <GroupStyle HidesIfEmpty="True">
                     <GroupStyle.HeaderTemplate>
@@ -242,14 +240,14 @@
             Spacing="12"
             Visibility="{x:Bind ViewModel.HasError, Mode=OneWay}">
             <FontIcon Glyph="&#xE783;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-            <TextBlock Text="Couldn't load your activity" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock x:Uid="Activity_ErrorTitle" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
             <TextBlock
                 Text="{x:Bind ViewModel.Error, Mode=OneWay}"
                 TextWrapping="Wrap"
                 MaxWidth="420"
                 TextAlignment="Center"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            <Button Content="Try again" HorizontalAlignment="Center" Command="{x:Bind ViewModel.RefreshCommand}" />
+            <Button x:Uid="Pages_TryAgain" HorizontalAlignment="Center" Command="{x:Bind ViewModel.RefreshCommand}" />
         </StackPanel>
 
         <!-- No unlocks at all. -->
@@ -260,9 +258,9 @@
             Spacing="12"
             Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay}">
             <FontIcon Glyph="&#xE81C;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-            <TextBlock Text="No unlocks yet" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock x:Uid="Activity_EmptyTitle" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
             <TextBlock
-                Text="Achievements you unlock show up here, newest first. Steam keeps unlock times for games you've played on this PC."
+                x:Uid="Activity_EmptyBody"
                 TextWrapping="Wrap"
                 MaxWidth="420"
                 TextAlignment="Center"
@@ -277,13 +275,13 @@
             Spacing="12"
             Visibility="{x:Bind ViewModel.IsNoMatches, Mode=OneWay}">
             <FontIcon Glyph="&#xE721;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-            <TextBlock Text="No unlocks match" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+            <TextBlock x:Uid="Activity_NoMatchesTitle" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
             <TextBlock
-                Text="Try a different search or a longer date range."
+                x:Uid="Activity_NoMatchesBody"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                 HorizontalAlignment="Center" />
             <Button
-                Content="Clear filters"
+                x:Uid="Pages_ClearFilters"
                 HorizontalAlignment="Center"
                 Style="{StaticResource AccentButtonStyle}"
                 Command="{x:Bind ViewModel.ClearFiltersCommand}" />

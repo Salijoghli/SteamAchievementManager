@@ -317,9 +317,9 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
         {
             MenuFlyoutPresenterStyle = GameFormat.ThemedMenuFlyoutPresenterStyle(this.Root.ActualTheme),
         };
-        var steamGuide = new MenuFlyoutItem { Text = "Find a guide on Steam", Icon = new FontIcon { Glyph = "" } };
+        var steamGuide = new MenuFlyoutItem { Text = Strings.Get("Game_MenuSteamGuide"), Icon = new FontIcon { Glyph = "" } };
         steamGuide.Click += (_, _) => this.OpenUrl(this.ViewModel.GetSteamGuideUrl(achievement));
-        var webSearch = new MenuFlyoutItem { Text = "Search the web", Icon = new FontIcon { Glyph = "" } };
+        var webSearch = new MenuFlyoutItem { Text = Strings.Get("Game_MenuWebSearch"), Icon = new FontIcon { Glyph = "" } };
         webSearch.Click += (_, _) => this.OpenUrl(this.ViewModel.GetWebSearchUrl(achievement));
         menu.Items.Add(steamGuide);
         menu.Items.Add(webSearch);
@@ -329,7 +329,7 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
             menu.Items.Add(new MenuFlyoutSeparator());
             var note = new MenuFlyoutItem
             {
-                Text = achievement.HasNote ? "Edit note…" : "Add note…",
+                Text = Strings.Get(achievement.HasNote ? "Game_MenuEditNote" : "Game_MenuAddNote"),
                 Icon = new FontIcon { Glyph = "" },
             };
             note.Click += (_, _) =>
@@ -345,7 +345,7 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
             {
                 var reveal = new MenuFlyoutItem
                 {
-                    Text = achievement.IsRevealed ? "Hide description" : "Reveal description",
+                    Text = Strings.Get(achievement.IsRevealed ? "Game_MenuHideDescription" : "Game_MenuRevealDescription"),
                     Icon = new FontIcon { Glyph = "" },
                 };
                 reveal.Click += (_, _) => achievement.IsRevealed = !achievement.IsRevealed;
@@ -362,13 +362,13 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
         {
             if (await Launcher.LaunchUriAsync(new Uri(url)) == false)
             {
-                this.ViewModel.ShowStatus(new GameOperationResult(false, "Couldn't open the browser", url));
+                this.ViewModel.ShowStatus(new GameOperationResult(false, Strings.Get("Game_BrowserFailed"), url));
             }
         }
         catch (Exception e)
         {
             Diagnostics.Log($"Couldn't open {url}", e);
-            this.ViewModel.ShowStatus(new GameOperationResult(false, "Couldn't open the browser", e.Message));
+            this.ViewModel.ShowStatus(new GameOperationResult(false, Strings.Get("Game_BrowserFailed"), e.Message));
         }
     }
     #endregion
@@ -392,7 +392,7 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
         {
             Header = achievement.Name,
             Text = achievement.Note ?? "",
-            PlaceholderText = "Tips, requirements, reminders…",
+            PlaceholderText = Strings.Get("Game_NotePlaceholder"),
             AcceptsReturn = true,
             TextWrapping = TextWrapping.Wrap,
             Width = 340,
@@ -400,13 +400,13 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
             MaxHeight = 260,
         };
         ScrollViewer.SetVerticalScrollBarVisibility(box, ScrollBarVisibility.Auto);
-        AutomationProperties.SetName(box, $"Note for {achievement.Name}");
+        AutomationProperties.SetName(box, Strings.Format("Game_NoteName", achievement.Name));
 
         var panel = new StackPanel { Spacing = 8 };
         panel.Children.Add(box);
         panel.Children.Add(new TextBlock
         {
-            Text = "Saved when closed · Ctrl+Enter to save and close · clear the text to delete the note",
+            Text = Strings.Get("Game_NoteHint"),
             Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"],
             Opacity = 0.7,
             TextWrapping = TextWrapping.Wrap,
@@ -480,10 +480,9 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
         this.CommitFocusedNumberBox();
         if (this.ViewModel.HasUnsavedChanges &&
             await this.ShowDialogAsync(
-                "Discard pending changes?",
-                "Reloading replaces your pending changes with the current state from Steam.",
-                "Discard and reload",
-                closeText: "Cancel") != ContentDialogResult.Primary)
+                Strings.Get("Game_DiscardTitle"),
+                Strings.Get("Game_DiscardReloadMessage"),
+                Strings.Get("Game_DiscardReloadButton")) != ContentDialogResult.Primary)
         {
             return;
         }
@@ -501,7 +500,7 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
         object content,
         string primaryText,
         string? secondaryText = null,
-        string closeText = "Cancel",
+        string? closeText = null,
         bool destructive = false,
         ContentDialogButton defaultButton = ContentDialogButton.Primary)
     {
@@ -510,7 +509,7 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
             Title = title,
             Content = content is string text ? new TextBlock { Text = text, TextWrapping = TextWrapping.Wrap } : content,
             PrimaryButtonText = primaryText,
-            CloseButtonText = closeText,
+            CloseButtonText = closeText ?? Strings.Get("Common_Cancel"),
             DefaultButton = defaultButton,
         };
         if (secondaryText != null)
@@ -628,11 +627,11 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
         });
         content.Children.Add(new TextBlock
         {
-            Text = "The changes are written to your Steam account right away.",
+            Text = Strings.Get("Game_CommitDialogNote"),
             TextWrapping = TextWrapping.Wrap,
         });
 
-        if (await this.ShowDialogAsync("Commit changes?", content, "Commit") == ContentDialogResult.Primary)
+        if (await this.ShowDialogAsync(Strings.Get("Game_CommitDialogTitle"), content, Strings.Get("Game_CommitDialogButton")) == ContentDialogResult.Primary)
         {
             await this.ViewModel.StoreAsync(CommitSource.Manual, this.ConfirmCommitWithoutBackupAsync);
         }
@@ -641,10 +640,9 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
     /// <summary>Asked when the automatic backup before a commit fails. True = commit anyway.</summary>
     private async Task<bool> ConfirmCommitWithoutBackupAsync(string reason) =>
         await this.ShowDialogAsync(
-            "Couldn't create a backup",
-            $"Couldn't create a backup ({reason}). Commit anyway?",
-            "Commit anyway",
-            closeText: "Cancel",
+            Strings.Get("Game_BackupFailedTitle"),
+            Strings.Format("Game_BackupFailedMessage", reason),
+            Strings.Get("Game_CommitAnywayButton"),
             defaultButton: ContentDialogButton.Close) == ContentDialogResult.Primary;
     #endregion
 
@@ -681,10 +679,9 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
 
         if (this.ViewModel.HasUnsavedChanges &&
             await this.ShowDialogAsync(
-                "Discard pending changes?",
-                "Restoring a backup replaces your pending changes.",
-                "Discard and continue",
-                closeText: "Cancel") != ContentDialogResult.Primary)
+                Strings.Get("Game_DiscardTitle"),
+                Strings.Get("Game_DiscardRestoreMessage"),
+                Strings.Get("Game_DiscardContinueButton")) != ContentDialogResult.Primary)
         {
             return;
         }
@@ -703,9 +700,7 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
             });
             content.Children.Add(new TextBlock
             {
-                Text = $"This restores the backup from {when}. Unlock dates can't be restored: Steam sets the " +
-                    "date of every achievement unlocked now to the current time. The changes are written to " +
-                    "your Steam account right away, after a \"Before restore\" backup of the current state.",
+                Text = Strings.Format("Game_RestoreDetails", when),
                 TextWrapping = TextWrapping.Wrap,
             });
         }
@@ -713,7 +708,7 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
         {
             content.Children.Add(new TextBlock
             {
-                Text = $"Nothing to restore: everything that can be changed already matches the backup from {when}.",
+                Text = Strings.Format("Game_RestoreNothing", when),
                 TextWrapping = TextWrapping.Wrap,
             });
         }
@@ -722,7 +717,7 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
         {
             content.Children.Add(new TextBlock
             {
-                Text = "Can't be restored:",
+                Text = Strings.Get("Game_RestoreCantBeRestored"),
                 Style = (Style)Application.Current.Resources["BodyStrongTextBlockStyle"],
                 Margin = new Thickness(0, 4, 0, 0),
             });
@@ -741,11 +736,11 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
         if (this.ViewModel.CanCommit() == false)
         {
             this.ViewModel.DiscardChanges();
-            await this.ShowDialogAsync("Restore backup", content, "OK", closeText: "");
+            await this.ShowDialogAsync(Strings.Get("Game_RestoreDialogTitle"), content, Strings.Get("Common_Ok"), closeText: "");
             return;
         }
 
-        if (await this.ShowDialogAsync("Restore backup?", content, "Restore") == ContentDialogResult.Primary)
+        if (await this.ShowDialogAsync(Strings.Get("Game_RestoreConfirmTitle"), content, Strings.Get("Common_Restore")) == ContentDialogResult.Primary)
         {
             await this.ViewModel.StoreAsync(CommitSource.Restore, this.ConfirmCommitWithoutBackupAsync);
         }
@@ -761,22 +756,19 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
     private async void OnResetAllStats(object sender, RoutedEventArgs e)
     {
         if (await this.ShowDialogAsync(
-                "Reset all stats?",
-                "This resets every statistic for this game on your Steam account — not just achievements. " +
-                "Game progress tracked by stats will be lost. Are you sure you want to reset stats?",
-                "Continue",
-                closeText: "Cancel",
+                Strings.Get("Game_ResetStatsTitle"),
+                Strings.Get("Game_ResetStatsMessage"),
+                Strings.Get("Game_Continue"),
                 defaultButton: ContentDialogButton.Close) != ContentDialogResult.Primary)
         {
             return;
         }
 
         var answer = await this.ShowDialogAsync(
-            "Reset achievements too?",
-            "Do you want to reset this game's achievements as well? Choosing \"Only stats\" leaves achievements as they are.",
-            "Reset achievements too",
-            secondaryText: "Only stats",
-            closeText: "Cancel",
+            Strings.Get("Game_ResetAchievementsTitle"),
+            Strings.Get("Game_ResetAchievementsMessage"),
+            Strings.Get("Game_ResetAchievementsTooButton"),
+            secondaryText: Strings.Get("Game_OnlyStatsButton"),
             defaultButton: ContentDialogButton.Close);
         if (answer == ContentDialogResult.None)
         {
@@ -785,12 +777,9 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
 
         var achievementsToo = answer == ContentDialogResult.Primary;
         if (await this.ShowDialogAsync(
-                "Are you absolutely sure?",
-                achievementsToo
-                    ? "All stats AND all achievements for this game will be reset. This can't be undone."
-                    : "All stats for this game will be reset. This can't be undone.",
-                achievementsToo ? "Reset stats and achievements" : "Reset stats",
-                closeText: "Cancel",
+                Strings.Get("Game_ResetSureTitle"),
+                Strings.Get(achievementsToo ? "Game_ResetSureAll" : "Game_ResetSureStats"),
+                Strings.Get(achievementsToo ? "Game_ResetStatsAndAchievementsButton" : "Game_ResetStatsOnlyButton"),
                 destructive: true) != ContentDialogResult.Primary)
         {
             return;
@@ -809,10 +798,9 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
 
         args.Cancel = true;
         if (await this.ShowDialogAsync(
-                "Discard uncommitted changes?",
+                Strings.Get("Game_CloseDiscardTitle"),
                 this.ViewModel.UnsavedChangesText,
-                "Discard",
-                closeText: "Cancel",
+                Strings.Get("Game_CloseDiscardButton"),
                 defaultButton: ContentDialogButton.Close) == ContentDialogResult.Primary)
         {
             this._closeConfirmed = true;

@@ -37,12 +37,12 @@ public sealed partial class LibraryViewModel
         switch (smartList)
         {
             case AlmostPerfectList when card.Progress is { Total: > 0 } p && p.Unlocked < p.Total:
-                return $"{LibraryFormat.Count(p.Total - p.Unlocked)} left";
+                return Strings.Plural("Library_SmartBadgeLeft", p.Total - p.Unlocked);
 
             case RarestOwnedList when card.Progress is { Unlocked: > 0 }:
                 if (this._rarest.TryGetValue(card.AppId, out var rarest))
                 {
-                    return rarest is { } percent ? $"Rarest {FormatPercent(percent)}" : "No rarity data";
+                    return rarest is { } percent ? Strings.Format("Library_SmartBadgeRarest", FormatPercent(percent)) : Strings.Get("Library_SmartBadgeNoRarity");
                 }
 
                 return this._isRarestLoading ? "" : null;
@@ -125,8 +125,8 @@ public sealed partial class LibraryViewModel
             this._isRarestLoading = false;
             this._isRarestLoaded = true;
             this.ShowNotice(
-                "Couldn't load unlock data",
-                "\"Rarest owned\" needs your unlocked achievements from Steam's local stats cache, which couldn't be read.",
+                Strings.Get("Library_RarestLoadFailedTitle"),
+                Strings.Get("Library_RarestLoadFailed"),
                 InfoBarSeverity.Warning);
             this.ApplyFilter();
             return;

@@ -275,8 +275,8 @@ public sealed class CollectionsService
 
         var name = id switch
         {
-            "favorite" => "Favorites (Steam)",
-            "hidden" => "Hidden (Steam)",
+            "favorite" => Strings.Get("Collections_SteamFavorites"),
+            "hidden" => Strings.Get("Collections_SteamHidden"),
             _ => value.TryGetProperty("name", out var n) && n.ValueKind == JsonValueKind.String &&
                  string.IsNullOrWhiteSpace(n.GetString()) == false
                 ? n.GetString()!

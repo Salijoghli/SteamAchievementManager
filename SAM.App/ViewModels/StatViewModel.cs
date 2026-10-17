@@ -12,7 +12,11 @@ using SAM.App.Models;
 namespace SAM.App.ViewModels;
 
 /// <summary>An achievement whose progress depends on a stat (for the "Used by" section).</summary>
-public sealed record StatUsage(string AchievementName, double TargetValue);
+public sealed record StatUsage(string AchievementName, double TargetValue)
+{
+    /// <summary>"Achievement name — target 100".</summary>
+    public string Text => Strings.Format("Stat_UsedByTarget", this.AchievementName, this.TargetValue.ToString("G7", CultureInfo.CurrentCulture));
+}
 
 /// <summary>
 /// One stat row. <see cref="EditValue"/> is what the user typed; it's validated and only
@@ -66,9 +70,9 @@ public sealed partial class StatViewModel : ObservableObject
 
     public string KindText => this.Definition.Kind switch
     {
-        StatKind.Integer => "Integer",
-        StatKind.Float => "Float",
-        _ => "Average rate",
+        StatKind.Integer => Strings.Get("Stat_KindInteger"),
+        StatKind.Float => Strings.Get("Stat_KindFloat"),
+        _ => Strings.Get("Stat_KindAverageRate"),
     };
 
     public string FlagsText
@@ -78,17 +82,17 @@ public sealed partial class StatViewModel : ObservableObject
             var parts = new List<string> { this.KindText };
             if (this.IsIncrementOnly)
             {
-                parts.Add("increment-only");
+                parts.Add(Strings.Get("Stat_IncrementOnly"));
             }
 
             if (this.HasBounds)
             {
-                parts.Add($"range {Format(this.Definition.MinValue)} – {Format(this.Definition.MaxValue)}");
+                parts.Add(Strings.Format("Stat_Range", Format(this.Definition.MinValue), Format(this.Definition.MaxValue)));
             }
 
             if (this.Definition.MaxChange > 0)
             {
-                parts.Add($"max change {Format(this.Definition.MaxChange)}");
+                parts.Add(Strings.Format("Stat_MaxChange", Format(this.Definition.MaxChange)));
             }
 
             return string.Join(" · ", parts);
@@ -97,13 +101,13 @@ public sealed partial class StatViewModel : ObservableObject
 
     /// <summary>Why the stat can't be edited (shown when <see cref="IsReadOnly"/>).</summary>
     public string ProtectedText => this.IsProtected
-        ? "Protected — only the game's servers can change this stat"
-        : "Average rate — Steam only updates these from the game's play sessions, so they can't be edited here";
+        ? Strings.Get("Stat_ProtectedText")
+        : Strings.Get("Stat_AverageRateText");
 
     /// <summary>The value Steam reported when loaded (or last committed).</summary>
     public double OriginalValue { get; private set; }
 
-    public string OriginalValueText => "Was " + Format(this.OriginalValue);
+    public string OriginalValueText => Strings.Format("Stat_WasValue", Format(this.OriginalValue));
 
     /// <summary>Last valid value; this is what gets stored.</summary>
     [ObservableProperty]
@@ -195,59 +199,58 @@ public sealed partial class StatViewModel : ObservableObject
 
         if (double.IsNaN(value) || double.IsInfinity(value))
         {
-            return "Enter a number.";
+            return Strings.Get("Stat_ErrorNotNumber");
         }
 
         if (this.IsProtected)
         {
-            return "This stat is protected and can't be changed.";
+            return Strings.Get("Stat_ErrorProtected");
         }
 
         if (this.IsAverageRate)
         {
-            return "Average-rate stats can't be changed here.";
+            return Strings.Get("Stat_ErrorAverageRate");
         }
 
         if (this.IsInteger)
         {
             if (Math.Floor(value) != value)
             {
-                return "This stat takes whole numbers only.";
+                return Strings.Get("Stat_ErrorWholeNumbers");
             }
 
             if (value < int.MinValue || value > int.MaxValue)
             {
-                return "The value is out of range for an integer stat.";
+                return Strings.Get("Stat_ErrorIntegerRange");
             }
         }
         else if (value < float.MinValue || value > float.MaxValue)
         {
-            return "The value is out of range.";
+            return Strings.Get("Stat_ErrorRange");
         }
 
         if (this.HasBounds)
         {
             if (value < this.Definition.MinValue)
             {
-                return $"The minimum is {Format(this.Definition.MinValue)}.";
+                return Strings.Format("Stat_ErrorMinimum", Format(this.Definition.MinValue));
             }
 
             if (value > this.Definition.MaxValue)
             {
-                return $"The maximum is {Format(this.Definition.MaxValue)}.";
+                return Strings.Format("Stat_ErrorMaximum", Format(this.Definition.MaxValue));
             }
         }
 
         if (this.IsIncrementOnly && value < this.OriginalValue)
         {
-            return $"This stat can only increase; it can't go below {Format(this.OriginalValue)}.";
+            return Strings.Format("Stat_ErrorIncrementOnly", Format(this.OriginalValue));
         }
 
         // Steam rejects a store that changes a stat by more than its "maxchange" at once.
         if (this.Definition.MaxChange > 0 && Math.Abs(value - this.OriginalValue) > this.Definition.MaxChange)
         {
-            return $"This stat can change by at most {Format(this.Definition.MaxChange)} at a time " +
-                $"(from {Format(this.OriginalValue)}).";
+            return Strings.Format("Stat_ErrorMaxChange", Format(this.Definition.MaxChange), Format(this.OriginalValue));
         }
 
         return null;
@@ -257,12 +260,12 @@ public sealed partial class StatViewModel : ObservableObject
     {
         if (value >= float.MaxValue || value == int.MaxValue)
         {
-            return "max";
+            return Strings.Get("Stat_Max");
         }
 
         if (value <= float.MinValue || value == int.MinValue)
         {
-            return "min";
+            return Strings.Get("Stat_Min");
         }
 
         return Math.Abs(value) >= 1e7 && Math.Floor(value) == value

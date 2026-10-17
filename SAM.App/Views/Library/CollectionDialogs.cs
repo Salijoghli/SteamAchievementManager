@@ -14,7 +14,7 @@ internal static class CollectionDialogs
         var box = new TextBox
         {
             Text = initial,
-            PlaceholderText = "Collection name",
+            PlaceholderText = Strings.Get("Collections_NamePlaceholder"),
             MaxLength = 100,
             Width = 320,
         };
@@ -28,7 +28,7 @@ internal static class CollectionDialogs
             Title = title,
             Content = box,
             PrimaryButtonText = primaryText,
-            CloseButtonText = "Cancel",
+            CloseButtonText = Strings.Get("Common_Cancel"),
             DefaultButton = ContentDialogButton.Primary,
             IsPrimaryButtonEnabled = initial.Trim().Length > 0,
         };
@@ -52,8 +52,8 @@ internal static class CollectionDialogs
     public static async Task ShowManageAsync(XamlRoot root, LibraryViewModel library)
     {
         var list = new StackPanel { Spacing = 4 };
-        var newName = new TextBox { PlaceholderText = "New collection name", MaxLength = 100 };
-        var create = new Button { Content = "Create", IsEnabled = false };
+        var newName = new TextBox { PlaceholderText = Strings.Get("Collections_NewNamePlaceholder"), MaxLength = 100 };
+        var create = new Button { Content = Strings.Get("Common_Create"), IsEnabled = false };
         newName.TextChanged += (_, _) => create.IsEnabled = newName.Text.Trim().Length > 0;
 
         var content = new StackPanel { Width = 420, Spacing = 16 };
@@ -67,7 +67,7 @@ internal static class CollectionDialogs
         content.Children.Add(new ScrollViewer { Content = list, MaxHeight = 360 });
         content.Children.Add(new TextBlock
         {
-            Text = "Steam collections are read-only here; change them in Steam.",
+            Text = Strings.Get("Collections_SteamReadOnly"),
             TextWrapping = TextWrapping.Wrap,
             Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"],
             Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
@@ -78,9 +78,9 @@ internal static class CollectionDialogs
             XamlRoot = root,
             RequestedTheme = library.RequestedTheme,
             Style = (Style)Application.Current.Resources["DefaultContentDialogStyle"],
-            Title = "Manage collections",
+            Title = Strings.Get("Collections_ManageTitle"),
             Content = content,
-            CloseButtonText = "Close",
+            CloseButtonText = Strings.Get("Common_Close"),
             DefaultButton = ContentDialogButton.Close,
         };
 
@@ -91,7 +91,7 @@ internal static class CollectionDialogs
             {
                 list.Children.Add(new TextBlock
                 {
-                    Text = "You haven't made any collections yet.",
+                    Text = Strings.Get("Collections_None"),
                     Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
                 });
                 return;
@@ -114,7 +114,7 @@ internal static class CollectionDialogs
             label.Children.Add(new TextBlock { Text = collection.Name, TextTrimming = TextTrimming.CharacterEllipsis });
             label.Children.Add(new TextBlock
             {
-                Text = collection.AppIds.Count == 1 ? "1 game" : $"{LibraryFormat.Count(collection.AppIds.Count)} games",
+                Text = Strings.Plural("Collections_GameCount", collection.AppIds.Count),
                 Style = (Style)Application.Current.Resources["CaptionTextBlockStyle"],
                 Foreground = (Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
             });
@@ -122,7 +122,7 @@ internal static class CollectionDialogs
 
             // Rename: an inline flyout (a second ContentDialog can't open while this one is shown).
             var renameBox = new TextBox { Text = collection.Name, MaxLength = 100, Width = 240 };
-            var renameSave = new Button { Content = "Rename", Style = (Style)Application.Current.Resources["AccentButtonStyle"], HorizontalAlignment = HorizontalAlignment.Right };
+            var renameSave = new Button { Content = Strings.Get("Common_Rename"), Style = (Style)Application.Current.Resources["AccentButtonStyle"], HorizontalAlignment = HorizontalAlignment.Right };
             var renamePanel = new StackPanel { Spacing = 8 };
             renamePanel.Children.Add(renameBox);
             renamePanel.Children.Add(renameSave);
@@ -134,14 +134,14 @@ internal static class CollectionDialogs
                 library.RenameCollection(collection.Id, renameBox.Text);
                 Rebuild();
             };
-            var rename = IconButton("", $"Rename {collection.Name}");
+            var rename = IconButton("", Strings.Format("Collections_RenameNamed", collection.Name));
             rename.Flyout = renameFlyout;
             Grid.SetColumn(rename, 1);
             row.Children.Add(rename);
 
-            var confirm = new Button { Content = "Delete", Style = (Style)Application.Current.Resources["AccentButtonStyle"], HorizontalAlignment = HorizontalAlignment.Right };
+            var confirm = new Button { Content = Strings.Get("Common_Delete"), Style = (Style)Application.Current.Resources["AccentButtonStyle"], HorizontalAlignment = HorizontalAlignment.Right };
             var confirmPanel = new StackPanel { Spacing = 12, Width = 260 };
-            confirmPanel.Children.Add(new TextBlock { Text = $"Delete \"{collection.Name}\"? The games stay in your library.", TextWrapping = TextWrapping.Wrap });
+            confirmPanel.Children.Add(new TextBlock { Text = Strings.Format("Collections_DeleteConfirm", collection.Name), TextWrapping = TextWrapping.Wrap });
             confirmPanel.Children.Add(confirm);
             var confirmFlyout = new Flyout { Content = confirmPanel };
             confirm.Click += (_, _) =>
@@ -150,7 +150,7 @@ internal static class CollectionDialogs
                 library.DeleteCollection(collection.Id);
                 Rebuild();
             };
-            var delete = IconButton("", $"Delete {collection.Name}");
+            var delete = IconButton("", Strings.Format("Collections_DeleteNamed", collection.Name));
             delete.Flyout = confirmFlyout;
             Grid.SetColumn(delete, 2);
             row.Children.Add(delete);

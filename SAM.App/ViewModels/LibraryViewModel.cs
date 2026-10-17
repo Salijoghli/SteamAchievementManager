@@ -65,6 +65,9 @@ public sealed partial class LibraryViewModel : ObservableObject
     private bool _isShutDown;
     private readonly CancellationTokenSource _lifetime = new();
 
+    /// <summary>The UI language this process started with; a change takes effect after a restart.</summary>
+    private readonly string _startupLanguage;
+
     /// <summary>Smart list keys stored in <see cref="AppSettings.SmartList"/>.</summary>
     public const string AlmostPerfectList = "almost-perfect";
 
@@ -105,6 +108,8 @@ public sealed partial class LibraryViewModel : ObservableObject
             "Dark" => 2,
             _ => 0,
         };
+        this._startupLanguage = settings.Language;
+        this.LanguageIndex = LanguageIndexOf(settings.Language);
         this.KeepOtherAccountsCache = settings.KeepOtherAccountsCache;
         this.InstalledOnly = settings.InstalledOnly;
         this.ShowHidden = settings.ShowHidden;
@@ -122,9 +127,9 @@ public sealed partial class LibraryViewModel : ObservableObject
         if (services.AccountSwitched)
         {
             this.IsAccountNoticeOpen = true;
-            this.AccountNoticeMessage = settings.KeepOtherAccountsCache
-                ? "A different Steam account is logged in. Cached data from the previous account was kept."
-                : "A different Steam account is logged in. Cached data from the previous account was cleared.";
+            this.AccountNoticeMessage = Strings.Get(settings.KeepOtherAccountsCache
+                ? "Library_AccountSwitchedKept"
+                : "Library_AccountSwitchedCleared");
         }
 
         services.Favorites.Changed += this.OnFavoritesStoreChanged;
@@ -134,9 +139,9 @@ public sealed partial class LibraryViewModel : ObservableObject
     /// <summary>The smart lists offered in the header, in menu order.</summary>
     public static IReadOnlyList<LibrarySmartList> SmartLists { get; } =
     [
-        new(AlmostPerfectList, "Almost perfect", "80% or more unlocked, fewest remaining first"),
-        new(NeverStartedList, "Never started", "Has achievements but none unlocked, most played first"),
-        new(RarestOwnedList, "Rarest owned", "Ordered by the rarest achievement you've unlocked"),
+        new(AlmostPerfectList, Strings.Get("Library_SmartAlmostPerfect"), Strings.Get("Library_SmartAlmostPerfectHint")),
+        new(NeverStartedList, Strings.Get("Library_SmartNeverStarted"), Strings.Get("Library_SmartNeverStartedHint")),
+        new(RarestOwnedList, Strings.Get("Library_SmartRarestOwned"), Strings.Get("Library_SmartRarestOwnedHint")),
     ];
 
     /// <summary>Every owned game (unfiltered), for pages that summarize the whole library.</summary>
@@ -259,6 +264,11 @@ public sealed partial class LibraryViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(RequestedTheme))]
     private int _themeIndex;
 
+    /// <summary>Index into <see cref="Languages"/>.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsRestartNeeded))]
+    private int _languageIndex;
+
     [ObservableProperty]
     private bool _keepOtherAccountsCache;
 
@@ -348,7 +358,7 @@ public sealed partial class LibraryViewModel : ObservableObject
 
     public bool IsSmartListActive => this.SmartList != null;
 
-    public string SmartListName => SmartLists.FirstOrDefault(l => l.Key == this.SmartList)?.Name ?? "Smart lists";
+    public string SmartListName => SmartLists.FirstOrDefault(l => l.Key == this.SmartList)?.Name ?? Strings.Get("Library_SmartLists");
 
     /// <summary>Smart lists have their own order, so the sort controls are disabled while one is active.</summary>
     public bool IsSortEnabled => this.IsSmartListActive == false;
@@ -357,7 +367,9 @@ public sealed partial class LibraryViewModel : ObservableObject
 
     /// <summary>Name shown on the collection picker.</summary>
     public string CollectionFilterName =>
-        this.CollectionFilter == null ? "All games" : this.FindCollection(this.CollectionFilter)?.Name ?? "All games";
+        this.CollectionFilter == null
+            ? Strings.Get("Library_CollectionsAllGames")
+            : this.FindCollection(this.CollectionFilter)?.Name ?? Strings.Get("Library_CollectionsAllGames");
 
     /// <summary>Steam collections with explicit app lists (read-only).</summary>
     public IReadOnlyList<GameCollection> SteamCollections { get; private set; } = [];
@@ -389,7 +401,14 @@ public sealed partial class LibraryViewModel : ObservableObject
 
     public string SortDirectionGlyph => this.SortDescending ? "" : "";
 
-    public string SortDirectionLabel => this.SortDescending ? "Descending (click for ascending)" : "Ascending (click for descending)";
+    public string SortDirectionLabel => Strings.Get(this.SortDescending ? "Library_SortDescendingLabel" : "Library_SortAscendingLabel");
+
+    /// <summary>The UI languages offered in Settings, as <see cref="AppSettings.Language"/> values.</summary>
+    public static IReadOnlyList<string> Languages { get; } = ["en-US", "ka-GE"];
+
+    /// <summary>True when the chosen language differs from the one this process is showing.</summary>
+    public bool IsRestartNeeded =>
+        LanguageIndexOf(this._startupLanguage) != this.LanguageIndex;
 
     public ElementTheme RequestedTheme => this.ThemeIndex switch
     {
@@ -467,7 +486,7 @@ public sealed partial class LibraryViewModel : ObservableObject
             }
 
             var reason = e is HttpRequestException
-                ? "The game list couldn't be downloaded. Check your internet connection."
+                ? Strings.Get("Library_GameListDownloadFailed")
                 : e.Message;
             if (this._master.Count == 0)
             {
@@ -476,7 +495,7 @@ public sealed partial class LibraryViewModel : ObservableObject
             }
             else
             {
-                this.RefreshWarning = $"Showing your cached library. {reason}";
+                this.RefreshWarning = Strings.Format("Library_ShowingCached", reason);
                 this.IsRefreshWarningOpen = true;
             }
         }
@@ -713,10 +732,10 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
 
         var percent = total == 0 ? 0 : (double)unlocked / total * 100;
-        this.CompletionText = $"{percent.ToString("0.#", CultureInfo.CurrentCulture)}% complete";
-        this.CompletionDetail = $"{LibraryFormat.Count(unlocked)} of {LibraryFormat.Count(total)} achievements unlocked across games with achievements";
-        this.PerfectText = $"{LibraryFormat.Count(perfect)} perfect";
-        this.TotalPlaytimeText = $"{LibraryFormat.Playtime(playtime)} played";
+        this.CompletionText = Strings.Format("Library_CompletionSummary", percent.ToString("0.#", CultureInfo.CurrentCulture));
+        this.CompletionDetail = Strings.Plural("Library_CompletionDetail", total, LibraryFormat.Count(unlocked));
+        this.PerfectText = Strings.Plural("Library_PerfectSummaryText", perfect);
+        this.TotalPlaytimeText = Strings.Format("Library_PlaytimeSummaryText", LibraryFormat.Playtime(playtime));
         this.IsSummaryReady = true;
     }
     #endregion
@@ -838,6 +857,29 @@ public sealed partial class LibraryViewModel : ObservableObject
     partial void OnThemeIndexChanged(int value) => this.SaveSettings();
 
     partial void OnKeepOtherAccountsCacheChanged(bool value) => this.SaveSettings();
+
+    partial void OnLanguageIndexChanged(int value)
+    {
+        if (this._initializing || value < 0 || value >= Languages.Count)
+        {
+            return;
+        }
+
+        // Only written when the user picks a language, so a hand-edited culture (e.g. "de-DE" for
+        // date formats) survives other settings changes.
+        this._services.Settings.Language = Languages[value];
+        this.SaveSettings();
+    }
+
+    /// <summary>Starts a new SAM in the chosen language and closes this one.</summary>
+    [RelayCommand]
+    private void RestartApp() => App.Restart();
+
+    private static int LanguageIndexOf(string? language) =>
+        string.Equals(language, "ka-GE", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(language, "ka", StringComparison.OrdinalIgnoreCase)
+            ? 1
+            : 0;
 
     private void OnViewSettingChanged()
     {
@@ -1048,8 +1090,8 @@ public sealed partial class LibraryViewModel : ObservableObject
 
         this.ShownCount = list.Count;
         this.CountText = list.Count == this._master.Count
-            ? $"{LibraryFormat.Count(list.Count)} games"
-            : $"{LibraryFormat.Count(list.Count)} of {LibraryFormat.Count(this._master.Count)} games";
+            ? Strings.Plural("Library_GameCount", list.Count)
+            : Strings.Plural("Library_GameCountFiltered", this._master.Count, LibraryFormat.Count(list.Count));
         this.OnPropertyChanged(nameof(this.IsNoMatches));
     }
 
@@ -1184,8 +1226,8 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
 
         return this._master.TryGetValue(appId, out var card)
-            ? [new LibrarySuggestion($"Open {card.Name} (App ID {appId})", appId, card)]
-            : [new LibrarySuggestion($"Open App ID {appId}", appId, null)];
+            ? [new LibrarySuggestion(Strings.Format("Library_SuggestOpenGame", card.Name, card.AppIdText), appId, card)]
+            : [new LibrarySuggestion(Strings.Format("Library_SuggestOpenAppId", appId.ToString(CultureInfo.InvariantCulture)), appId, null)];
     }
 
     /// <summary>Handles a chosen suggestion or a submitted query. Returns true if something was opened.</summary>
@@ -1218,13 +1260,19 @@ public sealed partial class LibraryViewModel : ObservableObject
         catch (Exception e)
         {
             Diagnostics.Log($"Couldn't check ownership of {suggestion.AppId}", e);
-            this.ShowNotice("Couldn't check App ID", $"Couldn't check whether you own App ID {suggestion.AppId}: {e.Message}", InfoBarSeverity.Error);
+            this.ShowNotice(
+                Strings.Get("Library_CheckAppIdFailedTitle"),
+                Strings.Format("Library_CheckAppIdFailed", suggestion.AppId.ToString(CultureInfo.InvariantCulture), e.Message),
+                InfoBarSeverity.Error);
             return false;
         }
 
         if (entry == null)
         {
-            this.ShowNotice("Not owned", $"You don't own App ID {suggestion.AppId}.", InfoBarSeverity.Warning);
+            this.ShowNotice(
+                Strings.Get("Library_NotOwnedTitle"),
+                Strings.Format("Library_NotOwned", suggestion.AppId.ToString(CultureInfo.InvariantCulture)),
+                InfoBarSeverity.Warning);
             return false;
         }
 
@@ -1265,7 +1313,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         catch (Exception e)
         {
             Diagnostics.Log("Couldn't save favorites", e);
-            this.ShowNotice("Couldn't save favorites", e.Message, InfoBarSeverity.Error);
+            this.ShowNotice(Strings.Get("Library_SaveFavoritesFailed"), e.Message, InfoBarSeverity.Error);
         }
 
         if (this.FavoritesOnly || this.PinFavorites)
@@ -1314,7 +1362,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         catch (Exception e)
         {
             Diagnostics.Log($"Couldn't open {card.AppId}", e);
-            this.ShowNotice($"Couldn't open {card.Name}", e.Message, InfoBarSeverity.Error);
+            this.ShowNotice(Strings.Format("Library_OpenGameFailed", card.Name), e.Message, InfoBarSeverity.Error);
         }
     }
 
@@ -1329,16 +1377,16 @@ public sealed partial class LibraryViewModel : ObservableObject
         catch (Exception e)
         {
             Diagnostics.Log("Couldn't copy to the clipboard", e);
-            this.ShowNotice("Couldn't copy the App ID", e.Message, InfoBarSeverity.Error);
+            this.ShowNotice(Strings.Get("Library_CopyAppIdFailed"), e.Message, InfoBarSeverity.Error);
         }
     }
 
-    internal void OpenUrl(string url) => this.LaunchUri(url, "Couldn't open the browser");
+    internal void OpenUrl(string url) => this.LaunchUri(url, Strings.Get("Library_OpenBrowserFailed"));
 
     /// <summary>Starts the game through Steam if it's installed, or opens Steam's install dialog.</summary>
     internal void PlayOrInstall(GameCardViewModel card) => this.LaunchUri(
         card.IsInstalled ? $"steam://rungameid/{card.AppIdText}" : $"steam://install/{card.AppIdText}",
-        card.IsInstalled ? $"Couldn't start {card.Name}" : $"Couldn't install {card.Name}");
+        Strings.Format(card.IsInstalled ? "Library_StartGameFailed" : "Library_InstallGameFailed", card.Name));
 
     private async void LaunchUri(string url, string failureTitle)
     {
@@ -1366,7 +1414,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         catch (Exception e)
         {
             Diagnostics.Log($"Couldn't open {path}", e);
-            this.ShowNotice("Couldn't open the file", e.Message, InfoBarSeverity.Error);
+            this.ShowNotice(Strings.Get("Library_OpenFileFailed"), e.Message, InfoBarSeverity.Error);
         }
     }
 
@@ -1417,7 +1465,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         catch (Exception e)
         {
             Diagnostics.Log("Couldn't clear the cache", e);
-            this.ShowNotice("Couldn't clear the cache", e.Message, InfoBarSeverity.Error);
+            this.ShowNotice(Strings.Get("Library_ClearCacheFailed"), e.Message, InfoBarSeverity.Error);
         }
 
         await this.RefreshAsync();

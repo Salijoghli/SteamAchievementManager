@@ -17,7 +17,7 @@ public sealed partial class LibrarySettingsDialog : ContentDialog
         viewModel.PropertyChanged += this.OnViewModelPropertyChanged;
         this.Closed += (_, _) => viewModel.PropertyChanged -= this.OnViewModelPropertyChanged;
         this.Opened += async (_, _) => await this.UpdateCacheSizeAsync();
-        this.VersionText.Text = $"Version {LibraryViewModel.CurrentVersionText}";
+        this.VersionText.Text = Strings.Format("Settings_Version", LibraryViewModel.CurrentVersionText);
     }
 
     public LibraryViewModel ViewModel { get; }

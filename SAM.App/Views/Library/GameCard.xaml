@@ -95,7 +95,7 @@
                     Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.IsInstalled), Mode=OneWay}">
                     <StackPanel Orientation="Horizontal" Spacing="4">
                         <FontIcon Glyph="&#xE73E;" FontSize="10" Foreground="White" />
-                        <TextBlock Text="Installed" FontSize="11" Foreground="White" />
+                        <TextBlock x:Uid="Card_InstalledBadge" FontSize="11" Foreground="White" />
                     </StackPanel>
                 </Border>
 

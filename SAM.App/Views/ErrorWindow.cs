@@ -9,14 +9,14 @@ public sealed class ErrorWindow : Window
 {
     public ErrorWindow(string title, string message)
     {
-        this.Title = "Steam Achievement Manager";
+        this.Title = Strings.Get("Common_AppName");
         this.SystemBackdrop = new MicaBackdrop();
         this.AppWindow.Resize(new Windows.Graphics.SizeInt32(560, 320));
         this.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "SAM.ico"));
 
         var close = new Button
         {
-            Content = "Close",
+            Content = Strings.Get("Common_Close"),
             Style = (Style)Application.Current.Resources["AccentButtonStyle"],
             HorizontalAlignment = HorizontalAlignment.Right,
         };

@@ -32,10 +32,10 @@ public sealed partial class HistoryItemViewModel : ObservableObject
     public uint AppId => this.Record.AppId;
 
     public string GameName => string.IsNullOrWhiteSpace(this.Record.GameName)
-        ? $"App {this.Record.AppId.ToString(CultureInfo.InvariantCulture)}"
+        ? Strings.Format("Pages_AppFallbackName", this.Record.AppId.ToString(CultureInfo.InvariantCulture))
         : this.Record.GameName;
 
-    public string OpenGameLabel => $"Open {this.GameName}";
+    public string OpenGameLabel => Strings.Format("Pages_OpenGame", this.GameName);
 
     public string TimeText => this.Record.Time.LocalDateTime.ToString("t", CultureInfo.CurrentCulture);
 
@@ -43,13 +43,17 @@ public sealed partial class HistoryItemViewModel : ObservableObject
 
     public string FullTimeText => this.Record.Time.LocalDateTime.ToString("F", CultureInfo.CurrentCulture);
 
-    public string Source => string.IsNullOrWhiteSpace(this.Record.Source) ? "Unknown" : this.Record.Source;
+    /// <summary>The stored <see cref="CommitSource"/> value (used for filtering).</summary>
+    public string Source => this.Record.Source ?? "";
+
+    /// <summary>The source as shown: known <see cref="CommitSource"/> values are localized.</summary>
+    public string SourceText => HistoryViewModel.SourceName(this.Record.Source);
 
     public bool Succeeded => this.Record.Succeeded;
 
     public bool Failed => this.Record.Succeeded == false;
 
-    public string StatusText => this.Record.Succeeded ? "Succeeded" : "Failed";
+    public string StatusText => Strings.Get(this.Record.Succeeded ? "History_StatusSucceeded" : "History_StatusFailed");
 
     public string? Message => this.Record.Message;
 
@@ -65,30 +69,32 @@ public sealed partial class HistoryItemViewModel : ObservableObject
             var parts = new List<string>(3);
             if (this.Record.Unlocked.Count > 0)
             {
-                parts.Add($"unlocked {LibraryFormat.Count(this.Record.Unlocked.Count)}");
+                parts.Add(Strings.Plural("History_SummaryUnlocked", this.Record.Unlocked.Count));
             }
 
             if (this.Record.Locked.Count > 0)
             {
-                parts.Add($"locked {LibraryFormat.Count(this.Record.Locked.Count)}");
+                parts.Add(Strings.Plural("History_SummaryLocked", this.Record.Locked.Count));
             }
 
             if (this.Record.Stats.Count > 0)
             {
-                parts.Add(this.Record.Stats.Count == 1 ? "changed 1 stat" : $"changed {LibraryFormat.Count(this.Record.Stats.Count)} stats");
+                parts.Add(Strings.Plural("History_SummaryStats", this.Record.Stats.Count));
             }
 
             if (parts.Count == 0)
             {
-                return "No changes";
+                return Strings.Get("History_NoChanges");
             }
 
             var text = string.Join(", ", parts);
-            return char.ToUpper(text[0], CultureInfo.CurrentCulture) + text[1..];
+
+            // Only Latin text is capitalized: upper-casing Georgian would give Mtavruli capitals.
+            return char.IsAsciiLetterLower(text[0]) ? char.ToUpperInvariant(text[0]) + text[1..] : text;
         }
     }
 
-    public string AutomationName => $"{this.GameName}, {this.Summary}, {this.StatusText}, {this.Source}, {this.FullTimeText}";
+    public string AutomationName => $"{this.GameName}, {this.Summary}, {this.StatusText}, {this.SourceText}, {this.FullTimeText}";
 
     [ObservableProperty]
     private bool _isExpanded;
@@ -173,17 +179,17 @@ public sealed partial class HistoryItemViewModel : ObservableObject
         var groups = new List<HistoryDetailGroup>(3);
         if (this.Record.Unlocked.Count > 0)
         {
-            groups.Add(new HistoryDetailGroup("Unlocked", this.Record.Unlocked.Select(Achievement).ToList()));
+            groups.Add(new HistoryDetailGroup(Strings.Get("History_DetailUnlocked"), this.Record.Unlocked.Select(Achievement).ToList()));
         }
 
         if (this.Record.Locked.Count > 0)
         {
-            groups.Add(new HistoryDetailGroup("Locked", this.Record.Locked.Select(Achievement).ToList()));
+            groups.Add(new HistoryDetailGroup(Strings.Get("History_DetailLocked"), this.Record.Locked.Select(Achievement).ToList()));
         }
 
         if (this.Record.Stats.Count > 0)
         {
-            groups.Add(new HistoryDetailGroup("Stats", this.Record.Stats.Select(Stat).ToList()));
+            groups.Add(new HistoryDetailGroup(Strings.Get("History_DetailStats"), this.Record.Stats.Select(Stat).ToList()));
         }
 
         return groups;
@@ -208,9 +214,13 @@ public sealed partial class HistoryViewModel : ObservableObject
         this._dispatcher = DispatcherQueue.GetForCurrentThread();
     }
 
-    /// <summary>Source filter choices, in <see cref="SourceIndex"/> order ("All sources" first).</summary>
+    /// <summary>Stored source values, in <see cref="SourceIndex"/> order (null for "All sources").</summary>
+    private static readonly string?[] SourceKeys =
+        [null, CommitSource.Manual, CommitSource.Restore, CommitSource.CommandLine, CommitSource.Farm];
+
+    /// <summary>Source filter choices as shown, in <see cref="SourceIndex"/> order ("All sources" first).</summary>
     public IReadOnlyList<string> SourceOptions { get; } =
-        ["All sources", CommitSource.Manual, CommitSource.Restore, CommitSource.CommandLine, CommitSource.Farm];
+        SourceKeys.Select(key => key == null ? Strings.Get("History_AllSources") : SourceName(key)).ToList();
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsListVisible), nameof(IsEmpty), nameof(IsNoMatches))]
@@ -251,7 +261,20 @@ public sealed partial class HistoryViewModel : ObservableObject
 
     public bool IsNoMatches => this.IsLoading == false && this.Error == null && this.TotalCount > 0 && this.ShownCount == 0;
 
-    private string? SelectedSource => this.SourceIndex > 0 && this.SourceIndex < this.SourceOptions.Count ? this.SourceOptions[this.SourceIndex] : null;
+    private string? SelectedSource => this.SourceIndex > 0 && this.SourceIndex < SourceKeys.Length ? SourceKeys[this.SourceIndex] : null;
+
+    /// <summary>
+    /// A history entry's source as shown. The log stores <see cref="CommitSource"/>'s English
+    /// constants; known ones are localized and anything else is shown as stored.
+    /// </summary>
+    public static string SourceName(string? source) => source switch
+    {
+        CommitSource.Manual => Strings.Get("History_SourceManual"),
+        CommitSource.Restore => Strings.Get("History_SourceRestore"),
+        CommitSource.CommandLine => Strings.Get("History_SourceCommandLine"),
+        CommitSource.Farm => Strings.Get("History_SourceFarm"),
+        _ => string.IsNullOrWhiteSpace(source) ? Strings.Get("History_SourceUnknown") : source,
+    };
 
     partial void OnSearchTextChanged(string value) => this.ApplyFilter();
 
@@ -304,8 +327,8 @@ public sealed partial class HistoryViewModel : ObservableObject
         {
             Diagnostics.Log("History: couldn't load the commit log", e);
             error = e is NotImplementedException
-                ? "Commit history isn't available in this build yet."
-                : $"Couldn't read the commit history. {e.Message}";
+                ? Strings.Get("History_Unavailable")
+                : Strings.Format("History_LoadError", e.Message);
         }
 
         if (version != this._loadVersion)
@@ -358,10 +381,8 @@ public sealed partial class HistoryViewModel : ObservableObject
 
     private void UpdateCountText()
     {
-        static string Commits(int count) => count == 1 ? "1 commit" : $"{LibraryFormat.Count(count)} commits";
-
         this.CountText = this.Error != null ? ""
-            : this.ShownCount == this.TotalCount ? Commits(this.TotalCount)
-            : $"{LibraryFormat.Count(this.ShownCount)} of {Commits(this.TotalCount)}";
+            : this.ShownCount == this.TotalCount ? Strings.Plural("History_Commits", this.TotalCount)
+            : Strings.Plural("History_ShownOfTotal", this.TotalCount, LibraryFormat.Count(this.ShownCount));
     }
 }

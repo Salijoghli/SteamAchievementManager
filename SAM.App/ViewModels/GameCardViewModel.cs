@@ -113,9 +113,13 @@ public sealed partial class GameCardViewModel : ObservableObject
 
     public string ProgressText => this.Progress switch
     {
-        null or { Total: 0 } => "No achievements",
-        { Unlocked: 0 } p => $"0 / {p.Total} · Not started",
-        { } p => $"{p.Unlocked} / {p.Total} · {Math.Floor(p.Fraction * 100).ToString(CultureInfo.CurrentCulture)}%",
+        null or { Total: 0 } => Strings.Get("Card_NoAchievements"),
+        { Unlocked: 0 } p => Strings.Format("Card_ProgressNotStarted", LibraryFormat.Count(p.Total)),
+        { } p => Strings.Format(
+            "Card_Progress",
+            LibraryFormat.Count(p.Unlocked),
+            LibraryFormat.Count(p.Total),
+            Math.Floor(p.Fraction * 100).ToString(CultureInfo.CurrentCulture)),
     };
 
     public string PlaytimeText => LibraryFormat.PlaytimeSummary(this.Playtime);
@@ -127,7 +131,7 @@ public sealed partial class GameCardViewModel : ObservableObject
 
     /// <summary>"40%" for the list view, or "–" without achievements.</summary>
     public string PercentText => this.Progress is { Total: > 0 } p
-        ? $"{Math.Floor(p.Fraction * 100).ToString(CultureInfo.CurrentCulture)}%"
+        ? Strings.Format("Card_Percent", Math.Floor(p.Fraction * 100).ToString(CultureInfo.CurrentCulture))
         : "–";
 
     public string PlaytimeShortText => this.PlaytimeSpan > TimeSpan.Zero ? LibraryFormat.Playtime(this.PlaytimeSpan) : "–";
@@ -139,11 +143,11 @@ public sealed partial class GameCardViewModel : ObservableObject
     public string InstalledText => this.Installed is { } i ? LibraryFormat.Bytes(i.SizeOnDisk) : "";
 
     /// <summary>"Play" for installed games, "Install" otherwise.</summary>
-    public string PlayLabel => this.IsInstalled ? "Play" : "Install";
+    public string PlayLabel => Strings.Get(this.IsInstalled ? "Card_Play" : "Card_Install");
 
     public string PlayGlyph => this.IsInstalled ? "" : "";
 
-    public string HiddenLabel => this.IsHidden ? "Unhide game" : "Hide game";
+    public string HiddenLabel => Strings.Get(this.IsHidden ? "Card_UnhideGame" : "Card_HideGame");
 
     public string HiddenGlyph => this.IsHidden ? "" : "";
 
@@ -156,11 +160,11 @@ public sealed partial class GameCardViewModel : ObservableObject
 
     public string FavoriteGlyph => this.IsFavorite ? "" : "";
 
-    public string FavoriteLabel => this.IsFavorite ? "Remove from favorites" : "Add to favorites";
+    public string FavoriteLabel => Strings.Get(this.IsFavorite ? "Card_RemoveFromFavorites" : "Card_AddToFavorites");
 
     public string ToolTipText => this.Installed is { } installed
-        ? $"{this.Name} (App ID {this.AppIdText})\nInstalled ·{LibraryFormat.Bytes(installed.SizeOnDisk)}"
-        : $"{this.Name} (App ID {this.AppIdText})";
+        ? Strings.Format("Card_ToolTipInstalled", this.Name, this.AppIdText, LibraryFormat.Bytes(installed.SizeOnDisk))
+        : Strings.Format("Card_ToolTip", this.Name, this.AppIdText);
 
     internal void Update(GameEntry entry)
     {

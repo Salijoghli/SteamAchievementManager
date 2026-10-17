@@ -1,0 +1,2163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Common_AppName" xml:space="preserve">
+    <value>Steam Achievement Manager</value>
+  </data>
+  <data name="Common_Close" xml:space="preserve">
+    <value>დახურვა</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>გაუქმება</value>
+  </data>
+  <data name="Common_Delete" xml:space="preserve">
+    <value>წაშლა</value>
+  </data>
+  <data name="Common_Rename" xml:space="preserve">
+    <value>სახელის შეცვლა</value>
+  </data>
+  <data name="Common_Create" xml:space="preserve">
+    <value>შექმნა</value>
+  </data>
+  <data name="Common_Restore" xml:space="preserve">
+    <value>აღდგენა</value>
+  </data>
+  <data name="Common_Ok" xml:space="preserve">
+    <value>კარგი</value>
+  </data>
+  <data name="Settings_Dialog.Title" xml:space="preserve">
+    <value>პარამეტრები</value>
+  </data>
+  <data name="Settings_Dialog.CloseButtonText" xml:space="preserve">
+    <value>დახურვა</value>
+  </data>
+  <data name="Settings_Appearance.Text" xml:space="preserve">
+    <value>იერსახე</value>
+  </data>
+  <data name="Settings_Theme.Header" xml:space="preserve">
+    <value>თემა</value>
+  </data>
+  <data name="Settings_ThemeSystem.Content" xml:space="preserve">
+    <value>სისტემური</value>
+  </data>
+  <data name="Settings_ThemeLight.Content" xml:space="preserve">
+    <value>ღია</value>
+  </data>
+  <data name="Settings_ThemeDark.Content" xml:space="preserve">
+    <value>მუქი</value>
+  </data>
+  <data name="Settings_Language.Header" xml:space="preserve">
+    <value>ენა</value>
+  </data>
+  <data name="Settings_LanguageEnglish.Content" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="Settings_LanguageGeorgian.Content" xml:space="preserve">
+    <value>ქართული</value>
+  </data>
+  <data name="Settings_RestartNeeded.Title" xml:space="preserve">
+    <value>ცვლილების ასამოქმედებლად გადატვირთეთ SAM</value>
+  </data>
+  <data name="Settings_RestartNeeded.Message" xml:space="preserve">
+    <value>ღია თამაშების ფანჯრებში ენა შემდეგი გახსნისას შეიცვლება.</value>
+  </data>
+  <data name="Settings_RestartNow.Content" xml:space="preserve">
+    <value>გადატვირთვა</value>
+  </data>
+  <data name="Settings_Library.Text" xml:space="preserve">
+    <value>ბიბლიოთეკა</value>
+  </data>
+  <data name="Settings_KeepOtherAccountsCache.Header" xml:space="preserve">
+    <value>სხვა Steam-ანგარიშების ქეშის შენარჩუნება</value>
+  </data>
+  <data name="Settings_CacheSize.Text" xml:space="preserve">
+    <value>ქეშის ზომა</value>
+  </data>
+  <data name="Settings_ClearCache.Content" xml:space="preserve">
+    <value>ქეშის გასუფთავება</value>
+  </data>
+  <data name="Settings_ClearCacheConfirm.Text" xml:space="preserve">
+    <value>წაიშალოს ყველა ჩამოტვირთული სურათი, თამაშების სია და სხვა ქეშირებული მონაცემი? რჩეულები და პარამეტრები შენარჩუნდება. ბიბლიოთეკა თავიდან ჩაიტვირთება.</value>
+  </data>
+  <data name="Settings_ClearCacheConfirmButton.Content" xml:space="preserve">
+    <value>ქეშის გასუფთავება</value>
+  </data>
+  <data name="Settings_GameWindow.Text" xml:space="preserve">
+    <value>თამაშის ფანჯარა</value>
+  </data>
+  <data name="Settings_SpoilerProtection.Header" xml:space="preserve">
+    <value>სპოილერებისგან დაცვა ფარული მიღწევებისთვის</value>
+  </data>
+  <data name="Settings_SpoilerProtectionHint.Text" xml:space="preserve">
+    <value>ფარული მიღწევების აღწერა დაბინდული რჩება, სანამ მასზე არ დააწკაპუნებთ.</value>
+  </data>
+  <data name="Settings_BackupBeforeCommit.Header" xml:space="preserve">
+    <value>სარეზერვო ასლი ყოველი შენახვის წინ</value>
+  </data>
+  <data name="Settings_BackupBeforeCommitHint.Text" xml:space="preserve">
+    <value>ცვლილებების შენახვამდე ინახავს თამაშის მიღწევებსა და სტატისტიკას, რათა მოგვიანებით აღდგენა შეძლოთ.</value>
+  </data>
+  <data name="Settings_App.Text" xml:space="preserve">
+    <value>აპლიკაცია</value>
+  </data>
+  <data name="Settings_MinimizeToTray.Header" xml:space="preserve">
+    <value>დახურვისას სისტემურ არეში ჩაკეცვა</value>
+  </data>
+  <data name="Settings_ShowNotifications.Header" xml:space="preserve">
+    <value>შეტყობინებების ჩვენება</value>
+  </data>
+  <data name="Settings_CheckForUpdates.Header" xml:space="preserve">
+    <value>განახლებების შემოწმება გაშვებისას</value>
+  </data>
+  <data name="Settings_CheckNow.Content" xml:space="preserve">
+    <value>შემოწმება</value>
+  </data>
+  <data name="Settings_SteamAccount.Text" xml:space="preserve">
+    <value>Steam-ანგარიში</value>
+  </data>
+  <data name="Settings_Version" xml:space="preserve">
+    <value>ვერსია {0}</value>
+  </data>
+  <data name="App_CantConnectToSteam" xml:space="preserve">
+    <value>Steam-თან დაკავშირება ვერ მოხერხდა</value>
+  </data>
+  <data name="App_TrayHintTitle" xml:space="preserve">
+    <value>SAM კვლავ მუშაობს სისტემურ არეში</value>
+  </data>
+  <data name="App_TrayHintMessage" xml:space="preserve">
+    <value>ბიბლიოთეკის გასახსნელად დააწკაპუნეთ ხატულაზე სისტემურ არეში, ან დააწკაპუნეთ მასზე მარჯვენა ღილაკით და აირჩიეთ „გასვლა“.</value>
+  </data>
+  <data name="Tray_OpenLibrary" xml:space="preserve">
+    <value>ბიბლიოთეკის გახსნა</value>
+  </data>
+  <data name="Tray_Exit" xml:space="preserve">
+    <value>გასვლა</value>
+  </data>
+  <data name="Steam_NotInstalled" xml:space="preserve">
+    <value>როგორც ჩანს, Steam დაინსტალირებული არ არის.</value>
+  </data>
+  <data name="Steam_NotLoggedIn" xml:space="preserve">
+    <value>Steam არ არის გაშვებული ან ანგარიშში არ ხართ შესული. გაუშვით Steam, შედით ანგარიშში და სცადეთ ხელახლა.
+
+თუ ეს თამაში Family Sharing-ით გაქვთ, შესაძლოა დაბლოკილი იყოს, სანამ მფლობელი თამაშობს.</value>
+  </data>
+  <data name="Steam_AppIdRejected" xml:space="preserve">
+    <value>Steam-მა App ID {0} არ მიიღო. დარწმუნდით, რომ ეს თამაში გეკუთვნით.</value>
+  </data>
+  <data name="Steam_NotRunning" xml:space="preserve">
+    <value>Steam არ არის გაშვებული. გაუშვით Steam და სცადეთ ხელახლა.</value>
+  </data>
+  <data name="Steam_ClientLibraryMissing" xml:space="preserve">
+    <value>Steam-ის კლიენტის ბიბლიოთეკის (steamclient64.dll) ჩატვირთვა ვერ მოხერხდა.</value>
+  </data>
+  <data name="Steam_StatsRequestRefused" xml:space="preserve">
+    <value>Steam-მა თქვენი სტატისტიკის მოთხოვნა უარყო.</value>
+  </data>
+  <data name="Steam_StatsTimedOut" xml:space="preserve">
+    <value>Steam-მა თქვენი სტატისტიკა დროულად არ დააბრუნა.</value>
+  </data>
+  <data name="Steam_StatsGenericError" xml:space="preserve">
+    <value>Steam-მა ზოგადი შეცდომა დააბრუნა. როგორც წესი, ეს ნიშნავს, რომ თამაში არ გეკუთვნით.</value>
+  </data>
+  <data name="Steam_StatsError" xml:space="preserve">
+    <value>სტატისტიკის მიღებისას Steam-მა დააბრუნა შეცდომა {0}.</value>
+  </data>
+  <data name="Steam_StoreRefused" xml:space="preserve">
+    <value>Steam-მა ცვლილებების შენახვაზე უარი თქვა.</value>
+  </data>
+  <data name="Steam_StoreTimedOut" xml:space="preserve">
+    <value>Steam-მა ცვლილებების შენახვა არ დაადასტურა. შესაძლოა ისინი ჯერ კიდევ მოლოდინშია და მოგვიანებით აიტვირთება; მიმდინარე მდგომარეობის სანახავად ცოტა ხანში ხელახლა ჩატვირთეთ.</value>
+  </data>
+  <data name="Steam_StoreRejectedRule" xml:space="preserve">
+    <value>Steam-ის სერვერებმა ცვლილებები უარყო, რადგან რომელიღაც მნიშვნელობა არღვევს თამაშის წესს (მაგალითად, სტატისტიკის ზღვარს). Steam-მა ისინი გააუქმა.</value>
+  </data>
+  <data name="Steam_StoreRejectedGeneric" xml:space="preserve">
+    <value>Steam-ის სერვერებმა ცვლილებები უარყო (ზოგადი შეცდომა).</value>
+  </data>
+  <data name="Steam_StoreNoConnection" xml:space="preserve">
+    <value>Steam ვერ დაუკავშირდა თავის სერვერებს.</value>
+  </data>
+  <data name="Steam_StoreAccessDenied" xml:space="preserve">
+    <value>Steam-ის სერვერებმა წვდომა უარყო.</value>
+  </data>
+  <data name="Steam_StoreServerTimedOut" xml:space="preserve">
+    <value>Steam-ის სერვერებმა დროულად არ უპასუხა.</value>
+  </data>
+  <data name="Steam_StoreRejectedError" xml:space="preserve">
+    <value>Steam-ის სერვერებმა ცვლილებები უარყო (შეცდომა {0}).</value>
+  </data>
+  <data name="Library_AppTitle.Text" xml:space="preserve">
+    <value>Steam Achievement Manager</value>
+  </data>
+  <data name="Library_PageLibrary.Text" xml:space="preserve">
+    <value>ბიბლიოთეკა</value>
+  </data>
+  <data name="Library_PageStats.Text" xml:space="preserve">
+    <value>სტატისტიკა</value>
+  </data>
+  <data name="Library_PageActivity.Text" xml:space="preserve">
+    <value>აქტივობა</value>
+  </data>
+  <data name="Library_PageHistory.Text" xml:space="preserve">
+    <value>ისტორია</value>
+  </data>
+  <data name="Library_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>თამაშის ან App ID-ის ძიება</value>
+  </data>
+  <data name="Library_SearchBox.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თამაშის ან App ID-ის ძიება</value>
+  </data>
+  <data name="Library_SearchBox.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>თამაშის ან App ID-ის ძიება (Ctrl+F)</value>
+  </data>
+  <data name="Library_CollectionPicker.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>კოლექცია</value>
+  </data>
+  <data name="Library_CollectionPicker.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>კოლექციის ჩვენება</value>
+  </data>
+  <data name="Library_AllGamesItem.Text" xml:space="preserve">
+    <value>ყველა თამაში</value>
+  </data>
+  <data name="Library_SmartListPicker.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ჭკვიანი სიები</value>
+  </data>
+  <data name="Library_SmartListPicker.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ჭკვიანი სიები</value>
+  </data>
+  <data name="Library_SmartListNoneItem.Text" xml:space="preserve">
+    <value>არცერთი</value>
+  </data>
+  <data name="Library_GridView.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ბადის ხედი</value>
+  </data>
+  <data name="Library_GridView.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ბადის ხედი</value>
+  </data>
+  <data name="Library_ListView.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>სიის ხედი</value>
+  </data>
+  <data name="Library_ListView.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>სიის ხედი</value>
+  </data>
+  <data name="Library_RefreshButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ბიბლიოთეკის განახლება</value>
+  </data>
+  <data name="Library_RefreshButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ბიბლიოთეკის განახლება (F5)</value>
+  </data>
+  <data name="Library_MoreOptions.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>სხვა პარამეტრები</value>
+  </data>
+  <data name="Library_MoreOptions.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>სხვა პარამეტრები</value>
+  </data>
+  <data name="Library_ExportLibraryItem.Text" xml:space="preserve">
+    <value>ბიბლიოთეკის ექსპორტი (CSV)…</value>
+  </data>
+  <data name="Library_ExportAchievementsItem.Text" xml:space="preserve">
+    <value>ყველა მიღწევის ექსპორტი (CSV)…</value>
+  </data>
+  <data name="Library_ManageCollectionsItem.Text" xml:space="preserve">
+    <value>კოლექციების მართვა…</value>
+  </data>
+  <data name="Library_SettingsButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>პარამეტრები</value>
+  </data>
+  <data name="Library_SettingsButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>პარამეტრები</value>
+  </data>
+  <data name="Library_PerfectSummary.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>თამაშები, რომლებშიც ყველა მიღწევა განბლოკილია</value>
+  </data>
+  <data name="Library_PlaytimeSummary.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>თამაშის საერთო დრო</value>
+  </data>
+  <data name="Library_RefreshingRing.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ბიბლიოთეკა ახლდება</value>
+  </data>
+  <data name="Library_RefreshingRing.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ბიბლიოთეკა ახლდება…</value>
+  </data>
+  <data name="Library_RefreshingBar.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ბიბლიოთეკა ახლდება</value>
+  </data>
+  <data name="Library_SortBy.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>დალაგება</value>
+  </data>
+  <data name="Library_SortBy.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>დალაგება</value>
+  </data>
+  <data name="Library_SortName.Content" xml:space="preserve">
+    <value>სახელი</value>
+  </data>
+  <data name="Library_SortAppId.Content" xml:space="preserve">
+    <value>App ID</value>
+  </data>
+  <data name="Library_SortRecentlyPlayed.Content" xml:space="preserve">
+    <value>ბოლოს ნათამაშები</value>
+  </data>
+  <data name="Library_SortPlaytime.Content" xml:space="preserve">
+    <value>თამაშის დრო</value>
+  </data>
+  <data name="Library_SortCompletion.Content" xml:space="preserve">
+    <value>დასრულება %</value>
+  </data>
+  <data name="Library_SortDescending.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>კლებადობით დალაგება</value>
+  </data>
+  <data name="Library_PinFavorites.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>რჩეულების ზემოთ მიმაგრება</value>
+  </data>
+  <data name="Library_PinFavorites.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>რჩეულების ზემოთ მიმაგრება</value>
+  </data>
+  <data name="Library_FiltersButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ფილტრები</value>
+  </data>
+  <data name="Library_FiltersButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ფილტრები</value>
+  </data>
+  <data name="Library_FiltersLabel.Text" xml:space="preserve">
+    <value>ფილტრები</value>
+  </data>
+  <data name="Library_FilterShow.Text" xml:space="preserve">
+    <value>ჩვენება</value>
+  </data>
+  <data name="Library_FilterGames.Content" xml:space="preserve">
+    <value>თამაშები</value>
+  </data>
+  <data name="Library_FilterDemos.Content" xml:space="preserve">
+    <value>დემოვერსიები</value>
+  </data>
+  <data name="Library_FilterMods.Content" xml:space="preserve">
+    <value>მოდები</value>
+  </data>
+  <data name="Library_FilterJunk.Content" xml:space="preserve">
+    <value>სხვა</value>
+  </data>
+  <data name="Library_FilterFavoritesOnly.Header" xml:space="preserve">
+    <value>მხოლოდ რჩეულები</value>
+  </data>
+  <data name="Library_FilterInstalledOnly.Header" xml:space="preserve">
+    <value>მხოლოდ დაინსტალირებული</value>
+  </data>
+  <data name="Library_FilterShowHidden.Header" xml:space="preserve">
+    <value>დამალული თამაშების ჩვენება</value>
+  </data>
+  <data name="Library_FilterCompletion.Header" xml:space="preserve">
+    <value>მიღწევები</value>
+  </data>
+  <data name="Library_CompletionAll.Content" xml:space="preserve">
+    <value>ყველა</value>
+  </data>
+  <data name="Library_CompletionHasAchievements.Content" xml:space="preserve">
+    <value>მიღწევებით</value>
+  </data>
+  <data name="Library_CompletionNotStarted.Content" xml:space="preserve">
+    <value>დაუწყებელი</value>
+  </data>
+  <data name="Library_CompletionInProgress.Content" xml:space="preserve">
+    <value>მიმდინარე</value>
+  </data>
+  <data name="Library_CompletionPerfect.Content" xml:space="preserve">
+    <value>სრულყოფილი</value>
+  </data>
+  <data name="Library_SmartListIgnoresFilter.Text" xml:space="preserve">
+    <value>არ მოქმედებს, სანამ ჭკვიანი სია აქტიურია.</value>
+  </data>
+  <data name="Library_FilterLastPlayed.Header" xml:space="preserve">
+    <value>ბოლოს ნათამაშები</value>
+  </data>
+  <data name="Library_LastPlayedAny.Content" xml:space="preserve">
+    <value>ნებისმიერ დროს</value>
+  </data>
+  <data name="Library_LastPlayedToday.Content" xml:space="preserve">
+    <value>დღეს</value>
+  </data>
+  <data name="Library_LastPlayedPast7Days.Content" xml:space="preserve">
+    <value>ბოლო 7 დღე</value>
+  </data>
+  <data name="Library_LastPlayedPast30Days.Content" xml:space="preserve">
+    <value>ბოლო 30 დღე</value>
+  </data>
+  <data name="Library_LastPlayedThisYear.Content" xml:space="preserve">
+    <value>წელს</value>
+  </data>
+  <data name="Library_LastPlayedNever.Content" xml:space="preserve">
+    <value>არასდროს უთამაშია</value>
+  </data>
+  <data name="Library_LastPlayedCustom.Content" xml:space="preserve">
+    <value>საკუთარი პერიოდი</value>
+  </data>
+  <data name="Library_FilterFrom.Header" xml:space="preserve">
+    <value>საწყისი თარიღი</value>
+  </data>
+  <data name="Library_FilterFrom.PlaceholderText" xml:space="preserve">
+    <value>ნებისმიერი</value>
+  </data>
+  <data name="Library_FilterTo.Header" xml:space="preserve">
+    <value>საბოლოო თარიღი</value>
+  </data>
+  <data name="Library_FilterTo.PlaceholderText" xml:space="preserve">
+    <value>ნებისმიერი</value>
+  </data>
+  <data name="Library_ResetFilters.Content" xml:space="preserve">
+    <value>ფილტრების გასუფთავება</value>
+  </data>
+  <data name="Library_LoadErrorBar.Title" xml:space="preserve">
+    <value>ბიბლიოთეკის ჩატვირთვა ვერ მოხერხდა</value>
+  </data>
+  <data name="Library_RetryButton.Content" xml:space="preserve">
+    <value>ხელახლა ცდა</value>
+  </data>
+  <data name="Library_RefreshWarningBar.Title" xml:space="preserve">
+    <value>განახლება ვერ მოხერხდა</value>
+  </data>
+  <data name="Library_UpdateDownload.Content" xml:space="preserve">
+    <value>ჩამოტვირთვა</value>
+  </data>
+  <data name="Library_UpdateSkip.Content" xml:space="preserve">
+    <value>ამ ვერსიის გამოტოვება</value>
+  </data>
+  <data name="Library_ExportingBar.Title" xml:space="preserve">
+    <value>მიმდინარეობს ექსპორტი</value>
+  </data>
+  <data name="Library_ExportDoneBar.Title" xml:space="preserve">
+    <value>ექსპორტი დასრულდა</value>
+  </data>
+  <data name="Library_OpenExportedFile.Content" xml:space="preserve">
+    <value>ფაილის გახსნა</value>
+  </data>
+  <data name="Library_OpenExportedFolder.Content" xml:space="preserve">
+    <value>საქაღალდის გახსნა</value>
+  </data>
+  <data name="Library_LoadingGames.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თამაშები იტვირთება</value>
+  </data>
+  <data name="Library_LoadingGamesList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თამაშები იტვირთება</value>
+  </data>
+  <data name="Library_GamesGrid.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თამაშები</value>
+  </data>
+  <data name="Library_GamesList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თამაშები</value>
+  </data>
+  <data name="Library_ColumnName.Text" xml:space="preserve">
+    <value>სახელი</value>
+  </data>
+  <data name="Library_ColumnProgress.Text" xml:space="preserve">
+    <value>პროგრესი</value>
+  </data>
+  <data name="Library_ColumnPlaytime.Text" xml:space="preserve">
+    <value>თამაშის დრო</value>
+  </data>
+  <data name="Library_ColumnLastPlayed.Text" xml:space="preserve">
+    <value>ბოლოს ნათამაშები</value>
+  </data>
+  <data name="Library_ColumnInstalled.Text" xml:space="preserve">
+    <value>დაინსტალირებული</value>
+  </data>
+  <data name="Library_ColumnFavorite.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>რჩეული</value>
+  </data>
+  <data name="Library_ColumnFavorite.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>რჩეული</value>
+  </data>
+  <data name="Library_NoMatchesTitle.Text" xml:space="preserve">
+    <value>შესაბამისი თამაში ვერ მოიძებნა</value>
+  </data>
+  <data name="Library_NoMatchesHint.Text" xml:space="preserve">
+    <value>სცადეთ სხვა საძიებო სიტყვა ან შეარბილეთ ფილტრები.</value>
+  </data>
+  <data name="Library_ClearSearchAndFilters.Content" xml:space="preserve">
+    <value>ძიებისა და ფილტრების გასუფთავება</value>
+  </data>
+  <data name="Library_EmptyTitle.Text" xml:space="preserve">
+    <value>თამაშები ვერ მოიძებნა</value>
+  </data>
+  <data name="Library_EmptyHint.Text" xml:space="preserve">
+    <value>SAM-ის სიის არცერთი თამაში ამ Steam-ანგარიშს არ ეკუთვნის. თამაშის დასამატებლად მოძებნეთ მისი App ID.</value>
+  </data>
+  <data name="Library_EmptyRefresh.Content" xml:space="preserve">
+    <value>განახლება</value>
+  </data>
+  <data name="Library_CollectionsAllGames" xml:space="preserve">
+    <value>ყველა თამაში</value>
+  </data>
+  <data name="Library_CollectionsSteamGroup" xml:space="preserve">
+    <value>Steam-ის კოლექციები</value>
+  </data>
+  <data name="Library_CollectionsSamGroup" xml:space="preserve">
+    <value>SAM-ის კოლექციები</value>
+  </data>
+  <data name="Library_CollectionsManage" xml:space="preserve">
+    <value>კოლექციების მართვა…</value>
+  </data>
+  <data name="Library_SmartListNone" xml:space="preserve">
+    <value>არცერთი</value>
+  </data>
+  <data name="Library_ExportLibraryFileName" xml:space="preserve">
+    <value>SAM ბიბლიოთეკა {0}</value>
+  </data>
+  <data name="Library_ExportAchievementsFileName" xml:space="preserve">
+    <value>SAM მიღწევები {0}</value>
+  </data>
+  <data name="Library_CsvFileType" xml:space="preserve">
+    <value>CSV (მძიმით გამოყოფილი)</value>
+  </data>
+  <data name="Library_ChooseFileFailed" xml:space="preserve">
+    <value>ფაილის არჩევა ვერ მოხერხდა</value>
+  </data>
+  <data name="LibraryFormat_Hours" xml:space="preserve">
+    <value>{0} სთ</value>
+  </data>
+  <data name="LibraryFormat_Minutes" xml:space="preserve">
+    <value>{0} წთ</value>
+  </data>
+  <data name="LibraryFormat_NeverPlayed" xml:space="preserve">
+    <value>არასდროს უთამაშია</value>
+  </data>
+  <data name="LibraryFormat_Today" xml:space="preserve">
+    <value>დღეს</value>
+  </data>
+  <data name="LibraryFormat_Yesterday" xml:space="preserve">
+    <value>გუშინ</value>
+  </data>
+  <data name="LibraryFormat_DaysAgo_One" xml:space="preserve">
+    <value>{0} დღის წინ</value>
+  </data>
+  <data name="LibraryFormat_DaysAgo_Other" xml:space="preserve">
+    <value>{0} დღის წინ</value>
+  </data>
+  <data name="LibraryFormat_WeeksAgo_One" xml:space="preserve">
+    <value>{0} კვირის წინ</value>
+  </data>
+  <data name="LibraryFormat_WeeksAgo_Other" xml:space="preserve">
+    <value>{0} კვირის წინ</value>
+  </data>
+  <data name="LibraryFormat_MonthsAgo_One" xml:space="preserve">
+    <value>{0} თვის წინ</value>
+  </data>
+  <data name="LibraryFormat_MonthsAgo_Other" xml:space="preserve">
+    <value>{0} თვის წინ</value>
+  </data>
+  <data name="LibraryFormat_YearsAgo_One" xml:space="preserve">
+    <value>{0} წლის წინ</value>
+  </data>
+  <data name="LibraryFormat_YearsAgo_Other" xml:space="preserve">
+    <value>{0} წლის წინ</value>
+  </data>
+  <data name="LibraryFormat_PlaytimeAndLastPlayed" xml:space="preserve">
+    <value>{0} · {1}</value>
+  </data>
+  <data name="LibraryFormat_Bytes_One" xml:space="preserve">
+    <value>{0} ბაიტი</value>
+  </data>
+  <data name="LibraryFormat_Bytes_Other" xml:space="preserve">
+    <value>{0} ბაიტი</value>
+  </data>
+  <data name="LibraryFormat_KB" xml:space="preserve">
+    <value>{0} კბ</value>
+  </data>
+  <data name="LibraryFormat_MB" xml:space="preserve">
+    <value>{0} მბ</value>
+  </data>
+  <data name="LibraryFormat_GB" xml:space="preserve">
+    <value>{0} გბ</value>
+  </data>
+  <data name="LibraryFormat_TB" xml:space="preserve">
+    <value>{0} ტბ</value>
+  </data>
+  <data name="Card_NoAchievements" xml:space="preserve">
+    <value>მიღწევები არ აქვს</value>
+  </data>
+  <data name="Card_ProgressNotStarted" xml:space="preserve">
+    <value>0 / {0} · დაუწყებელი</value>
+  </data>
+  <data name="Card_Progress" xml:space="preserve">
+    <value>{0} / {1} · {2}%</value>
+  </data>
+  <data name="Card_Percent" xml:space="preserve">
+    <value>{0}%</value>
+  </data>
+  <data name="Card_Play" xml:space="preserve">
+    <value>თამაში</value>
+  </data>
+  <data name="Card_Install" xml:space="preserve">
+    <value>ინსტალაცია</value>
+  </data>
+  <data name="Card_HideGame" xml:space="preserve">
+    <value>თამაშის დამალვა</value>
+  </data>
+  <data name="Card_UnhideGame" xml:space="preserve">
+    <value>თამაშის გამოჩენა</value>
+  </data>
+  <data name="Card_AddToFavorites" xml:space="preserve">
+    <value>რჩეულებში დამატება</value>
+  </data>
+  <data name="Card_RemoveFromFavorites" xml:space="preserve">
+    <value>რჩეულებიდან ამოშლა</value>
+  </data>
+  <data name="Card_ToolTip" xml:space="preserve">
+    <value>{0} (App ID {1})</value>
+  </data>
+  <data name="Card_ToolTipInstalled" xml:space="preserve">
+    <value>{0} (App ID {1})
+დაინსტალირებულია · {2}</value>
+  </data>
+  <data name="Card_InstalledBadge.Text" xml:space="preserve">
+    <value>დაინსტალირებული</value>
+  </data>
+  <data name="Card_MenuOpen" xml:space="preserve">
+    <value>გახსნა</value>
+  </data>
+  <data name="Card_MenuUnlockAll" xml:space="preserve">
+    <value>ყველა მიღწევის განბლოკვა…</value>
+  </data>
+  <data name="Card_MenuLockAll" xml:space="preserve">
+    <value>ყველა მიღწევის დაბლოკვა…</value>
+  </data>
+  <data name="Card_MenuCopyAppId" xml:space="preserve">
+    <value>App ID-ის კოპირება</value>
+  </data>
+  <data name="Card_MenuStorePage" xml:space="preserve">
+    <value>მაღაზიის გვერდის გახსნა</value>
+  </data>
+  <data name="Card_MenuCommunityPage" xml:space="preserve">
+    <value>საზოგადოების მიღწევების გვერდის გახსნა</value>
+  </data>
+  <data name="Card_MenuAddToCollection" xml:space="preserve">
+    <value>კოლექციაში დამატება</value>
+  </data>
+  <data name="Card_MenuNewCollection" xml:space="preserve">
+    <value>ახალი კოლექცია…</value>
+  </data>
+  <data name="Collections_NewTitle" xml:space="preserve">
+    <value>ახალი კოლექცია</value>
+  </data>
+  <data name="Collections_NamePlaceholder" xml:space="preserve">
+    <value>კოლექციის სახელი</value>
+  </data>
+  <data name="Collections_NewNamePlaceholder" xml:space="preserve">
+    <value>ახალი კოლექციის სახელი</value>
+  </data>
+  <data name="Collections_SteamReadOnly" xml:space="preserve">
+    <value>Steam-ის კოლექციების შეცვლა აქ შეუძლებელია; შეცვალეთ ისინი Steam-ში.</value>
+  </data>
+  <data name="Collections_ManageTitle" xml:space="preserve">
+    <value>კოლექციების მართვა</value>
+  </data>
+  <data name="Collections_None" xml:space="preserve">
+    <value>ჯერ არცერთი კოლექცია არ შეგიქმნიათ.</value>
+  </data>
+  <data name="Collections_GameCount_One" xml:space="preserve">
+    <value>{0} თამაში</value>
+  </data>
+  <data name="Collections_GameCount_Other" xml:space="preserve">
+    <value>{0} თამაში</value>
+  </data>
+  <data name="Collections_RenameNamed" xml:space="preserve">
+    <value>სახელის შეცვლა: {0}</value>
+  </data>
+  <data name="Collections_DeleteNamed" xml:space="preserve">
+    <value>წაშლა: {0}</value>
+  </data>
+  <data name="Collections_DeleteConfirm" xml:space="preserve">
+    <value>წაიშალოს „{0}“? თამაშები ბიბლიოთეკაში დარჩება.</value>
+  </data>
+  <data name="Collections_SteamFavorites" xml:space="preserve">
+    <value>რჩეულები (Steam)</value>
+  </data>
+  <data name="Collections_SteamHidden" xml:space="preserve">
+    <value>დამალული (Steam)</value>
+  </data>
+  <data name="Collections_UpdateFailed" xml:space="preserve">
+    <value>კოლექციის განახლება ვერ მოხერხდა</value>
+  </data>
+  <data name="Collections_CreateFailed" xml:space="preserve">
+    <value>კოლექციის შექმნა ვერ მოხერხდა</value>
+  </data>
+  <data name="Collections_RenameFailed" xml:space="preserve">
+    <value>კოლექციის სახელის შეცვლა ვერ მოხერხდა</value>
+  </data>
+  <data name="Collections_DeleteFailed" xml:space="preserve">
+    <value>კოლექციის წაშლა ვერ მოხერხდა</value>
+  </data>
+  <data name="Library_AccountSwitchedKept" xml:space="preserve">
+    <value>შესულია სხვა Steam-ანგარიში. წინა ანგარიშის ქეშირებული მონაცემები შენარჩუნებულია.</value>
+  </data>
+  <data name="Library_AccountSwitchedCleared" xml:space="preserve">
+    <value>შესულია სხვა Steam-ანგარიში. წინა ანგარიშის ქეშირებული მონაცემები წაიშალა.</value>
+  </data>
+  <data name="Library_SmartLists" xml:space="preserve">
+    <value>ჭკვიანი სიები</value>
+  </data>
+  <data name="Library_SmartAlmostPerfect" xml:space="preserve">
+    <value>თითქმის სრულყოფილი</value>
+  </data>
+  <data name="Library_SmartAlmostPerfectHint" xml:space="preserve">
+    <value>80% ან მეტი განბლოკილია; ჯერ ის, სადაც ყველაზე ცოტა დარჩა</value>
+  </data>
+  <data name="Library_SmartNeverStarted" xml:space="preserve">
+    <value>დაუწყებელი</value>
+  </data>
+  <data name="Library_SmartNeverStartedHint" xml:space="preserve">
+    <value>მიღწევები აქვს, მაგრამ არცერთი განბლოკილი არ არის; ჯერ ყველაზე ნათამაშები</value>
+  </data>
+  <data name="Library_SmartRarestOwned" xml:space="preserve">
+    <value>ყველაზე იშვიათი</value>
+  </data>
+  <data name="Library_SmartRarestOwnedHint" xml:space="preserve">
+    <value>დალაგებულია თქვენ მიერ განბლოკილი ყველაზე იშვიათი მიღწევის მიხედვით</value>
+  </data>
+  <data name="Library_SmartBadgeLeft_One" xml:space="preserve">
+    <value>დარჩა {0}</value>
+  </data>
+  <data name="Library_SmartBadgeLeft_Other" xml:space="preserve">
+    <value>დარჩა {0}</value>
+  </data>
+  <data name="Library_SmartBadgeRarest" xml:space="preserve">
+    <value>ყველაზე იშვიათი {0}</value>
+  </data>
+  <data name="Library_SmartBadgeNoRarity" xml:space="preserve">
+    <value>იშვიათობის მონაცემები არ არის</value>
+  </data>
+  <data name="Library_RarestLoadFailedTitle" xml:space="preserve">
+    <value>განბლოკვის მონაცემების ჩატვირთვა ვერ მოხერხდა</value>
+  </data>
+  <data name="Library_RarestLoadFailed" xml:space="preserve">
+    <value>„ყველაზე იშვიათს“ სჭირდება თქვენი განბლოკილი მიღწევები Steam-ის სტატისტიკის ლოკალური ქეშიდან, რომლის წაკითხვაც ვერ მოხერხდა.</value>
+  </data>
+  <data name="Library_SortDescendingLabel" xml:space="preserve">
+    <value>კლებადობით (დააწკაპუნეთ ზრდადობისთვის)</value>
+  </data>
+  <data name="Library_SortAscendingLabel" xml:space="preserve">
+    <value>ზრდადობით (დააწკაპუნეთ კლებადობისთვის)</value>
+  </data>
+  <data name="Library_GameListDownloadFailed" xml:space="preserve">
+    <value>თამაშების სიის ჩამოტვირთვა ვერ მოხერხდა. შეამოწმეთ ინტერნეტთან კავშირი.</value>
+  </data>
+  <data name="Library_ShowingCached" xml:space="preserve">
+    <value>ნაჩვენებია ქეშირებული ბიბლიოთეკა. {0}</value>
+  </data>
+  <data name="Library_CompletionSummary" xml:space="preserve">
+    <value>{0}% დასრულებული</value>
+  </data>
+  <data name="Library_CompletionDetail_One" xml:space="preserve">
+    <value>მიღწევების მქონე თამაშებში განბლოკილია {0}-დან {1} მიღწევა</value>
+  </data>
+  <data name="Library_CompletionDetail_Other" xml:space="preserve">
+    <value>მიღწევების მქონე თამაშებში განბლოკილია {0}-დან {1} მიღწევა</value>
+  </data>
+  <data name="Library_PerfectSummaryText_One" xml:space="preserve">
+    <value>{0} სრულყოფილი</value>
+  </data>
+  <data name="Library_PerfectSummaryText_Other" xml:space="preserve">
+    <value>{0} სრულყოფილი</value>
+  </data>
+  <data name="Library_PlaytimeSummaryText" xml:space="preserve">
+    <value>ნათამაშებია {0}</value>
+  </data>
+  <data name="Library_GameCount_One" xml:space="preserve">
+    <value>{0} თამაში</value>
+  </data>
+  <data name="Library_GameCount_Other" xml:space="preserve">
+    <value>{0} თამაში</value>
+  </data>
+  <data name="Library_GameCountFiltered_One" xml:space="preserve">
+    <value>{0}-დან {1} თამაში</value>
+  </data>
+  <data name="Library_GameCountFiltered_Other" xml:space="preserve">
+    <value>{0}-დან {1} თამაში</value>
+  </data>
+  <data name="Library_SuggestOpenGame" xml:space="preserve">
+    <value>გახსნა: {0} (App ID {1})</value>
+  </data>
+  <data name="Library_SuggestOpenAppId" xml:space="preserve">
+    <value>გახსნა: App ID {0}</value>
+  </data>
+  <data name="Library_CheckAppIdFailedTitle" xml:space="preserve">
+    <value>App ID-ის შემოწმება ვერ მოხერხდა</value>
+  </data>
+  <data name="Library_CheckAppIdFailed" xml:space="preserve">
+    <value>ვერ შემოწმდა, გეკუთვნით თუ არა App ID {0}: {1}</value>
+  </data>
+  <data name="Library_NotOwnedTitle" xml:space="preserve">
+    <value>არ გეკუთვნით</value>
+  </data>
+  <data name="Library_NotOwned" xml:space="preserve">
+    <value>App ID {0} თქვენ არ გეკუთვნით.</value>
+  </data>
+  <data name="Library_SaveFavoritesFailed" xml:space="preserve">
+    <value>რჩეულების შენახვა ვერ მოხერხდა</value>
+  </data>
+  <data name="Library_OpenGameFailed" xml:space="preserve">
+    <value>ვერ გაიხსნა: {0}</value>
+  </data>
+  <data name="Library_CopyAppIdFailed" xml:space="preserve">
+    <value>App ID-ის კოპირება ვერ მოხერხდა</value>
+  </data>
+  <data name="Library_OpenBrowserFailed" xml:space="preserve">
+    <value>ბრაუზერის გახსნა ვერ მოხერხდა</value>
+  </data>
+  <data name="Library_StartGameFailed" xml:space="preserve">
+    <value>ვერ გაეშვა: {0}</value>
+  </data>
+  <data name="Library_InstallGameFailed" xml:space="preserve">
+    <value>ინსტალაცია ვერ მოხერხდა: {0}</value>
+  </data>
+  <data name="Library_OpenFileFailed" xml:space="preserve">
+    <value>ფაილის გახსნა ვერ მოხერხდა</value>
+  </data>
+  <data name="Library_ClearCacheFailed" xml:space="preserve">
+    <value>ქეშის გასუფთავება ვერ მოხერხდა</value>
+  </data>
+  <data name="Library_HideGameFailed" xml:space="preserve">
+    <value>თამაშის დამალვა ვერ მოხერხდა</value>
+  </data>
+  <data name="Library_UnhideGameFailed" xml:space="preserve">
+    <value>თამაშის გამოჩენა ვერ მოხერხდა</value>
+  </data>
+  <data name="Library_GameHiddenTitle" xml:space="preserve">
+    <value>თამაში დამალულია: {0}</value>
+  </data>
+  <data name="Library_GameHiddenMessage" xml:space="preserve">
+    <value>მის კვლავ სანახავად ფილტრებში ჩართეთ „დამალული თამაშების ჩვენება“.</value>
+  </data>
+  <data name="Export_ExportingLibrary" xml:space="preserve">
+    <value>მიმდინარეობს ბიბლიოთეკის ექსპორტი…</value>
+  </data>
+  <data name="Export_LibraryDone_One" xml:space="preserve">
+    <value>{0} თამაში ექსპორტირებულია ფაილში {1}.</value>
+  </data>
+  <data name="Export_LibraryDone_Other" xml:space="preserve">
+    <value>{0} თამაში ექსპორტირებულია ფაილში {1}.</value>
+  </data>
+  <data name="Export_ReadingAchievements" xml:space="preserve">
+    <value>მიღწევების წაკითხვა…</value>
+  </data>
+  <data name="Export_FetchingPercentages_One" xml:space="preserve">
+    <value>განბლოკვის გლობალური პროცენტების მიღება ({0}-დან {1} თამაში)…</value>
+  </data>
+  <data name="Export_FetchingPercentages_Other" xml:space="preserve">
+    <value>განბლოკვის გლობალური პროცენტების მიღება ({0}-დან {1} თამაში)…</value>
+  </data>
+  <data name="Export_WritingFile" xml:space="preserve">
+    <value>ფაილის ჩაწერა…</value>
+  </data>
+  <data name="Export_AchievementsDone_One" xml:space="preserve">
+    <value>{1} ექსპორტირებულია {0} მიღწევა ფაილში {2}.</value>
+  </data>
+  <data name="Export_AchievementsDone_Other" xml:space="preserve">
+    <value>{1} ექსპორტირებულია {0} მიღწევა ფაილში {2}.</value>
+  </data>
+  <data name="Export_FromGames_One" xml:space="preserve">
+    <value>{0} თამაშიდან</value>
+  </data>
+  <data name="Export_FromGames_Other" xml:space="preserve">
+    <value>{0} თამაშიდან</value>
+  </data>
+  <data name="Export_Failed" xml:space="preserve">
+    <value>ექსპორტი ვერ მოხერხდა</value>
+  </data>
+  <data name="Export_ColumnAppId" xml:space="preserve">
+    <value>App ID</value>
+  </data>
+  <data name="Export_ColumnName" xml:space="preserve">
+    <value>სახელი</value>
+  </data>
+  <data name="Export_ColumnType" xml:space="preserve">
+    <value>ტიპი</value>
+  </data>
+  <data name="Export_ColumnAchievementsUnlocked" xml:space="preserve">
+    <value>განბლოკილი მიღწევები</value>
+  </data>
+  <data name="Export_ColumnAchievementsTotal" xml:space="preserve">
+    <value>მიღწევები სულ</value>
+  </data>
+  <data name="Export_ColumnCompletion" xml:space="preserve">
+    <value>დასრულება %</value>
+  </data>
+  <data name="Export_ColumnPlaytimeHours" xml:space="preserve">
+    <value>თამაშის დრო (საათი)</value>
+  </data>
+  <data name="Export_ColumnLastPlayed" xml:space="preserve">
+    <value>ბოლოს ნათამაშები</value>
+  </data>
+  <data name="Export_ColumnInstalled" xml:space="preserve">
+    <value>დაინსტალირებული</value>
+  </data>
+  <data name="Export_ColumnFavorite" xml:space="preserve">
+    <value>რჩეული</value>
+  </data>
+  <data name="Export_ColumnGame" xml:space="preserve">
+    <value>თამაში</value>
+  </data>
+  <data name="Export_ColumnAchievementId" xml:space="preserve">
+    <value>მიღწევის ID</value>
+  </data>
+  <data name="Export_ColumnDescription" xml:space="preserve">
+    <value>აღწერა</value>
+  </data>
+  <data name="Export_ColumnUnlocked" xml:space="preserve">
+    <value>განბლოკილი</value>
+  </data>
+  <data name="Export_ColumnUnlockTime" xml:space="preserve">
+    <value>განბლოკვის დრო</value>
+  </data>
+  <data name="Export_ColumnGlobalPercent" xml:space="preserve">
+    <value>გლობალური განბლოკვა %</value>
+  </data>
+  <data name="Update_UpToDate" xml:space="preserve">
+    <value>თქვენ უახლესი ვერსია გაქვთ ({0}).</value>
+  </data>
+  <data name="Update_AvailableStatus" xml:space="preserve">
+    <value>ხელმისაწვდომია ვერსია {0}.</value>
+  </data>
+  <data name="Update_CheckFailed" xml:space="preserve">
+    <value>განახლებების შემოწმება ვერ მოხერხდა.</value>
+  </data>
+  <data name="Update_AvailableTitle" xml:space="preserve">
+    <value>ხელმისაწვდომია ვერსია {0}</value>
+  </data>
+  <data name="Update_YouHave" xml:space="preserve">
+    <value>თქვენ გაქვთ ვერსია {0}.</value>
+  </data>
+  <data name="Update_YouHaveWithTitle" xml:space="preserve">
+    <value>{0}. თქვენ გაქვთ ვერსია {1}.</value>
+  </data>
+  <data name="Game_TitleSuffix.Text" xml:space="preserve">
+    <value>  ·  Steam Achievement Manager</value>
+  </data>
+  <data name="Game_HeaderImage.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თამაშის სათაურის სურათი</value>
+  </data>
+  <data name="Game_CompletionRing.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>მიღწევების პროგრესი</value>
+  </data>
+  <data name="Game_AchievementsUnlockedCaption.Text" xml:space="preserve">
+    <value>განბლოკილი მიღწევა</value>
+  </data>
+  <data name="Game_LoadErrorBar.Title" xml:space="preserve">
+    <value>მიღწევების ჩატვირთვა ვერ მოხერხდა</value>
+  </data>
+  <data name="Game_LoadErrorRetry.Content" xml:space="preserve">
+    <value>ხელახლა ცდა</value>
+  </data>
+  <data name="Game_AchievementsTab.Text" xml:space="preserve">
+    <value>მიღწევები</value>
+  </data>
+  <data name="Game_StatisticsTab.Text" xml:space="preserve">
+    <value>სტატისტიკა</value>
+  </data>
+  <data name="Game_UnlockAllButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ყველა ნაჩვენები მიღწევის განბლოკვა (დაცულები გამოტოვებულია)</value>
+  </data>
+  <data name="Game_UnlockAllButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ყველას განბლოკვა</value>
+  </data>
+  <data name="Game_UnlockAllText.Text" xml:space="preserve">
+    <value>ყველას განბლოკვა</value>
+  </data>
+  <data name="Game_LockAllButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ყველა ნაჩვენები მიღწევის დაბლოკვა (დაცულები გამოტოვებულია)</value>
+  </data>
+  <data name="Game_LockAllButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ყველას დაბლოკვა</value>
+  </data>
+  <data name="Game_LockAllText.Text" xml:space="preserve">
+    <value>ყველას დაბლოკვა</value>
+  </data>
+  <data name="Game_InvertButton.Label" xml:space="preserve">
+    <value>შებრუნება</value>
+  </data>
+  <data name="Game_InvertButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ყველა ნაჩვენები მიღწევის მდგომარეობის შებრუნება (დაცულები გამოტოვებულია)</value>
+  </data>
+  <data name="Game_ReloadButton.Label" xml:space="preserve">
+    <value>განახლება</value>
+  </data>
+  <data name="Game_ReloadButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Steam-იდან ხელახლა ჩატვირთვა (F5)</value>
+  </data>
+  <data name="Game_BackupsButton.Label" xml:space="preserve">
+    <value>სარეზერვო ასლები</value>
+  </data>
+  <data name="Game_BackupsButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ამ თამაშის მიღწევებისა და სტატისტიკის სარეზერვო ასლების შექმნა, აღდგენა და წაშლა</value>
+  </data>
+  <data name="Game_CommitButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>მომლოდინე ცვლილებების Steam-ში ჩაწერა (Ctrl+S)</value>
+  </data>
+  <data name="Game_CommitButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ცვლილებების შენახვა</value>
+  </data>
+  <data name="Game_SpoilerToggle.Label" xml:space="preserve">
+    <value>სპოილერებისგან დაცვა</value>
+  </data>
+  <data name="Game_SpoilerToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ფარული მიღწევების აღწერის დამალვა, სანამ მასზე არ დააწკაპუნებთ</value>
+  </data>
+  <data name="Game_RevealAllButton.Label" xml:space="preserve">
+    <value>ყველა ფარულის ჩვენება</value>
+  </data>
+  <data name="Game_RevealAllButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ყველა ფარული მიღწევის აღწერის ჩვენება</value>
+  </data>
+  <data name="Game_ResetStatsButton.Label" xml:space="preserve">
+    <value>ყველა სტატისტიკის ჩამოყრა…</value>
+  </data>
+  <data name="Game_ResetStatsButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ამ თამაშის მთელი სტატისტიკის ჩამოყრა, სურვილისამებრ მიღწევებთან ერთად</value>
+  </data>
+  <data name="Game_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>მიღწევების ძიება (Ctrl+F)</value>
+  </data>
+  <data name="Game_SearchBox.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>მიღწევების ძიება</value>
+  </data>
+  <data name="Game_StateFilter.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ფილტრი მდგომარეობის მიხედვით</value>
+  </data>
+  <data name="Game_StateFilter.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>მდგომარეობის ფილტრი</value>
+  </data>
+  <data name="Game_StateAll.Content" xml:space="preserve">
+    <value>ყველა მიღწევა</value>
+  </data>
+  <data name="Game_StateLocked.Content" xml:space="preserve">
+    <value>დაბლოკილი</value>
+  </data>
+  <data name="Game_StateUnlocked.Content" xml:space="preserve">
+    <value>განბლოკილი</value>
+  </data>
+  <data name="Game_StatePending.Content" xml:space="preserve">
+    <value>მომლოდინე ცვლილებები</value>
+  </data>
+  <data name="Game_StateHasNotes.Content" xml:space="preserve">
+    <value>შენიშვნით</value>
+  </data>
+  <data name="Game_RarityFilter.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ფილტრი იშვიათობის მიხედვით</value>
+  </data>
+  <data name="Game_RarityFilter.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>იშვიათობის ფილტრი</value>
+  </data>
+  <data name="Game_RarityAny.Content" xml:space="preserve">
+    <value>ნებისმიერი იშვიათობა</value>
+  </data>
+  <data name="Game_RarityCommon.Content" xml:space="preserve">
+    <value>ხშირი</value>
+  </data>
+  <data name="Game_RarityUncommon.Content" xml:space="preserve">
+    <value>ნაკლებად ხშირი</value>
+  </data>
+  <data name="Game_RarityRare.Content" xml:space="preserve">
+    <value>იშვიათი</value>
+  </data>
+  <data name="Game_RarityEpic.Content" xml:space="preserve">
+    <value>ეპიკური</value>
+  </data>
+  <data name="Game_RarityLegendary.Content" xml:space="preserve">
+    <value>ლეგენდარული</value>
+  </data>
+  <data name="Game_SortBox.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>დალაგების წესი</value>
+  </data>
+  <data name="Game_SortBox.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>დალაგების წესი</value>
+  </data>
+  <data name="Game_SortDefault.Content" xml:space="preserve">
+    <value>დალაგება: ნაგულისხმევი</value>
+  </data>
+  <data name="Game_SortName.Content" xml:space="preserve">
+    <value>დალაგება: სახელი</value>
+  </data>
+  <data name="Game_SortRarest.Content" xml:space="preserve">
+    <value>დალაგება: ჯერ ყველაზე იშვიათი</value>
+  </data>
+  <data name="Game_SortCommonest.Content" xml:space="preserve">
+    <value>დალაგება: ჯერ ყველაზე ხშირი</value>
+  </data>
+  <data name="Game_SortNewest.Content" xml:space="preserve">
+    <value>დალაგება: ჯერ ბოლოს განბლოკილი</value>
+  </data>
+  <data name="Game_DateFilter.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>განბლოკილი მიღწევების ფილტრი განბლოკვის თარიღით</value>
+  </data>
+  <data name="Game_DateFilter.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>განბლოკვის თარიღის ფილტრი</value>
+  </data>
+  <data name="Game_DateAny.Content" xml:space="preserve">
+    <value>განბლოკილი: ნებისმიერ დროს</value>
+  </data>
+  <data name="Game_DateToday.Content" xml:space="preserve">
+    <value>განბლოკილი დღეს</value>
+  </data>
+  <data name="Game_Date7Days.Content" xml:space="preserve">
+    <value>განბლოკილი ბოლო 7 დღეში</value>
+  </data>
+  <data name="Game_Date30Days.Content" xml:space="preserve">
+    <value>განბლოკილი ბოლო 30 დღეში</value>
+  </data>
+  <data name="Game_DateThisYear.Content" xml:space="preserve">
+    <value>განბლოკილი წელს</value>
+  </data>
+  <data name="Game_DateCustom.Content" xml:space="preserve">
+    <value>განბლოკილი არჩეულ პერიოდში…</value>
+  </data>
+  <data name="Game_DateFrom.PlaceholderText" xml:space="preserve">
+    <value>დან</value>
+  </data>
+  <data name="Game_DateFrom.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>განბლოკილი თარიღიდან</value>
+  </data>
+  <data name="Game_DateTo.PlaceholderText" xml:space="preserve">
+    <value>მდე</value>
+  </data>
+  <data name="Game_DateTo.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>განბლოკილი თარიღამდე</value>
+  </data>
+  <data name="Game_NoMatches.Text" xml:space="preserve">
+    <value>მიმდინარე ფილტრებს არცერთი მიღწევა არ შეესაბამება.</value>
+  </data>
+  <data name="Game_AchievementList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>მიღწევები</value>
+  </data>
+  <data name="Game_RowProtectedIcon.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>დაცულია — მისი შეცვლა მხოლოდ თამაშის სერვერებს შეუძლიათ</value>
+  </data>
+  <data name="Game_RowProtectedIcon.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>დაცული</value>
+  </data>
+  <data name="Game_RowSpoilerMask.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>დააწკაპუნეთ აღწერის სანახავად</value>
+  </data>
+  <data name="Game_RowSpoilerMask.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ფარული მიღწევის აღწერა, დააწკაპუნეთ სანახავად</value>
+  </data>
+  <data name="Game_RowGuideButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>გზამკვლევის პოვნა</value>
+  </data>
+  <data name="Game_RowGuideButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>გზამკვლევის პოვნა</value>
+  </data>
+  <data name="Game_RowAddNote.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>შენიშვნის დამატება</value>
+  </data>
+  <data name="Game_RowAddNote.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>შენიშვნის დამატება</value>
+  </data>
+  <data name="Game_RowEditNote.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>შენიშვნის რედაქტირება</value>
+  </data>
+  <data name="Game_RowEditNote.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>შენიშვნის რედაქტირება</value>
+  </data>
+  <data name="Game_RowToggle.OnContent" xml:space="preserve">
+    <value>განბლოკილი</value>
+  </data>
+  <data name="Game_RowToggle.OffContent" xml:space="preserve">
+    <value>დაბლოკილი</value>
+  </data>
+  <data name="Game_StatsWarning.Title" xml:space="preserve">
+    <value>სტატისტიკა სიფრთხილით შეცვალეთ</value>
+  </data>
+  <data name="Game_StatsWarning.Message" xml:space="preserve">
+    <value>სტატისტიკის შეცვლამ შეიძლება დააზიანოს თქვენი პროგრესი თამაშში ან მასზე დამოკიდებული მიღწევები. სტატისტიკის ცვლილებები მიღწევების ცვლილებებთან ერთად ინახება.</value>
+  </data>
+  <data name="Game_StatsEditToggle.Header" xml:space="preserve">
+    <value>რედაქტირების დაშვება</value>
+  </data>
+  <data name="Game_StatsEditToggle.OnContent" xml:space="preserve">
+    <value>რისკი გავიაზრე — რედაქტირება ჩართულია</value>
+  </data>
+  <data name="Game_StatsEditToggle.OffContent" xml:space="preserve">
+    <value>რედაქტირება გამორთულია</value>
+  </data>
+  <data name="Game_NoStats.Text" xml:space="preserve">
+    <value>ამ თამაშს სტატისტიკა არ აქვს.</value>
+  </data>
+  <data name="Game_StatsList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>სტატისტიკა</value>
+  </data>
+  <data name="Game_StatUsedBy.Text" xml:space="preserve">
+    <value>გამოიყენება</value>
+  </data>
+  <data name="Game_StatResetButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>საწყისი მნიშვნელობის დაბრუნება</value>
+  </data>
+  <data name="Game_StatResetButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>საწყისი მნიშვნელობის დაბრუნება</value>
+  </data>
+  <data name="Game_AppName" xml:space="preserve">
+    <value>აპი {0}</value>
+  </data>
+  <data name="Game_AppIdText" xml:space="preserve">
+    <value>App ID {0}</value>
+  </data>
+  <data name="Game_HoursPlayed" xml:space="preserve">
+    <value>ნათამაშებია {0} სთ</value>
+  </data>
+  <data name="Game_MinutesPlayed_One" xml:space="preserve">
+    <value>ნათამაშებია {0} წთ</value>
+  </data>
+  <data name="Game_MinutesPlayed_Other" xml:space="preserve">
+    <value>ნათამაშებია {0} წთ</value>
+  </data>
+  <data name="Game_LastPlayed" xml:space="preserve">
+    <value>ბოლოს ნათამაშები: {0}</value>
+  </data>
+  <data name="Game_PendingNone" xml:space="preserve">
+    <value>მომლოდინე ცვლილებები არ არის</value>
+  </data>
+  <data name="Game_Pending_One" xml:space="preserve">
+    <value>{0} მომლოდინე ცვლილება</value>
+  </data>
+  <data name="Game_Pending_Other" xml:space="preserve">
+    <value>{0} მომლოდინე ცვლილება</value>
+  </data>
+  <data name="Game_PendingInvalid_One" xml:space="preserve">
+    <value>{1} · {0} არასწორი მნიშვნელობა</value>
+  </data>
+  <data name="Game_PendingInvalid_Other" xml:space="preserve">
+    <value>{1} · {0} არასწორი მნიშვნელობა</value>
+  </data>
+  <data name="Game_CommitLabel" xml:space="preserve">
+    <value>ცვლილებების შენახვა</value>
+  </data>
+  <data name="Game_CommitLabelCount" xml:space="preserve">
+    <value>ცვლილებების შენახვა ({0})</value>
+  </data>
+  <data name="Game_ShowingCount" xml:space="preserve">
+    <value>ნაჩვენებია {0}, სულ {1}</value>
+  </data>
+  <data name="Game_UnsavedNone" xml:space="preserve">
+    <value>შეუნახავი ცვლილებები არ გაქვთ.</value>
+  </data>
+  <data name="Game_UnsavedSentence" xml:space="preserve">
+    <value>თქვენ გაქვთ {0}.</value>
+  </data>
+  <data name="Game_UnsavedPending_One" xml:space="preserve">
+    <value>{0} ცვლილება, რომელიც Steam-ში ჯერ არ შენახულა</value>
+  </data>
+  <data name="Game_UnsavedPending_Other" xml:space="preserve">
+    <value>{0} ცვლილება, რომელიც Steam-ში ჯერ არ შენახულა</value>
+  </data>
+  <data name="Game_UnsavedInvalid_One" xml:space="preserve">
+    <value>{0} სტატისტიკის არასწორი ცვლილება</value>
+  </data>
+  <data name="Game_UnsavedInvalid_Other" xml:space="preserve">
+    <value>{0} სტატისტიკის არასწორი ცვლილება</value>
+  </data>
+  <data name="Game_ListSeparator" xml:space="preserve">
+    <value>, </value>
+  </data>
+  <data name="Game_ListAnd" xml:space="preserve">
+    <value> და </value>
+  </data>
+  <data name="Game_LoadFailed" xml:space="preserve">
+    <value>ამ თამაშის მიღწევების ჩატვირთვისას დაფიქსირდა შეცდომა: {0}</value>
+  </data>
+  <data name="Game_MissingSchema" xml:space="preserve">
+    <value>ამ თამაშს მიღწევები არ აქვს, ან Steam-ს მისი სქემა ჯერ არ შეუნახავს. ერთხელ გაუშვით თამაში და შემდეგ განაახლეთ.</value>
+  </data>
+  <data name="Game_SummaryUnlock_One" xml:space="preserve">
+    <value>{0} მიღწევის განბლოკვა</value>
+  </data>
+  <data name="Game_SummaryUnlock_Other" xml:space="preserve">
+    <value>{0} მიღწევის განბლოკვა</value>
+  </data>
+  <data name="Game_SummaryLock_One" xml:space="preserve">
+    <value>{0} მიღწევის დაბლოკვა</value>
+  </data>
+  <data name="Game_SummaryLock_Other" xml:space="preserve">
+    <value>{0} მიღწევის დაბლოკვა</value>
+  </data>
+  <data name="Game_SummaryStats_One" xml:space="preserve">
+    <value>{0} მაჩვენებლის შეცვლა</value>
+  </data>
+  <data name="Game_SummaryStats_Other" xml:space="preserve">
+    <value>{0} მაჩვენებლის შეცვლა</value>
+  </data>
+  <data name="Game_SummarySentence" xml:space="preserve">
+    <value>{0}.</value>
+  </data>
+  <data name="Game_SummaryNothing" xml:space="preserve">
+    <value>შესანახი არაფერია.</value>
+  </data>
+  <data name="Game_StoredAchievements_One" xml:space="preserve">
+    <value>{0} მიღწევა</value>
+  </data>
+  <data name="Game_StoredAchievements_Other" xml:space="preserve">
+    <value>{0} მიღწევა</value>
+  </data>
+  <data name="Game_StoredStats_One" xml:space="preserve">
+    <value>{0} მაჩვენებელი</value>
+  </data>
+  <data name="Game_StoredStats_Other" xml:space="preserve">
+    <value>{0} მაჩვენებელი</value>
+  </data>
+  <data name="Game_StoredMessage" xml:space="preserve">
+    <value>შენახულია: {0}.</value>
+  </data>
+  <data name="Game_ResultStoredTitle" xml:space="preserve">
+    <value>ცვლილებები შენახულია</value>
+  </data>
+  <data name="Game_ResultNothingStoredTitle" xml:space="preserve">
+    <value>არაფერი შენახულა</value>
+  </data>
+  <data name="Game_ResultFixInvalid" xml:space="preserve">
+    <value>ჯერ გაასწორეთ სტატისტიკის არასწორი მნიშვნელობები.</value>
+  </data>
+  <data name="Game_ResultNoPending" xml:space="preserve">
+    <value>მომლოდინე ცვლილებები არ არის.</value>
+  </data>
+  <data name="Game_ResultNoBackup" xml:space="preserve">
+    <value>შენახვა გაუქმდა, რადგან სარეზერვო ასლის შექმნა ვერ მოხერხდა.</value>
+  </data>
+  <data name="Game_ResultStoreFailedTitle" xml:space="preserve">
+    <value>ცვლილებების შენახვა ვერ მოხერხდა</value>
+  </data>
+  <data name="Game_ResultNothingSteamCanStore" xml:space="preserve">
+    <value>Steam-ისთვის შესანახი ცვლილებები არ არის.</value>
+  </data>
+  <data name="Game_FailureRefusedUnlock" xml:space="preserve">
+    <value>Steam-მა უარი თქვა „{0}“-ის ({1}) განბლოკვაზე.</value>
+  </data>
+  <data name="Game_FailureRefusedLock" xml:space="preserve">
+    <value>Steam-მა უარი თქვა „{0}“-ის ({1}) დაბლოკვაზე.</value>
+  </data>
+  <data name="Game_FailureRefusedStat" xml:space="preserve">
+    <value>Steam-მა არ მიიღო ახალი მნიშვნელობა მაჩვენებლისთვის „{0}“ ({1}).</value>
+  </data>
+  <data name="Game_FailurePreparing" xml:space="preserve">
+    <value>ცვლილებების მომზადებისას დაფიქსირდა შეცდომა: {0}</value>
+  </data>
+  <data name="Game_NothingWasStored" xml:space="preserve">
+    <value>არაფერი შენახულა. {0}</value>
+  </data>
+  <data name="Game_NotUndone" xml:space="preserve">
+    <value>{0} SAM-მა ვერ გააუქმა {1}-ში უკვე შეტანილი ცვლილება; Steam-მა შესაძლოა ის ატვირთოს, როცა ამ თამაშის სტატისტიკა შემდეგ ჯერზე შეინახება.</value>
+  </data>
+  <data name="Game_ResetCompleteTitle" xml:space="preserve">
+    <value>ჩამოყრა დასრულდა</value>
+  </data>
+  <data name="Game_ResetAllDone" xml:space="preserve">
+    <value>მთელი სტატისტიკა და ყველა მიღწევა ჩამოიყარა.</value>
+  </data>
+  <data name="Game_ResetStatsDone" xml:space="preserve">
+    <value>მთელი სტატისტიკა ჩამოიყარა.</value>
+  </data>
+  <data name="Game_ResetFailedTitle" xml:space="preserve">
+    <value>ჩამოყრა ვერ მოხერხდა</value>
+  </data>
+  <data name="Game_ResetRefused" xml:space="preserve">
+    <value>Steam-მა სტატისტიკის ჩამოყრაზე უარი თქვა.</value>
+  </data>
+  <data name="Game_NoteSaveFailed" xml:space="preserve">
+    <value>შენიშვნის შენახვა ვერ მოხერხდა</value>
+  </data>
+  <data name="Game_BrowserFailed" xml:space="preserve">
+    <value>ბრაუზერის გახსნა ვერ მოხერხდა</value>
+  </data>
+  <data name="Game_RestoreAchievementLocked" xml:space="preserve">
+    <value>მიღწევა „{0}“ (დაცული) — სარეზერვო ასლში დაბლოკილი იყო</value>
+  </data>
+  <data name="Game_RestoreAchievementUnlocked" xml:space="preserve">
+    <value>მიღწევა „{0}“ (დაცული) — სარეზერვო ასლში განბლოკილი იყო</value>
+  </data>
+  <data name="Game_RestoreStatProtected" xml:space="preserve">
+    <value>მაჩვენებელი „{0}“ (დაცული) — სარეზერვო ასლში: {1}</value>
+  </data>
+  <data name="Game_RestoreStatAverageRate" xml:space="preserve">
+    <value>მაჩვენებელი „{0}“ (საშუალო სიჩქარე) — სარეზერვო ასლში: {1}</value>
+  </data>
+  <data name="Game_RestoreStatError" xml:space="preserve">
+    <value>მაჩვენებელი „{0}“ — {1}</value>
+  </data>
+  <data name="Game_MenuSteamGuide" xml:space="preserve">
+    <value>გზამკვლევის ძიება Steam-ზე</value>
+  </data>
+  <data name="Game_MenuWebSearch" xml:space="preserve">
+    <value>ინტერნეტში ძიება</value>
+  </data>
+  <data name="Game_MenuEditNote" xml:space="preserve">
+    <value>შენიშვნის რედაქტირება…</value>
+  </data>
+  <data name="Game_MenuAddNote" xml:space="preserve">
+    <value>შენიშვნის დამატება…</value>
+  </data>
+  <data name="Game_MenuHideDescription" xml:space="preserve">
+    <value>აღწერის დამალვა</value>
+  </data>
+  <data name="Game_MenuRevealDescription" xml:space="preserve">
+    <value>აღწერის ჩვენება</value>
+  </data>
+  <data name="Game_NotePlaceholder" xml:space="preserve">
+    <value>რჩევები, მოთხოვნები, შეხსენებები…</value>
+  </data>
+  <data name="Game_NoteName" xml:space="preserve">
+    <value>შენიშვნა: {0}</value>
+  </data>
+  <data name="Game_NoteHint" xml:space="preserve">
+    <value>ინახება დახურვისას · Ctrl+Enter — შენახვა და დახურვა · შენიშვნის წასაშლელად წაშალეთ ტექსტი</value>
+  </data>
+  <data name="Game_DiscardTitle" xml:space="preserve">
+    <value>გაუქმდეს მომლოდინე ცვლილებები?</value>
+  </data>
+  <data name="Game_DiscardReloadMessage" xml:space="preserve">
+    <value>ხელახლა ჩატვირთვა თქვენს მომლოდინე ცვლილებებს Steam-ის მიმდინარე მდგომარეობით ჩაანაცვლებს.</value>
+  </data>
+  <data name="Game_DiscardReloadButton" xml:space="preserve">
+    <value>გაუქმება და განახლება</value>
+  </data>
+  <data name="Game_DiscardRestoreMessage" xml:space="preserve">
+    <value>სარეზერვო ასლის აღდგენა თქვენს მომლოდინე ცვლილებებს ჩაანაცვლებს.</value>
+  </data>
+  <data name="Game_DiscardContinueButton" xml:space="preserve">
+    <value>გაუქმება და გაგრძელება</value>
+  </data>
+  <data name="Game_CommitDialogTitle" xml:space="preserve">
+    <value>შეინახოს ცვლილებები?</value>
+  </data>
+  <data name="Game_CommitDialogNote" xml:space="preserve">
+    <value>ცვლილებები თქვენს Steam-ანგარიშში დაუყოვნებლივ ჩაიწერება.</value>
+  </data>
+  <data name="Game_CommitDialogButton" xml:space="preserve">
+    <value>შენახვა</value>
+  </data>
+  <data name="Game_BackupFailedTitle" xml:space="preserve">
+    <value>სარეზერვო ასლის შექმნა ვერ მოხერხდა</value>
+  </data>
+  <data name="Game_BackupFailedMessage" xml:space="preserve">
+    <value>სარეზერვო ასლის შექმნა ვერ მოხერხდა ({0}). მაინც შეინახოს?</value>
+  </data>
+  <data name="Game_CommitAnywayButton" xml:space="preserve">
+    <value>მაინც შენახვა</value>
+  </data>
+  <data name="Game_RestoreDetails" xml:space="preserve">
+    <value>ეს აღადგენს {0}-ის სარეზერვო ასლს. განბლოკვის თარიღების აღდგენა შეუძლებელია: ახლა განბლოკილ ყველა მიღწევას Steam მიმდინარე დროს მიანიჭებს. ცვლილებები თქვენს Steam-ანგარიშში დაუყოვნებლივ ჩაიწერება, მას შემდეგ რაც მიმდინარე მდგომარეობის „აღდგენამდე“ სარეზერვო ასლი შეიქმნება.</value>
+  </data>
+  <data name="Game_RestoreNothing" xml:space="preserve">
+    <value>აღსადგენი არაფერია: ყველაფერი, რისი შეცვლაც შესაძლებელია, უკვე ემთხვევა {0}-ის სარეზერვო ასლს.</value>
+  </data>
+  <data name="Game_RestoreCantBeRestored" xml:space="preserve">
+    <value>ვერ აღდგება:</value>
+  </data>
+  <data name="Game_RestoreDialogTitle" xml:space="preserve">
+    <value>სარეზერვო ასლის აღდგენა</value>
+  </data>
+  <data name="Game_RestoreConfirmTitle" xml:space="preserve">
+    <value>აღდგეს სარეზერვო ასლი?</value>
+  </data>
+  <data name="Game_ResetStatsTitle" xml:space="preserve">
+    <value>ჩამოიყაროს მთელი სტატისტიკა?</value>
+  </data>
+  <data name="Game_ResetStatsMessage" xml:space="preserve">
+    <value>ეს თქვენს Steam-ანგარიშზე ამ თამაშის მთელ სტატისტიკას ჩამოყრის — არა მხოლოდ მიღწევებს. სტატისტიკით აღრიცხული თამაშის პროგრესი დაიკარგება. ნამდვილად გსურთ სტატისტიკის ჩამოყრა?</value>
+  </data>
+  <data name="Game_Continue" xml:space="preserve">
+    <value>გაგრძელება</value>
+  </data>
+  <data name="Game_ResetAchievementsTitle" xml:space="preserve">
+    <value>ჩამოიყაროს მიღწევებიც?</value>
+  </data>
+  <data name="Game_ResetAchievementsMessage" xml:space="preserve">
+    <value>გსურთ ამ თამაშის მიღწევების ჩამოყრაც? „მხოლოდ სტატისტიკის“ არჩევისას მიღწევები უცვლელი დარჩება.</value>
+  </data>
+  <data name="Game_ResetAchievementsTooButton" xml:space="preserve">
+    <value>მიღწევების ჩამოყრაც</value>
+  </data>
+  <data name="Game_OnlyStatsButton" xml:space="preserve">
+    <value>მხოლოდ სტატისტიკა</value>
+  </data>
+  <data name="Game_ResetSureTitle" xml:space="preserve">
+    <value>ნამდვილად დარწმუნებული ხართ?</value>
+  </data>
+  <data name="Game_ResetSureAll" xml:space="preserve">
+    <value>ამ თამაშის მთელი სტატისტიკა და ყველა მიღწევა ჩამოიყრება. ამის გაუქმება შეუძლებელია.</value>
+  </data>
+  <data name="Game_ResetSureStats" xml:space="preserve">
+    <value>ამ თამაშის მთელი სტატისტიკა ჩამოიყრება. ამის გაუქმება შეუძლებელია.</value>
+  </data>
+  <data name="Game_ResetStatsAndAchievementsButton" xml:space="preserve">
+    <value>სტატისტიკისა და მიღწევების ჩამოყრა</value>
+  </data>
+  <data name="Game_ResetStatsOnlyButton" xml:space="preserve">
+    <value>სტატისტიკის ჩამოყრა</value>
+  </data>
+  <data name="Game_CloseDiscardTitle" xml:space="preserve">
+    <value>გაუქმდეს შეუნახავი ცვლილებები?</value>
+  </data>
+  <data name="Game_CloseDiscardButton" xml:space="preserve">
+    <value>გაუქმება</value>
+  </data>
+  <data name="Achievement_A11yUnlocked" xml:space="preserve">
+    <value>{0}, განბლოკილი</value>
+  </data>
+  <data name="Achievement_A11yLocked" xml:space="preserve">
+    <value>{0}, დაბლოკილი</value>
+  </data>
+  <data name="Achievement_UnlockedAt" xml:space="preserve">
+    <value>განბლოკილია {0}</value>
+  </data>
+  <data name="Achievement_Unlocked" xml:space="preserve">
+    <value>განბლოკილია</value>
+  </data>
+  <data name="Achievement_WillUnlock" xml:space="preserve">
+    <value>განიბლოკება</value>
+  </data>
+  <data name="Achievement_WillLock" xml:space="preserve">
+    <value>დაიბლოკება</value>
+  </data>
+  <data name="Achievement_HiddenClickToReveal" xml:space="preserve">
+    <value>ფარული მიღწევა — დააწკაპუნეთ სანახავად</value>
+  </data>
+  <data name="Achievement_HiddenHoverToReveal" xml:space="preserve">
+    <value>ფარული მიღწევა — მიიტანეთ კურსორი ან დააწკაპუნეთ სანახავად</value>
+  </data>
+  <data name="Achievement_Hidden" xml:space="preserve">
+    <value>ფარული მიღწევა</value>
+  </data>
+  <data name="Achievement_PercentOfPlayers" xml:space="preserve">
+    <value>მოთამაშეთა {0:0.#}%</value>
+  </data>
+  <data name="Achievement_ProtectedTooltip" xml:space="preserve">
+    <value>დაცულია — მისი შეცვლა მხოლოდ თამაშის სერვერებს შეუძლიათ</value>
+  </data>
+  <data name="Achievement_ToggleTooltip" xml:space="preserve">
+    <value>შესანახი მდგომარეობა: დაბლოკილი ან განბლოკილი</value>
+  </data>
+  <data name="Rarity_Common" xml:space="preserve">
+    <value>ხშირი</value>
+  </data>
+  <data name="Rarity_Uncommon" xml:space="preserve">
+    <value>ნაკლებად ხშირი</value>
+  </data>
+  <data name="Rarity_Rare" xml:space="preserve">
+    <value>იშვიათი</value>
+  </data>
+  <data name="Rarity_Epic" xml:space="preserve">
+    <value>ეპიკური</value>
+  </data>
+  <data name="Rarity_Legendary" xml:space="preserve">
+    <value>ლეგენდარული</value>
+  </data>
+  <data name="Stat_KindInteger" xml:space="preserve">
+    <value>მთელი რიცხვი</value>
+  </data>
+  <data name="Stat_KindFloat" xml:space="preserve">
+    <value>ათწილადი</value>
+  </data>
+  <data name="Stat_KindAverageRate" xml:space="preserve">
+    <value>საშუალო სიჩქარე</value>
+  </data>
+  <data name="Stat_IncrementOnly" xml:space="preserve">
+    <value>მხოლოდ ზრდადი</value>
+  </data>
+  <data name="Stat_Range" xml:space="preserve">
+    <value>დიაპაზონი {0} – {1}</value>
+  </data>
+  <data name="Stat_MaxChange" xml:space="preserve">
+    <value>მაქს. ცვლილება {0}</value>
+  </data>
+  <data name="Stat_ProtectedText" xml:space="preserve">
+    <value>დაცულია — ამ მაჩვენებლის შეცვლა მხოლოდ თამაშის სერვერებს შეუძლიათ</value>
+  </data>
+  <data name="Stat_AverageRateText" xml:space="preserve">
+    <value>საშუალო სიჩქარე — Steam მას მხოლოდ სათამაშო სესიების მიხედვით ანახლებს, ამიტომ აქ მისი რედაქტირება შეუძლებელია</value>
+  </data>
+  <data name="Stat_WasValue" xml:space="preserve">
+    <value>იყო {0}</value>
+  </data>
+  <data name="Stat_UsedByTarget" xml:space="preserve">
+    <value>{0} — მიზანი {1}</value>
+  </data>
+  <data name="Stat_ErrorNotNumber" xml:space="preserve">
+    <value>შეიყვანეთ რიცხვი.</value>
+  </data>
+  <data name="Stat_ErrorProtected" xml:space="preserve">
+    <value>ეს მაჩვენებელი დაცულია და მისი შეცვლა შეუძლებელია.</value>
+  </data>
+  <data name="Stat_ErrorAverageRate" xml:space="preserve">
+    <value>საშუალო სიჩქარის მაჩვენებლების აქ შეცვლა შეუძლებელია.</value>
+  </data>
+  <data name="Stat_ErrorWholeNumbers" xml:space="preserve">
+    <value>ეს მაჩვენებელი მხოლოდ მთელ რიცხვებს იღებს.</value>
+  </data>
+  <data name="Stat_ErrorIntegerRange" xml:space="preserve">
+    <value>მნიშვნელობა მთელრიცხვა მაჩვენებლის დიაპაზონს სცდება.</value>
+  </data>
+  <data name="Stat_ErrorRange" xml:space="preserve">
+    <value>მნიშვნელობა დიაპაზონს სცდება.</value>
+  </data>
+  <data name="Stat_ErrorMinimum" xml:space="preserve">
+    <value>მინიმუმია {0}.</value>
+  </data>
+  <data name="Stat_ErrorMaximum" xml:space="preserve">
+    <value>მაქსიმუმია {0}.</value>
+  </data>
+  <data name="Stat_ErrorIncrementOnly" xml:space="preserve">
+    <value>ეს მაჩვენებელი მხოლოდ იზრდება; {0}-ზე ნაკლები ვერ იქნება.</value>
+  </data>
+  <data name="Stat_ErrorMaxChange" xml:space="preserve">
+    <value>ეს მაჩვენებელი ერთ ჯერზე მაქსიმუმ {0}-ით შეიძლება შეიცვალოს ({1}-დან).</value>
+  </data>
+  <data name="Stat_Max" xml:space="preserve">
+    <value>მაქს.</value>
+  </data>
+  <data name="Stat_Min" xml:space="preserve">
+    <value>მინ.</value>
+  </data>
+  <data name="Backups_Dialog.Title" xml:space="preserve">
+    <value>სარეზერვო ასლები</value>
+  </data>
+  <data name="Backups_Dialog.CloseButtonText" xml:space="preserve">
+    <value>დახურვა</value>
+  </data>
+  <data name="Backups_Intro.Text" xml:space="preserve">
+    <value>ამ თამაშის მიღწევებისა და სტატისტიკის ასლები. აღდგენისას შენახული მდგომარეობა მომლოდინე ცვლილებებად მზადდება და შენახვამდე დადასტურებას მოგთხოვთ.</value>
+  </data>
+  <data name="Backups_CreateButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Steam-ის მიმდინარე მდგომარეობის შენახვა</value>
+  </data>
+  <data name="Backups_CreateText.Text" xml:space="preserve">
+    <value>სარეზერვო ასლის შექმნა</value>
+  </data>
+  <data name="Backups_Empty.Text" xml:space="preserve">
+    <value>სარეზერვო ასლები ჯერ არ არის.</value>
+  </data>
+  <data name="Backups_List.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>სარეზერვო ასლები</value>
+  </data>
+  <data name="Backups_RestoreButton.Content" xml:space="preserve">
+    <value>აღდგენა</value>
+  </data>
+  <data name="Backups_RestoreButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ამ ასლის მდგომარეობის მომზადება და გადახედვა შენახვამდე</value>
+  </data>
+  <data name="Backups_DeleteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ამ სარეზერვო ასლის წაშლა</value>
+  </data>
+  <data name="Backups_DeleteButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>სარეზერვო ასლის წაშლა</value>
+  </data>
+  <data name="Backups_DeleteConfirm" xml:space="preserve">
+    <value>წაიშალოს {0}-ის სარეზერვო ასლი? ამის გაუქმება შეუძლებელია.</value>
+  </data>
+  <data name="Backups_ReasonDefault" xml:space="preserve">
+    <value>სარეზერვო ასლი</value>
+  </data>
+  <data name="Backups_ReasonBeforeCommit" xml:space="preserve">
+    <value>შენახვამდე</value>
+  </data>
+  <data name="Backups_ReasonBeforeRestore" xml:space="preserve">
+    <value>აღდგენამდე</value>
+  </data>
+  <data name="Backups_ReasonManual" xml:space="preserve">
+    <value>ხელით</value>
+  </data>
+  <data name="Backups_ReasonBeforeCli" xml:space="preserve">
+    <value>ბრძანების ხაზიდან შენახვამდე</value>
+  </data>
+  <data name="Backups_Details" xml:space="preserve">
+    <value>{0} / {1} განბლოკილი · {2}</value>
+  </data>
+  <data name="Backups_Stats_One" xml:space="preserve">
+    <value>{0} მაჩვენებელი</value>
+  </data>
+  <data name="Backups_Stats_Other" xml:space="preserve">
+    <value>{0} მაჩვენებელი</value>
+  </data>
+  <data name="Backups_ReadFailed" xml:space="preserve">
+    <value>სარეზერვო ასლების წაკითხვა ვერ მოხერხდა: {0}</value>
+  </data>
+  <data name="Backups_CreateFailed" xml:space="preserve">
+    <value>სარეზერვო ასლის შექმნა ვერ მოხერხდა: {0}</value>
+  </data>
+  <data name="Backups_DeleteFailed" xml:space="preserve">
+    <value>სარეზერვო ასლის წაშლა ვერ მოხერხდა: {0}</value>
+  </data>
+  <data name="Stats_Intro.Text" xml:space="preserve">
+    <value>თქვენი მიღწევების მიმოხილვა ყველა თამაშში, რომელიც გეკუთვნით.</value>
+  </data>
+  <data name="Pages_Refreshing.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ახლდება</value>
+  </data>
+  <data name="Stats_RefreshButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ხელახლა გამოთვლა</value>
+  </data>
+  <data name="Stats_RefreshButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>სტატისტიკის განახლება</value>
+  </data>
+  <data name="Pages_RefreshLabel.Text" xml:space="preserve">
+    <value>განახლება</value>
+  </data>
+  <data name="Stats_Loading.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>სტატისტიკა იტვირთება</value>
+  </data>
+  <data name="Stats_EmptyTitle.Text" xml:space="preserve">
+    <value>სტატისტიკა ჯერ არ არის</value>
+  </data>
+  <data name="Stats_EmptyBody.Text" xml:space="preserve">
+    <value>სტატისტიკა გამოჩნდება, როცა ბიბლიოთეკა ჩაიტვირთება. მოიცადეთ და განაახლეთ.</value>
+  </data>
+  <data name="Stats_EmptyRefresh.Content" xml:space="preserve">
+    <value>განახლება</value>
+  </data>
+  <data name="Stats_TileUnlocked.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>განბლოკილი მიღწევები</value>
+  </data>
+  <data name="Stats_TileUnlockedLabel.Text" xml:space="preserve">
+    <value>განბლოკილი მიღწევები</value>
+  </data>
+  <data name="Stats_TileCompletion.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>საერთო დასრულება</value>
+  </data>
+  <data name="Stats_TileCompletionLabel.Text" xml:space="preserve">
+    <value>საერთო დასრულება</value>
+  </data>
+  <data name="Stats_TilePerfect.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>სრულყოფილი თამაშები</value>
+  </data>
+  <data name="Stats_TilePerfectLabel.Text" xml:space="preserve">
+    <value>სრულყოფილი თამაშები</value>
+  </data>
+  <data name="Stats_TilePlaytime.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თამაშის საერთო დრო</value>
+  </data>
+  <data name="Stats_TilePlaytimeLabel.Text" xml:space="preserve">
+    <value>თამაშის საერთო დრო</value>
+  </data>
+  <data name="Stats_TileHunter.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>მონადირის ქულა</value>
+  </data>
+  <data name="Stats_TileHunterLabel.Text" xml:space="preserve">
+    <value>მონადირის ქულა</value>
+  </data>
+  <data name="Stats_HunterProgress.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>მონადირის ქულის გამოთვლის პროგრესი</value>
+  </data>
+  <data name="Stats_TimelineErrorBar.Title" xml:space="preserve">
+    <value>განბლოკვების ისტორია მიუწვდომელია</value>
+  </data>
+  <data name="Stats_MonthlyTitle.Text" xml:space="preserve">
+    <value>განბლოკვები თვეების მიხედვით</value>
+  </data>
+  <data name="Stats_MonthlyTableToggle.Content" xml:space="preserve">
+    <value>ცხრილი</value>
+  </data>
+  <data name="Stats_MonthlyTableToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>რიცხვების ცხრილად ჩვენება</value>
+  </data>
+  <data name="Stats_MonthlyTableToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თვიური განბლოკვების ცხრილად ჩვენება</value>
+  </data>
+  <data name="Stats_MonthlyChart.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>განბლოკვები თვეების მიხედვით, ბოლო 24 თვე</value>
+  </data>
+  <data name="Stats_MonthlyChart.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
+    <value>თითოეული თვის წასაკითხად გამოიყენეთ მარცხენა და მარჯვენა ისრიანი ღილაკები, ან გადადით ცხრილზე.</value>
+  </data>
+  <data name="Stats_MonthlyTable.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>განბლოკვები თვეების მიხედვით</value>
+  </data>
+  <data name="Stats_NoChartData.Text" xml:space="preserve">
+    <value>დიაგრამისთვის განბლოკვები ჯერ არ არის.</value>
+  </data>
+  <data name="Stats_CumulativeTitle.Text" xml:space="preserve">
+    <value>განბლოკილი მიღწევები დროის მიხედვით</value>
+  </data>
+  <data name="Stats_CumulativeTableToggle.Content" xml:space="preserve">
+    <value>ცხრილი</value>
+  </data>
+  <data name="Stats_CumulativeTableToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>რიცხვების ცხრილად ჩვენება</value>
+  </data>
+  <data name="Stats_CumulativeTableToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>განბლოკილი მიღწევების დინამიკის ცხრილად ჩვენება</value>
+  </data>
+  <data name="Stats_CumulativeChart.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>განბლოკილი მიღწევების ჯამი თვეების მიხედვით</value>
+  </data>
+  <data name="Stats_CumulativeChart.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
+    <value>თითოეული თვის წასაკითხად გამოიყენეთ მარცხენა და მარჯვენა ისრიანი ღილაკები, ან გადადით ცხრილზე.</value>
+  </data>
+  <data name="Stats_CumulativeTable.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თითოეული თვის ბოლოსთვის განბლოკილი მიღწევები</value>
+  </data>
+  <data name="Stats_RarestTitle.Text" xml:space="preserve">
+    <value>ყველაზე იშვიათი განბლოკვები</value>
+  </data>
+  <data name="Stats_RarestSubtitle.Text" xml:space="preserve">
+    <value>თქვენი მიღწევები, რომლებიც ყველაზე ცოტა მოთამაშეს აქვს</value>
+  </data>
+  <data name="Stats_RarestFetching.Text" xml:space="preserve">
+    <value>იტვირთება გლობალური განბლოკვის მაჩვენებლები…</value>
+  </data>
+  <data name="Stats_RarestEmpty.Text" xml:space="preserve">
+    <value>გლობალური სტატისტიკის მქონე განბლოკვები ჯერ არ არის.</value>
+  </data>
+  <data name="Stats_RarestList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ყველაზე იშვიათი განბლოკვები</value>
+  </data>
+  <data name="Stats_TopCompletionTitle.Text" xml:space="preserve">
+    <value>ყველაზე მეტად დასრულებული თამაშები</value>
+  </data>
+  <data name="Stats_TopCompletionSubtitle.Text" xml:space="preserve">
+    <value>დაწყებული თამაშები განბლოკილი მიღწევების წილის მიხედვით</value>
+  </data>
+  <data name="Stats_TopCompletionEmpty.Text" xml:space="preserve">
+    <value>დაწყებული თამაშები ჯერ არ არის.</value>
+  </data>
+  <data name="Stats_TopCompletionList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ყველაზე მეტად დასრულებული თამაშები</value>
+  </data>
+  <data name="Stats_TopPlaytimeTitle.Text" xml:space="preserve">
+    <value>ყველაზე დიდხანს ნათამაშები თამაშები</value>
+  </data>
+  <data name="Stats_TopPlaytimeSubtitle.Text" xml:space="preserve">
+    <value>თამაშის საერთო დროის მიხედვით</value>
+  </data>
+  <data name="Stats_TopPlaytimeEmpty.Text" xml:space="preserve">
+    <value>თამაშის დრო ჯერ არ დაფიქსირებულა.</value>
+  </data>
+  <data name="Stats_TopPlaytimeList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ყველაზე დიდხანს ნათამაშები თამაშები</value>
+  </data>
+  <data name="Activity_Search.PlaceholderText" xml:space="preserve">
+    <value>ფილტრი თამაშის ან მიღწევის მიხედვით</value>
+  </data>
+  <data name="Activity_Search.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ფილტრი თამაშის ან მიღწევის მიხედვით</value>
+  </data>
+  <data name="Activity_Range.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>პერიოდი</value>
+  </data>
+  <data name="Activity_RefreshButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>განბლოკვების ხელახლა წაკითხვა</value>
+  </data>
+  <data name="Activity_RefreshButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>აქტივობის განახლება</value>
+  </data>
+  <data name="Activity_Loading.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>აქტივობა იტვირთება</value>
+  </data>
+  <data name="Activity_Feed.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ბოლო განბლოკვები</value>
+  </data>
+  <data name="Activity_ErrorTitle.Text" xml:space="preserve">
+    <value>აქტივობის ჩატვირთვა ვერ მოხერხდა</value>
+  </data>
+  <data name="Pages_TryAgain.Content" xml:space="preserve">
+    <value>ხელახლა ცდა</value>
+  </data>
+  <data name="Activity_EmptyTitle.Text" xml:space="preserve">
+    <value>განბლოკვები ჯერ არ არის</value>
+  </data>
+  <data name="Activity_EmptyBody.Text" xml:space="preserve">
+    <value>აქ გამოჩნდება თქვენ მიერ განბლოკილი მიღწევები, უახლესი — პირველი. Steam ინახავს განბლოკვის დროს იმ თამაშებისთვის, რომლებიც ამ კომპიუტერზე გითამაშიათ.</value>
+  </data>
+  <data name="Activity_NoMatchesTitle.Text" xml:space="preserve">
+    <value>შესაბამისი განბლოკვები არ მოიძებნა</value>
+  </data>
+  <data name="Activity_NoMatchesBody.Text" xml:space="preserve">
+    <value>სცადეთ სხვა საძიებო ტექსტი ან უფრო გრძელი პერიოდი.</value>
+  </data>
+  <data name="Pages_ClearFilters.Content" xml:space="preserve">
+    <value>ფილტრების გასუფთავება</value>
+  </data>
+  <data name="History_Search.PlaceholderText" xml:space="preserve">
+    <value>ფილტრი თამაშის მიხედვით</value>
+  </data>
+  <data name="History_Search.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ფილტრი თამაშის მიხედვით</value>
+  </data>
+  <data name="History_Source.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>წყარო</value>
+  </data>
+  <data name="History_RefreshButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>შენახვების ისტორიის ხელახლა წაკითხვა</value>
+  </data>
+  <data name="History_RefreshButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ისტორიის განახლება</value>
+  </data>
+  <data name="History_BackupsHint.Text" xml:space="preserve">
+    <value>ეძებთ სარეზერვო ასლებს? თითოეული თამაშის სარეზერვო ასლები მის საკუთარ ფანჯარაშია. დააწკაპუნეთ ქვემოთ თამაშის სახელზე და აღადგინეთ იქიდან.</value>
+  </data>
+  <data name="History_Loading.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ისტორია იტვირთება</value>
+  </data>
+  <data name="History_List.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>შენახვების ისტორია</value>
+  </data>
+  <data name="History_SourceBadge.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>საიდან მოხდა ეს შენახვა</value>
+  </data>
+  <data name="History_NoChangesRecorded.Text" xml:space="preserve">
+    <value>ამ შენახვისას მიღწევების ან სტატისტიკის ცვლილებები არ დაფიქსირებულა.</value>
+  </data>
+  <data name="History_ErrorLabel.Text" xml:space="preserve">
+    <value>შეცდომა</value>
+  </data>
+  <data name="History_ErrorTitle.Text" xml:space="preserve">
+    <value>ისტორიის ჩატვირთვა ვერ მოხერხდა</value>
+  </data>
+  <data name="History_EmptyTitle.Text" xml:space="preserve">
+    <value>შენახვები ჯერ არ არის</value>
+  </data>
+  <data name="History_EmptyBody.Text" xml:space="preserve">
+    <value>როცა SAM-ში მიღწევების ან სტატისტიკის ცვლილებებს შეინახავთ, აქ გამოჩნდება, რა შეიცვალა და წარმატებით შესრულდა თუ არა.</value>
+  </data>
+  <data name="History_NoMatchesTitle.Text" xml:space="preserve">
+    <value>შესაბამისი შენახვები არ მოიძებნა</value>
+  </data>
+  <data name="History_NoMatchesBody.Text" xml:space="preserve">
+    <value>სცადეთ სხვა თამაში ან წყარო.</value>
+  </data>
+  <data name="Pages_Today" xml:space="preserve">
+    <value>დღეს</value>
+  </data>
+  <data name="Pages_Yesterday" xml:space="preserve">
+    <value>გუშინ</value>
+  </data>
+  <data name="Pages_OpenGame" xml:space="preserve">
+    <value>{0} — გახსნა</value>
+  </data>
+  <data name="Pages_AppFallbackName" xml:space="preserve">
+    <value>აპი {0}</value>
+  </data>
+  <data name="Pages_Unlocks_One" xml:space="preserve">
+    <value>{0} განბლოკვა</value>
+  </data>
+  <data name="Pages_Unlocks_Other" xml:space="preserve">
+    <value>{0} განბლოკვა</value>
+  </data>
+  <data name="Pages_TimelineUnavailable" xml:space="preserve">
+    <value>განბლოკვების ისტორია ამ ვერსიაში ჯერ მიუწვდომელია.</value>
+  </data>
+  <data name="Pages_TimelineError" xml:space="preserve">
+    <value>განბლოკვების ისტორიის წაკითხვა ვერ მოხერხდა. {0}</value>
+  </data>
+  <data name="Pages_RarityToolTip" xml:space="preserve">
+    <value>{0}: ეს მიღწევა მოთამაშეთა {1}-ს აქვს</value>
+  </data>
+  <data name="Pages_RarityCommon" xml:space="preserve">
+    <value>ხშირი</value>
+  </data>
+  <data name="Pages_RarityUncommon" xml:space="preserve">
+    <value>ნაკლებად ხშირი</value>
+  </data>
+  <data name="Pages_RarityRare" xml:space="preserve">
+    <value>იშვიათი</value>
+  </data>
+  <data name="Pages_RarityEpic" xml:space="preserve">
+    <value>ეპიკური</value>
+  </data>
+  <data name="Pages_RarityLegendary" xml:space="preserve">
+    <value>ლეგენდარული</value>
+  </data>
+  <data name="Chart_TickThousands" xml:space="preserve">
+    <value>{0} ათ.</value>
+  </data>
+  <data name="Chart_TickMillions" xml:space="preserve">
+    <value>{0} მლნ</value>
+  </data>
+  <data name="Stats_RankedAchievements_One" xml:space="preserve">
+    <value>{1} / {0} მიღწევა</value>
+  </data>
+  <data name="Stats_RankedAchievements_Other" xml:space="preserve">
+    <value>{1} / {0} მიღწევა</value>
+  </data>
+  <data name="Stats_PlaytimeShare" xml:space="preserve">
+    <value>თქვენი თამაშის დროის {0}</value>
+  </data>
+  <data name="Stats_UnlockedDetail_One" xml:space="preserve">
+    <value>{0} მიღწევიდან</value>
+  </data>
+  <data name="Stats_UnlockedDetail_Other" xml:space="preserve">
+    <value>{0} მიღწევიდან</value>
+  </data>
+  <data name="Stats_NoGamesStarted" xml:space="preserve">
+    <value>დაწყებული თამაშები ჯერ არ არის</value>
+  </data>
+  <data name="Stats_AverageStarted" xml:space="preserve">
+    <value>დაწყებული თამაშების საშუალო: {0}</value>
+  </data>
+  <data name="Stats_PerfectDetail_One" xml:space="preserve">
+    <value>მიღწევების მქონე {0} თამაშიდან</value>
+  </data>
+  <data name="Stats_PerfectDetail_Other" xml:space="preserve">
+    <value>მიღწევების მქონე {0} თამაშიდან</value>
+  </data>
+  <data name="Stats_PlaytimeDetail_One" xml:space="preserve">
+    <value>{0} ნათამაშებ თამაშში</value>
+  </data>
+  <data name="Stats_PlaytimeDetail_Other" xml:space="preserve">
+    <value>{0} ნათამაშებ თამაშში</value>
+  </data>
+  <data name="Stats_MonthlyPoint" xml:space="preserve">
+    <value>{0}: {1}</value>
+  </data>
+  <data name="Stats_MonthlySummary" xml:space="preserve">
+    <value>{0} ბოლო {1} თვეში</value>
+  </data>
+  <data name="Stats_CumulativePoint" xml:space="preserve">
+    <value>{0}, თვის ბოლოს: {1} განბლოკილი</value>
+  </data>
+  <data name="Stats_CumulativeSummary_One" xml:space="preserve">
+    <value>{0} განბლოკვა ცნობილი თარიღით, {1}-დან</value>
+  </data>
+  <data name="Stats_CumulativeSummary_Other" xml:space="preserve">
+    <value>{0} განბლოკვა ცნობილი თარიღით, {1}-დან</value>
+  </data>
+  <data name="Stats_HunterNeedsTimeline" xml:space="preserve">
+    <value>საჭიროა განბლოკვების ისტორია</value>
+  </data>
+  <data name="Stats_HunterCalculating" xml:space="preserve">
+    <value>გამოითვლება… {0} / {1} თამაში</value>
+  </data>
+  <data name="Stats_HunterNoUnlocks" xml:space="preserve">
+    <value>განბლოკვები ჯერ არ არის</value>
+  </data>
+  <data name="Stats_HunterFrom_One" xml:space="preserve">
+    <value>გლობალური სტატისტიკის მქონე {0} განბლოკვიდან</value>
+  </data>
+  <data name="Stats_HunterFrom_Other" xml:space="preserve">
+    <value>გლობალური სტატისტიკის მქონე {0} განბლოკვიდან</value>
+  </data>
+  <data name="Stats_HunterExplanation" xml:space="preserve">
+    <value>მონადირის ქულა იშვიათ განბლოკვებს აჯილდოებს. თითოეული განბლოკილი მიღწევა იძლევა 100 ÷ იმ მოთამაშეთა პროცენტს, ვისაც ის აქვს: 1 ქულას, თუ ყველას აქვს, 10 ქულას 10%-ისას, 100 ქულას 1%-ისას და მაქსიმუმ 1 000 ქულას 0,1%-ისას ან უფრო იშვიათისას. გლობალური სტატისტიკის არმქონე მიღწევები არ ითვლება.</value>
+  </data>
+  <data name="Activity_RangeLast7Days" xml:space="preserve">
+    <value>ბოლო 7 დღე</value>
+  </data>
+  <data name="Activity_RangeLast30Days" xml:space="preserve">
+    <value>ბოლო 30 დღე</value>
+  </data>
+  <data name="Activity_RangeLast90Days" xml:space="preserve">
+    <value>ბოლო 90 დღე</value>
+  </data>
+  <data name="Activity_RangeAllTime" xml:space="preserve">
+    <value>მთელი დრო</value>
+  </data>
+  <data name="Activity_ShownOfTotal_One" xml:space="preserve">
+    <value>{1} / {0} განბლოკვა</value>
+  </data>
+  <data name="Activity_ShownOfTotal_Other" xml:space="preserve">
+    <value>{1} / {0} განბლოკვა</value>
+  </data>
+  <data name="History_StatusSucceeded" xml:space="preserve">
+    <value>წარმატებით შესრულდა</value>
+  </data>
+  <data name="History_StatusFailed" xml:space="preserve">
+    <value>ვერ შესრულდა</value>
+  </data>
+  <data name="History_SummaryUnlocked_One" xml:space="preserve">
+    <value>განბლოკილია {0}</value>
+  </data>
+  <data name="History_SummaryUnlocked_Other" xml:space="preserve">
+    <value>განბლოკილია {0}</value>
+  </data>
+  <data name="History_SummaryLocked_One" xml:space="preserve">
+    <value>დაბლოკილია {0}</value>
+  </data>
+  <data name="History_SummaryLocked_Other" xml:space="preserve">
+    <value>დაბლოკილია {0}</value>
+  </data>
+  <data name="History_SummaryStats_One" xml:space="preserve">
+    <value>შეიცვალა {0} სტატისტიკა</value>
+  </data>
+  <data name="History_SummaryStats_Other" xml:space="preserve">
+    <value>შეიცვალა {0} სტატისტიკა</value>
+  </data>
+  <data name="History_NoChanges" xml:space="preserve">
+    <value>ცვლილებები არ არის</value>
+  </data>
+  <data name="History_DetailUnlocked" xml:space="preserve">
+    <value>განბლოკილი</value>
+  </data>
+  <data name="History_DetailLocked" xml:space="preserve">
+    <value>დაბლოკილი</value>
+  </data>
+  <data name="History_DetailStats" xml:space="preserve">
+    <value>სტატისტიკა</value>
+  </data>
+  <data name="History_AllSources" xml:space="preserve">
+    <value>ყველა წყარო</value>
+  </data>
+  <data name="History_SourceManual" xml:space="preserve">
+    <value>ხელით</value>
+  </data>
+  <data name="History_SourceRestore" xml:space="preserve">
+    <value>აღდგენა</value>
+  </data>
+  <data name="History_SourceCommandLine" xml:space="preserve">
+    <value>ბრძანების ზოლი</value>
+  </data>
+  <data name="History_SourceFarm" xml:space="preserve">
+    <value>ფარმი</value>
+  </data>
+  <data name="History_SourceUnknown" xml:space="preserve">
+    <value>უცნობი</value>
+  </data>
+  <data name="History_Unavailable" xml:space="preserve">
+    <value>შენახვების ისტორია ამ ვერსიაში ჯერ მიუწვდომელია.</value>
+  </data>
+  <data name="History_LoadError" xml:space="preserve">
+    <value>შენახვების ისტორიის წაკითხვა ვერ მოხერხდა. {0}</value>
+  </data>
+  <data name="History_Commits_One" xml:space="preserve">
+    <value>{0} შენახვა</value>
+  </data>
+  <data name="History_Commits_Other" xml:space="preserve">
+    <value>{0} შენახვა</value>
+  </data>
+  <data name="History_ShownOfTotal_One" xml:space="preserve">
+    <value>{1} / {0} შენახვა</value>
+  </data>
+  <data name="History_ShownOfTotal_Other" xml:space="preserve">
+    <value>{1} / {0} შენახვა</value>
+  </data>
+</root>

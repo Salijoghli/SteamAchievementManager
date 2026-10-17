@@ -134,7 +134,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock
-                    Text="Your achievement hunting across every game you own."
+                    x:Uid="Stats_Intro"
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     VerticalAlignment="Center"
                     TextTrimming="CharacterEllipsis" />
@@ -143,15 +143,14 @@
                     Width="16"
                     Height="16"
                     IsActive="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}"
-                    AutomationProperties.Name="Refreshing" />
+                    x:Uid="Pages_Refreshing" />
                 <Button
                     Grid.Column="2"
                     Command="{x:Bind ViewModel.RefreshCommand}"
-                    ToolTipService.ToolTip="Recalculate"
-                    AutomationProperties.Name="Refresh stats">
+                    x:Uid="Stats_RefreshButton">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE72C;" FontSize="14" />
-                        <TextBlock Text="Refresh" />
+                        <TextBlock x:Uid="Pages_RefreshLabel" />
                     </StackPanel>
                 </Button>
             </Grid>
@@ -161,7 +160,7 @@
                 Grid.Row="1"
                 Spacing="16"
                 Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}"
-                AutomationProperties.Name="Loading stats">
+                x:Uid="Stats_Loading">
                 <Grid x:Name="SkeletonTiles" ColumnSpacing="12" RowSpacing="12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -236,14 +235,14 @@
                 Spacing="12"
                 Visibility="{x:Bind ViewModel.IsEmpty, Mode=OneWay}">
                 <FontIcon Glyph="&#xE9D2;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-                <TextBlock Text="No stats yet" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+                <TextBlock x:Uid="Stats_EmptyTitle" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
                 <TextBlock
-                    Text="Your stats appear once your library has loaded. Give it a moment, then refresh."
+                    x:Uid="Stats_EmptyBody"
                     TextWrapping="Wrap"
                     MaxWidth="420"
                     TextAlignment="Center"
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                <Button Content="Refresh" HorizontalAlignment="Center" Command="{x:Bind ViewModel.RefreshCommand}" />
+                <Button x:Uid="Stats_EmptyRefresh" HorizontalAlignment="Center" Command="{x:Bind ViewModel.RefreshCommand}" />
             </StackPanel>
 
             <!-- Content. -->
@@ -258,33 +257,33 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <Border Style="{StaticResource PanelStyle}" AutomationProperties.Name="Achievements unlocked">
+                    <Border Style="{StaticResource PanelStyle}" x:Uid="Stats_TileUnlocked">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Achievements unlocked" Style="{StaticResource TileLabelStyle}" />
+                            <TextBlock x:Uid="Stats_TileUnlockedLabel" Style="{StaticResource TileLabelStyle}" />
                             <TextBlock Text="{x:Bind ViewModel.UnlockedText, Mode=OneWay}" Style="{StaticResource TileValueStyle}" />
                             <TextBlock Text="{x:Bind ViewModel.UnlockedDetail, Mode=OneWay}" Style="{StaticResource TileDetailStyle}" />
                         </StackPanel>
                     </Border>
 
-                    <Border Grid.Column="1" Style="{StaticResource PanelStyle}" AutomationProperties.Name="Overall completion">
+                    <Border Grid.Column="1" Style="{StaticResource PanelStyle}" x:Uid="Stats_TileCompletion">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Overall completion" Style="{StaticResource TileLabelStyle}" />
+                            <TextBlock x:Uid="Stats_TileCompletionLabel" Style="{StaticResource TileLabelStyle}" />
                             <TextBlock Text="{x:Bind ViewModel.CompletionText, Mode=OneWay}" Style="{StaticResource TileValueStyle}" />
                             <TextBlock Text="{x:Bind ViewModel.CompletionDetail, Mode=OneWay}" Style="{StaticResource TileDetailStyle}" />
                         </StackPanel>
                     </Border>
 
-                    <Border Grid.Column="2" Style="{StaticResource PanelStyle}" AutomationProperties.Name="Perfect games">
+                    <Border Grid.Column="2" Style="{StaticResource PanelStyle}" x:Uid="Stats_TilePerfect">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Perfect games" Style="{StaticResource TileLabelStyle}" />
+                            <TextBlock x:Uid="Stats_TilePerfectLabel" Style="{StaticResource TileLabelStyle}" />
                             <TextBlock Text="{x:Bind ViewModel.PerfectText, Mode=OneWay}" Style="{StaticResource TileValueStyle}" />
                             <TextBlock Text="{x:Bind ViewModel.PerfectDetail, Mode=OneWay}" Style="{StaticResource TileDetailStyle}" />
                         </StackPanel>
                     </Border>
 
-                    <Border Grid.Column="3" Style="{StaticResource PanelStyle}" AutomationProperties.Name="Total playtime">
+                    <Border Grid.Column="3" Style="{StaticResource PanelStyle}" x:Uid="Stats_TilePlaytime">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Total playtime" Style="{StaticResource TileLabelStyle}" />
+                            <TextBlock x:Uid="Stats_TilePlaytimeLabel" Style="{StaticResource TileLabelStyle}" />
                             <TextBlock Text="{x:Bind ViewModel.PlaytimeText, Mode=OneWay}" Style="{StaticResource TileValueStyle}" />
                             <TextBlock Text="{x:Bind ViewModel.PlaytimeDetail, Mode=OneWay}" Style="{StaticResource TileDetailStyle}" />
                         </StackPanel>
@@ -294,11 +293,11 @@
                         Grid.Column="4"
                         Style="{StaticResource PanelStyle}"
                         ToolTipService.ToolTip="{x:Bind pages:StatsViewModel.HunterScoreExplanation}"
-                        AutomationProperties.Name="Hunter score"
+                        x:Uid="Stats_TileHunter"
                         AutomationProperties.HelpText="{x:Bind pages:StatsViewModel.HunterScoreExplanation}">
                         <StackPanel Spacing="4">
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <TextBlock Text="Hunter score" Style="{StaticResource TileLabelStyle}" />
+                                <TextBlock x:Uid="Stats_TileHunterLabel" Style="{StaticResource TileLabelStyle}" />
                                 <FontIcon
                                     Glyph="&#xE946;"
                                     FontSize="12"
@@ -312,7 +311,7 @@
                                 Maximum="100"
                                 Value="{x:Bind ViewModel.HunterProgress, Mode=OneWay}"
                                 Visibility="{x:Bind ViewModel.IsHunterCalculating, Mode=OneWay}"
-                                AutomationProperties.Name="Hunter score progress" />
+                                x:Uid="Stats_HunterProgress" />
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -322,7 +321,7 @@
                     IsOpen="{x:Bind ViewModel.HasTimelineError, Mode=OneWay}"
                     IsClosable="False"
                     Severity="Warning"
-                    Title="Unlock history unavailable"
+                    x:Uid="Stats_TimelineErrorBar"
                     Message="{x:Bind ViewModel.TimelineError, Mode=OneWay}" />
 
                 <!-- Charts. -->
@@ -343,17 +342,15 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Unlocks per month" Style="{StaticResource PanelTitleStyle}" />
+                            <TextBlock x:Uid="Stats_MonthlyTitle" Style="{StaticResource PanelTitleStyle}" />
                             <TextBlock Grid.Row="1" Text="{x:Bind ViewModel.MonthlySummary, Mode=OneWay}" Style="{StaticResource PanelSubtitleStyle}" />
                             <ToggleButton
                                 x:Name="MonthlyTableToggle"
                                 Grid.RowSpan="2"
                                 Grid.Column="1"
-                                Content="Table"
+                                x:Uid="Stats_MonthlyTableToggle"
                                 Style="{StaticResource TableToggleStyle}"
-                                IsEnabled="{x:Bind ViewModel.HasTimeline, Mode=OneWay}"
-                                ToolTipService.ToolTip="Show the numbers as a table"
-                                AutomationProperties.Name="Show unlocks per month as a table" />
+                                IsEnabled="{x:Bind ViewModel.HasTimeline, Mode=OneWay}" />
 
                             <charts:ColumnChart
                                 Grid.Row="2"
@@ -367,8 +364,7 @@
                                 HoverBrush="{ThemeResource ChartHoverBrush}"
                                 AxisLabelBrush="{ThemeResource TextFillColorTertiaryBrush}"
                                 Visibility="{x:Bind pages:PageFormat.ChartVisible(ViewModel.HasTimeline, MonthlyTableToggle.IsChecked), Mode=OneWay}"
-                                AutomationProperties.Name="Unlocks per month over the last 24 months"
-                                AutomationProperties.HelpText="Use the left and right arrow keys to read each month, or switch to the table." />
+                                x:Uid="Stats_MonthlyChart" />
                             <ScrollViewer
                                 Grid.Row="2"
                                 Grid.ColumnSpan="2"
@@ -378,12 +374,12 @@
                                     ItemsSource="{x:Bind ViewModel.MonthlyPoints, Mode=OneWay}"
                                     ItemTemplate="{StaticResource TableRowTemplate}"
                                     Margin="0,0,12,0"
-                                    AutomationProperties.Name="Unlocks per month" />
+                                    x:Uid="Stats_MonthlyTable" />
                             </ScrollViewer>
                             <TextBlock
                                 Grid.Row="2"
                                 Grid.ColumnSpan="2"
-                                Text="No unlocks to chart yet."
+                                x:Uid="Stats_NoChartData"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -402,17 +398,15 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Achievements unlocked over time" Style="{StaticResource PanelTitleStyle}" />
+                            <TextBlock x:Uid="Stats_CumulativeTitle" Style="{StaticResource PanelTitleStyle}" />
                             <TextBlock Grid.Row="1" Text="{x:Bind ViewModel.CumulativeSummary, Mode=OneWay}" Style="{StaticResource PanelSubtitleStyle}" />
                             <ToggleButton
                                 x:Name="CumulativeTableToggle"
                                 Grid.RowSpan="2"
                                 Grid.Column="1"
-                                Content="Table"
+                                x:Uid="Stats_CumulativeTableToggle"
                                 Style="{StaticResource TableToggleStyle}"
-                                IsEnabled="{x:Bind ViewModel.HasTimeline, Mode=OneWay}"
-                                ToolTipService.ToolTip="Show the numbers as a table"
-                                AutomationProperties.Name="Show achievements unlocked over time as a table" />
+                                IsEnabled="{x:Bind ViewModel.HasTimeline, Mode=OneWay}" />
 
                             <charts:AreaChart
                                 Grid.Row="2"
@@ -426,8 +420,7 @@
                                 HoverBrush="{ThemeResource ChartHoverBrush}"
                                 AxisLabelBrush="{ThemeResource TextFillColorTertiaryBrush}"
                                 Visibility="{x:Bind pages:PageFormat.ChartVisible(ViewModel.HasTimeline, CumulativeTableToggle.IsChecked), Mode=OneWay}"
-                                AutomationProperties.Name="Total achievements unlocked, month by month"
-                                AutomationProperties.HelpText="Use the left and right arrow keys to read each month, or switch to the table." />
+                                x:Uid="Stats_CumulativeChart" />
                             <ScrollViewer
                                 Grid.Row="2"
                                 Grid.ColumnSpan="2"
@@ -437,12 +430,12 @@
                                     ItemsSource="{x:Bind ViewModel.CumulativePoints, Mode=OneWay}"
                                     ItemTemplate="{StaticResource TableRowTemplate}"
                                     Margin="0,0,12,0"
-                                    AutomationProperties.Name="Achievements unlocked by the end of each month" />
+                                    x:Uid="Stats_CumulativeTable" />
                             </ScrollViewer>
                             <TextBlock
                                 Grid.Row="2"
                                 Grid.ColumnSpan="2"
-                                Text="No unlocks to chart yet."
+                                x:Uid="Stats_NoChartData"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
@@ -462,17 +455,17 @@
                     <!-- Rarest unlocks. -->
                     <Border Style="{StaticResource PanelStyle}">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Rarest unlocks" Style="{StaticResource PanelTitleStyle}" />
-                            <TextBlock Text="Your achievements the fewest players have" Style="{StaticResource PanelSubtitleStyle}" />
+                            <TextBlock x:Uid="Stats_RarestTitle" Style="{StaticResource PanelTitleStyle}" />
+                            <TextBlock x:Uid="Stats_RarestSubtitle" Style="{StaticResource PanelSubtitleStyle}" />
                             <TextBlock
-                                Text="Fetching global unlock rates…"
+                                x:Uid="Stats_RarestFetching"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Visibility="{x:Bind ViewModel.IsFetchingRarest, Mode=OneWay}" />
                             <TextBlock
-                                Text="No unlocks with global stats yet."
+                                x:Uid="Stats_RarestEmpty"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Visibility="{x:Bind ViewModel.IsRarestEmpty, Mode=OneWay}" />
-                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.RarestUnlocks}" AutomationProperties.Name="Rarest unlocks">
+                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.RarestUnlocks}" x:Uid="Stats_RarestList">
                                 <ItemsRepeater.Layout>
                                     <StackLayout Spacing="4" />
                                 </ItemsRepeater.Layout>
@@ -537,32 +530,32 @@
                     <!-- Top games by completion. -->
                     <Border Grid.Column="1" Style="{StaticResource PanelStyle}">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Most complete games" Style="{StaticResource PanelTitleStyle}" />
-                            <TextBlock Text="Started games, by share of achievements unlocked" Style="{StaticResource PanelSubtitleStyle}" />
+                            <TextBlock x:Uid="Stats_TopCompletionTitle" Style="{StaticResource PanelTitleStyle}" />
+                            <TextBlock x:Uid="Stats_TopCompletionSubtitle" Style="{StaticResource PanelSubtitleStyle}" />
                             <TextBlock
-                                Text="No games started yet."
+                                x:Uid="Stats_TopCompletionEmpty"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Visibility="{x:Bind pages:PageFormat.VisibleIfEmpty(ViewModel.TopCompletion), Mode=OneWay}" />
                             <ItemsRepeater
                                 ItemsSource="{x:Bind ViewModel.TopCompletion, Mode=OneWay}"
                                 ItemTemplate="{StaticResource RankedRowTemplate}"
-                                AutomationProperties.Name="Most complete games" />
+                                x:Uid="Stats_TopCompletionList" />
                         </StackPanel>
                     </Border>
 
                     <!-- Top games by playtime. -->
                     <Border Grid.Column="2" Style="{StaticResource PanelStyle}">
                         <StackPanel Spacing="8">
-                            <TextBlock Text="Most played games" Style="{StaticResource PanelTitleStyle}" />
-                            <TextBlock Text="By total playtime" Style="{StaticResource PanelSubtitleStyle}" />
+                            <TextBlock x:Uid="Stats_TopPlaytimeTitle" Style="{StaticResource PanelTitleStyle}" />
+                            <TextBlock x:Uid="Stats_TopPlaytimeSubtitle" Style="{StaticResource PanelSubtitleStyle}" />
                             <TextBlock
-                                Text="No playtime recorded yet."
+                                x:Uid="Stats_TopPlaytimeEmpty"
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 Visibility="{x:Bind pages:PageFormat.VisibleIfEmpty(ViewModel.TopPlaytime), Mode=OneWay}" />
                             <ItemsRepeater
                                 ItemsSource="{x:Bind ViewModel.TopPlaytime, Mode=OneWay}"
                                 ItemTemplate="{StaticResource RankedRowTemplate}"
-                                AutomationProperties.Name="Most played games" />
+                                x:Uid="Stats_TopPlaytimeList" />
                         </StackPanel>
                     </Border>
                 </Grid>

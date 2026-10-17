@@ -76,7 +76,7 @@ public sealed class SteamSession : IDisposable
     {
         if (string.IsNullOrEmpty(API.Steam.GetInstallPath()))
         {
-            throw new SteamUnavailableException("Steam doesn't appear to be installed.");
+            throw new SteamUnavailableException(Strings.Get("Steam_NotInstalled"));
         }
 
         var client = new Client();
@@ -89,19 +89,16 @@ public sealed class SteamSession : IDisposable
             client.Dispose();
             var message = e.Failure switch
             {
-                ClientInitializeFailure.ConnectToGlobalUser =>
-                    "Steam isn't running or you're not logged in. Start Steam, log in, and try again.\n\n" +
-                    "If you have this game through Family Sharing, it may be locked while the owner is playing.",
-                ClientInitializeFailure.AppIdMismatch =>
-                    $"Steam didn't accept App ID {appId}. Make sure you own the game.",
-                _ => "Steam isn't running. Start Steam and try again.",
+                ClientInitializeFailure.ConnectToGlobalUser => Strings.Get("Steam_NotLoggedIn"),
+                ClientInitializeFailure.AppIdMismatch => Strings.Format("Steam_AppIdRejected", appId),
+                _ => Strings.Get("Steam_NotRunning"),
             };
             throw new SteamUnavailableException($"{message}\n\n({e.Message})", e);
         }
         catch (DllNotFoundException e)
         {
             client.Dispose();
-            throw new SteamUnavailableException("Couldn't load Steam's client library (steamclient64.dll).", e);
+            throw new SteamUnavailableException(Strings.Get("Steam_ClientLibraryMissing"), e);
         }
 
         return new SteamSession(client, appId);
@@ -130,21 +127,21 @@ public sealed class SteamSession : IDisposable
         {
             if (this._client.SteamUserStats.RequestUserStats(this.SteamId) == CallHandle.Invalid)
             {
-                throw new SteamUnavailableException("Steam refused the request for your stats.");
+                throw new SteamUnavailableException(Strings.Get("Steam_StatsRequestRefused"));
             }
 
             var finished = await Task.WhenAny(request.Task, Task.Delay(timeout ?? TimeSpan.FromSeconds(15)));
             if (finished != request.Task)
             {
-                throw new SteamUnavailableException("Steam didn't respond with your stats in time.");
+                throw new SteamUnavailableException(Strings.Get("Steam_StatsTimedOut"));
             }
 
             var result = request.Task.Result;
             if (result != 1)
             {
                 throw new SteamUnavailableException(result == 2
-                    ? "Steam returned a generic error. This usually means you don't own the game."
-                    : $"Steam returned error {result} while fetching your stats.");
+                    ? Strings.Get("Steam_StatsGenericError")
+                    : Strings.Format("Steam_StatsError", result));
             }
         }
         finally
@@ -204,15 +201,13 @@ public sealed class SteamSession : IDisposable
         {
             if (this._client.SteamUserStats.StoreStats() == false)
             {
-                throw new SteamStoreException(SteamStoreFailure.Refused, "Steam refused to store the changes.");
+                throw new SteamStoreException(SteamStoreFailure.Refused, Strings.Get("Steam_StoreRefused"));
             }
 
             var finished = await Task.WhenAny(request.Task, Task.Delay(timeout ?? TimeSpan.FromSeconds(30)));
             if (finished != request.Task)
             {
-                throw new SteamStoreException(SteamStoreFailure.TimedOut,
-                    "Steam didn't confirm that the changes were stored. They may still be pending and could " +
-                    "be uploaded later; reload in a moment to see the current state.");
+                throw new SteamStoreException(SteamStoreFailure.TimedOut, Strings.Get("Steam_StoreTimedOut"));
             }
 
             var result = request.Task.Result;
@@ -243,13 +238,12 @@ public sealed class SteamSession : IDisposable
     /// <summary>A readable message for a UserStatsStored EResult other than k_EResultOK.</summary>
     private static string DescribeStoreResult(int result) => result switch
     {
-        8 => "Steam's servers rejected the changes because a value broke one of the game's rules " +
-             "(for example a stat limit). Steam reverted them.",
-        2 => "Steam's servers rejected the changes (generic failure).",
-        3 => "Steam couldn't reach its servers.",
-        15 => "Steam's servers denied access.",
-        16 => "Steam's servers timed out.",
-        _ => $"Steam's servers rejected the changes (error {result}).",
+        8 => Strings.Get("Steam_StoreRejectedRule"),
+        2 => Strings.Get("Steam_StoreRejectedGeneric"),
+        3 => Strings.Get("Steam_StoreNoConnection"),
+        15 => Strings.Get("Steam_StoreAccessDenied"),
+        16 => Strings.Get("Steam_StoreServerTimedOut"),
+        _ => Strings.Format("Steam_StoreRejectedError", result),
     };
 
     public bool ResetAllStats(bool achievementsToo) => this._client.SteamUserStats.ResetAllStats(achievementsToo);

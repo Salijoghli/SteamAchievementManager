@@ -52,7 +52,7 @@ public sealed partial class GameBackupsViewModel : ObservableObject
         catch (Exception e)
         {
             Diagnostics.Log($"Couldn't list the backups for app {this._game.AppId}", e);
-            this.Error = $"Couldn't read the backups: {e.Message}";
+            this.Error = Strings.Format("Backups_ReadFailed", e.Message);
         }
     }
 
@@ -67,7 +67,7 @@ public sealed partial class GameBackupsViewModel : ObservableObject
         {
             Diagnostics.Log($"Couldn't create a backup for app {this._game.AppId}", e);
             this.Refresh();
-            this.Error = $"Couldn't create a backup: {e.Message}";
+            this.Error = Strings.Format("Backups_CreateFailed", e.Message);
             return;
         }
 
@@ -84,7 +84,7 @@ public sealed partial class GameBackupsViewModel : ObservableObject
         {
             Diagnostics.Log($"Couldn't delete backup {item.Snapshot.Id} of app {this._game.AppId}", e);
             this.Refresh();
-            this.Error = $"Couldn't delete the backup: {e.Message}";
+            this.Error = Strings.Format("Backups_DeleteFailed", e.Message);
             return;
         }
 

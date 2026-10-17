@@ -1,0 +1,2209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Common_AppName" xml:space="preserve">
+    <value>Steam Achievement Manager</value>
+    <comment>Product name; not translated.</comment>
+  </data>
+  <data name="Common_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Common_Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Common_Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="Common_Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="Common_Restore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="Common_Ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="Settings_Dialog.Title" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Settings_Dialog.CloseButtonText" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Settings_Appearance.Text" xml:space="preserve">
+    <value>Appearance</value>
+  </data>
+  <data name="Settings_Theme.Header" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="Settings_ThemeSystem.Content" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Settings_ThemeLight.Content" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="Settings_ThemeDark.Content" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="Settings_Language.Header" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="Settings_LanguageEnglish.Content" xml:space="preserve">
+    <value>English</value>
+    <comment>Language names are shown in their own language.</comment>
+  </data>
+  <data name="Settings_LanguageGeorgian.Content" xml:space="preserve">
+    <value>ქართული (Georgian)</value>
+  </data>
+  <data name="Settings_RestartNeeded.Title" xml:space="preserve">
+    <value>Restart SAM to apply</value>
+  </data>
+  <data name="Settings_RestartNeeded.Message" xml:space="preserve">
+    <value>Open game windows switch language the next time they're opened.</value>
+  </data>
+  <data name="Settings_RestartNow.Content" xml:space="preserve">
+    <value>Restart now</value>
+  </data>
+  <data name="Settings_Library.Text" xml:space="preserve">
+    <value>Library</value>
+  </data>
+  <data name="Settings_KeepOtherAccountsCache.Header" xml:space="preserve">
+    <value>Keep cached data for other Steam accounts</value>
+  </data>
+  <data name="Settings_CacheSize.Text" xml:space="preserve">
+    <value>Cache size</value>
+  </data>
+  <data name="Settings_ClearCache.Content" xml:space="preserve">
+    <value>Clear cache</value>
+  </data>
+  <data name="Settings_ClearCacheConfirm.Text" xml:space="preserve">
+    <value>Delete all downloaded images, game lists and other cached data? Favorites and settings are kept. The library will reload.</value>
+  </data>
+  <data name="Settings_ClearCacheConfirmButton.Content" xml:space="preserve">
+    <value>Clear cache</value>
+  </data>
+  <data name="Settings_GameWindow.Text" xml:space="preserve">
+    <value>Game window</value>
+  </data>
+  <data name="Settings_SpoilerProtection.Header" xml:space="preserve">
+    <value>Spoiler protection for hidden achievements</value>
+  </data>
+  <data name="Settings_SpoilerProtectionHint.Text" xml:space="preserve">
+    <value>Hidden achievements' descriptions stay blurred until you click them.</value>
+  </data>
+  <data name="Settings_BackupBeforeCommit.Header" xml:space="preserve">
+    <value>Back up before every commit</value>
+  </data>
+  <data name="Settings_BackupBeforeCommitHint.Text" xml:space="preserve">
+    <value>Saves a game's achievements and stats before changes are stored, so you can restore them later.</value>
+  </data>
+  <data name="Settings_App.Text" xml:space="preserve">
+    <value>App</value>
+  </data>
+  <data name="Settings_MinimizeToTray.Header" xml:space="preserve">
+    <value>Close to system tray</value>
+  </data>
+  <data name="Settings_ShowNotifications.Header" xml:space="preserve">
+    <value>Show notifications</value>
+  </data>
+  <data name="Settings_CheckForUpdates.Header" xml:space="preserve">
+    <value>Check for updates on startup</value>
+  </data>
+  <data name="Settings_CheckNow.Content" xml:space="preserve">
+    <value>Check now</value>
+  </data>
+  <data name="Settings_SteamAccount.Text" xml:space="preserve">
+    <value>Steam account</value>
+  </data>
+  <data name="Settings_Version" xml:space="preserve">
+    <value>Version {0}</value>
+  </data>
+  <data name="App_CantConnectToSteam" xml:space="preserve">
+    <value>Can't connect to Steam</value>
+  </data>
+  <data name="App_TrayHintTitle" xml:space="preserve">
+    <value>SAM is still running in the tray</value>
+  </data>
+  <data name="App_TrayHintMessage" xml:space="preserve">
+    <value>Click the tray icon to open the library, or right-click it and choose Exit to quit.</value>
+  </data>
+  <data name="Tray_OpenLibrary" xml:space="preserve">
+    <value>Open library</value>
+  </data>
+  <data name="Tray_Exit" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="Steam_NotInstalled" xml:space="preserve">
+    <value>Steam doesn't appear to be installed.</value>
+  </data>
+  <data name="Steam_NotLoggedIn" xml:space="preserve">
+    <value>Steam isn't running or you're not logged in. Start Steam, log in, and try again.
+
+If you have this game through Family Sharing, it may be locked while the owner is playing.</value>
+  </data>
+  <data name="Steam_AppIdRejected" xml:space="preserve">
+    <value>Steam didn't accept App ID {0}. Make sure you own the game.</value>
+  </data>
+  <data name="Steam_NotRunning" xml:space="preserve">
+    <value>Steam isn't running. Start Steam and try again.</value>
+  </data>
+  <data name="Steam_ClientLibraryMissing" xml:space="preserve">
+    <value>Couldn't load Steam's client library (steamclient64.dll).</value>
+  </data>
+  <data name="Steam_StatsRequestRefused" xml:space="preserve">
+    <value>Steam refused the request for your stats.</value>
+  </data>
+  <data name="Steam_StatsTimedOut" xml:space="preserve">
+    <value>Steam didn't respond with your stats in time.</value>
+  </data>
+  <data name="Steam_StatsGenericError" xml:space="preserve">
+    <value>Steam returned a generic error. This usually means you don't own the game.</value>
+  </data>
+  <data name="Steam_StatsError" xml:space="preserve">
+    <value>Steam returned error {0} while fetching your stats.</value>
+  </data>
+  <data name="Steam_StoreRefused" xml:space="preserve">
+    <value>Steam refused to store the changes.</value>
+  </data>
+  <data name="Steam_StoreTimedOut" xml:space="preserve">
+    <value>Steam didn't confirm that the changes were stored. They may still be pending and could be uploaded later; reload in a moment to see the current state.</value>
+  </data>
+  <data name="Steam_StoreRejectedRule" xml:space="preserve">
+    <value>Steam's servers rejected the changes because a value broke one of the game's rules (for example a stat limit). Steam reverted them.</value>
+  </data>
+  <data name="Steam_StoreRejectedGeneric" xml:space="preserve">
+    <value>Steam's servers rejected the changes (generic failure).</value>
+  </data>
+  <data name="Steam_StoreNoConnection" xml:space="preserve">
+    <value>Steam couldn't reach its servers.</value>
+  </data>
+  <data name="Steam_StoreAccessDenied" xml:space="preserve">
+    <value>Steam's servers denied access.</value>
+  </data>
+  <data name="Steam_StoreServerTimedOut" xml:space="preserve">
+    <value>Steam's servers timed out.</value>
+  </data>
+  <data name="Steam_StoreRejectedError" xml:space="preserve">
+    <value>Steam's servers rejected the changes (error {0}).</value>
+  </data>
+  <data name="Library_AppTitle.Text" xml:space="preserve">
+    <value>Steam Achievement Manager</value>
+    <comment>Product name; not translated.</comment>
+  </data>
+  <data name="Library_PageLibrary.Text" xml:space="preserve">
+    <value>Library</value>
+  </data>
+  <data name="Library_PageStats.Text" xml:space="preserve">
+    <value>Stats</value>
+  </data>
+  <data name="Library_PageActivity.Text" xml:space="preserve">
+    <value>Activity</value>
+  </data>
+  <data name="Library_PageHistory.Text" xml:space="preserve">
+    <value>History</value>
+  </data>
+  <data name="Library_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>Search games or App ID</value>
+  </data>
+  <data name="Library_SearchBox.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Search games or App ID</value>
+  </data>
+  <data name="Library_SearchBox.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Search games or App ID (Ctrl+F)</value>
+  </data>
+  <data name="Library_CollectionPicker.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Collection</value>
+  </data>
+  <data name="Library_CollectionPicker.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Show a collection</value>
+  </data>
+  <data name="Library_AllGamesItem.Text" xml:space="preserve">
+    <value>All games</value>
+  </data>
+  <data name="Library_SmartListPicker.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Smart lists</value>
+  </data>
+  <data name="Library_SmartListPicker.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Smart lists</value>
+  </data>
+  <data name="Library_SmartListNoneItem.Text" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Library_GridView.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Grid view</value>
+  </data>
+  <data name="Library_GridView.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Grid view</value>
+  </data>
+  <data name="Library_ListView.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>List view</value>
+  </data>
+  <data name="Library_ListView.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>List view</value>
+  </data>
+  <data name="Library_RefreshButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Refresh library</value>
+  </data>
+  <data name="Library_RefreshButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Refresh library (F5)</value>
+  </data>
+  <data name="Library_MoreOptions.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>More options</value>
+  </data>
+  <data name="Library_MoreOptions.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>More options</value>
+  </data>
+  <data name="Library_ExportLibraryItem.Text" xml:space="preserve">
+    <value>Export library (CSV)…</value>
+  </data>
+  <data name="Library_ExportAchievementsItem.Text" xml:space="preserve">
+    <value>Export all achievements (CSV)…</value>
+  </data>
+  <data name="Library_ManageCollectionsItem.Text" xml:space="preserve">
+    <value>Manage collections…</value>
+  </data>
+  <data name="Library_SettingsButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Library_SettingsButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Library_PerfectSummary.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Games with every achievement unlocked</value>
+  </data>
+  <data name="Library_PlaytimeSummary.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Total playtime</value>
+  </data>
+  <data name="Library_RefreshingRing.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Refreshing library</value>
+  </data>
+  <data name="Library_RefreshingRing.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Refreshing library…</value>
+  </data>
+  <data name="Library_RefreshingBar.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Refreshing library</value>
+  </data>
+  <data name="Library_SortBy.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Sort by</value>
+  </data>
+  <data name="Library_SortBy.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Sort by</value>
+  </data>
+  <data name="Library_SortName.Content" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Library_SortAppId.Content" xml:space="preserve">
+    <value>App ID</value>
+  </data>
+  <data name="Library_SortRecentlyPlayed.Content" xml:space="preserve">
+    <value>Recently played</value>
+  </data>
+  <data name="Library_SortPlaytime.Content" xml:space="preserve">
+    <value>Playtime</value>
+  </data>
+  <data name="Library_SortCompletion.Content" xml:space="preserve">
+    <value>Completion %</value>
+  </data>
+  <data name="Library_SortDescending.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Sort descending</value>
+  </data>
+  <data name="Library_PinFavorites.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Pin favorites to top</value>
+  </data>
+  <data name="Library_PinFavorites.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Pin favorites to top</value>
+  </data>
+  <data name="Library_FiltersButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Filters</value>
+  </data>
+  <data name="Library_FiltersButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Filters</value>
+  </data>
+  <data name="Library_FiltersLabel.Text" xml:space="preserve">
+    <value>Filters</value>
+  </data>
+  <data name="Library_FilterShow.Text" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="Library_FilterGames.Content" xml:space="preserve">
+    <value>Games</value>
+  </data>
+  <data name="Library_FilterDemos.Content" xml:space="preserve">
+    <value>Demos</value>
+  </data>
+  <data name="Library_FilterMods.Content" xml:space="preserve">
+    <value>Mods</value>
+  </data>
+  <data name="Library_FilterJunk.Content" xml:space="preserve">
+    <value>Junk</value>
+    <comment>Steam's "junk" app type (tools, videos, test apps).</comment>
+  </data>
+  <data name="Library_FilterFavoritesOnly.Header" xml:space="preserve">
+    <value>Favorites only</value>
+  </data>
+  <data name="Library_FilterInstalledOnly.Header" xml:space="preserve">
+    <value>Installed only</value>
+  </data>
+  <data name="Library_FilterShowHidden.Header" xml:space="preserve">
+    <value>Show hidden games</value>
+  </data>
+  <data name="Library_FilterCompletion.Header" xml:space="preserve">
+    <value>Achievements</value>
+  </data>
+  <data name="Library_CompletionAll.Content" xml:space="preserve">
+    <value>All</value>
+  </data>
+  <data name="Library_CompletionHasAchievements.Content" xml:space="preserve">
+    <value>Has achievements</value>
+  </data>
+  <data name="Library_CompletionNotStarted.Content" xml:space="preserve">
+    <value>Not started</value>
+  </data>
+  <data name="Library_CompletionInProgress.Content" xml:space="preserve">
+    <value>In progress</value>
+  </data>
+  <data name="Library_CompletionPerfect.Content" xml:space="preserve">
+    <value>Perfect</value>
+  </data>
+  <data name="Library_SmartListIgnoresFilter.Text" xml:space="preserve">
+    <value>Ignored while a smart list is active.</value>
+  </data>
+  <data name="Library_FilterLastPlayed.Header" xml:space="preserve">
+    <value>Last played</value>
+  </data>
+  <data name="Library_LastPlayedAny.Content" xml:space="preserve">
+    <value>Any time</value>
+  </data>
+  <data name="Library_LastPlayedToday.Content" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="Library_LastPlayedPast7Days.Content" xml:space="preserve">
+    <value>Past 7 days</value>
+  </data>
+  <data name="Library_LastPlayedPast30Days.Content" xml:space="preserve">
+    <value>Past 30 days</value>
+  </data>
+  <data name="Library_LastPlayedThisYear.Content" xml:space="preserve">
+    <value>This year</value>
+  </data>
+  <data name="Library_LastPlayedNever.Content" xml:space="preserve">
+    <value>Never played</value>
+  </data>
+  <data name="Library_LastPlayedCustom.Content" xml:space="preserve">
+    <value>Custom range</value>
+  </data>
+  <data name="Library_FilterFrom.Header" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="Library_FilterFrom.PlaceholderText" xml:space="preserve">
+    <value>Any</value>
+  </data>
+  <data name="Library_FilterTo.Header" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="Library_FilterTo.PlaceholderText" xml:space="preserve">
+    <value>Any</value>
+  </data>
+  <data name="Library_ResetFilters.Content" xml:space="preserve">
+    <value>Reset filters</value>
+  </data>
+  <data name="Library_LoadErrorBar.Title" xml:space="preserve">
+    <value>Couldn't load your library</value>
+  </data>
+  <data name="Library_RetryButton.Content" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="Library_RefreshWarningBar.Title" xml:space="preserve">
+    <value>Couldn't refresh</value>
+  </data>
+  <data name="Library_UpdateDownload.Content" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="Library_UpdateSkip.Content" xml:space="preserve">
+    <value>Skip this version</value>
+  </data>
+  <data name="Library_ExportingBar.Title" xml:space="preserve">
+    <value>Exporting</value>
+  </data>
+  <data name="Library_ExportDoneBar.Title" xml:space="preserve">
+    <value>Export complete</value>
+  </data>
+  <data name="Library_OpenExportedFile.Content" xml:space="preserve">
+    <value>Open file</value>
+  </data>
+  <data name="Library_OpenExportedFolder.Content" xml:space="preserve">
+    <value>Open folder</value>
+  </data>
+  <data name="Library_LoadingGames.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading games</value>
+  </data>
+  <data name="Library_LoadingGamesList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading games</value>
+  </data>
+  <data name="Library_GamesGrid.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Games</value>
+  </data>
+  <data name="Library_GamesList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Games</value>
+  </data>
+  <data name="Library_ColumnName.Text" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Library_ColumnProgress.Text" xml:space="preserve">
+    <value>Progress</value>
+  </data>
+  <data name="Library_ColumnPlaytime.Text" xml:space="preserve">
+    <value>Playtime</value>
+  </data>
+  <data name="Library_ColumnLastPlayed.Text" xml:space="preserve">
+    <value>Last played</value>
+  </data>
+  <data name="Library_ColumnInstalled.Text" xml:space="preserve">
+    <value>Installed</value>
+  </data>
+  <data name="Library_ColumnFavorite.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Favorite</value>
+  </data>
+  <data name="Library_ColumnFavorite.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Favorite</value>
+  </data>
+  <data name="Library_NoMatchesTitle.Text" xml:space="preserve">
+    <value>No games match</value>
+  </data>
+  <data name="Library_NoMatchesHint.Text" xml:space="preserve">
+    <value>Try a different search or loosen your filters.</value>
+  </data>
+  <data name="Library_ClearSearchAndFilters.Content" xml:space="preserve">
+    <value>Clear search and filters</value>
+  </data>
+  <data name="Library_EmptyTitle.Text" xml:space="preserve">
+    <value>No games found</value>
+  </data>
+  <data name="Library_EmptyHint.Text" xml:space="preserve">
+    <value>None of the games in SAM's list are owned by this Steam account. Search for an App ID to add one.</value>
+  </data>
+  <data name="Library_EmptyRefresh.Content" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Library_CollectionsAllGames" xml:space="preserve">
+    <value>All games</value>
+  </data>
+  <data name="Library_CollectionsSteamGroup" xml:space="preserve">
+    <value>Steam collections</value>
+  </data>
+  <data name="Library_CollectionsSamGroup" xml:space="preserve">
+    <value>SAM collections</value>
+  </data>
+  <data name="Library_CollectionsManage" xml:space="preserve">
+    <value>Manage collections…</value>
+  </data>
+  <data name="Library_SmartListNone" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Library_ExportLibraryFileName" xml:space="preserve">
+    <value>SAM library {0}</value>
+    <comment>Suggested file name; {0} is the date (yyyy-MM-dd).</comment>
+  </data>
+  <data name="Library_ExportAchievementsFileName" xml:space="preserve">
+    <value>SAM achievements {0}</value>
+    <comment>Suggested file name; {0} is the date (yyyy-MM-dd).</comment>
+  </data>
+  <data name="Library_CsvFileType" xml:space="preserve">
+    <value>CSV (comma separated)</value>
+  </data>
+  <data name="Library_ChooseFileFailed" xml:space="preserve">
+    <value>Couldn't choose a file</value>
+  </data>
+  <data name="LibraryFormat_Hours" xml:space="preserve">
+    <value>{0} h</value>
+    <comment>Playtime in hours.</comment>
+  </data>
+  <data name="LibraryFormat_Minutes" xml:space="preserve">
+    <value>{0} min</value>
+    <comment>Playtime in minutes.</comment>
+  </data>
+  <data name="LibraryFormat_NeverPlayed" xml:space="preserve">
+    <value>Never played</value>
+  </data>
+  <data name="LibraryFormat_Today" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="LibraryFormat_Yesterday" xml:space="preserve">
+    <value>Yesterday</value>
+  </data>
+  <data name="LibraryFormat_DaysAgo_One" xml:space="preserve">
+    <value>{0} day ago</value>
+  </data>
+  <data name="LibraryFormat_DaysAgo_Other" xml:space="preserve">
+    <value>{0} days ago</value>
+  </data>
+  <data name="LibraryFormat_WeeksAgo_One" xml:space="preserve">
+    <value>{0} week ago</value>
+  </data>
+  <data name="LibraryFormat_WeeksAgo_Other" xml:space="preserve">
+    <value>{0} weeks ago</value>
+  </data>
+  <data name="LibraryFormat_MonthsAgo_One" xml:space="preserve">
+    <value>{0} month ago</value>
+  </data>
+  <data name="LibraryFormat_MonthsAgo_Other" xml:space="preserve">
+    <value>{0} months ago</value>
+  </data>
+  <data name="LibraryFormat_YearsAgo_One" xml:space="preserve">
+    <value>{0} year ago</value>
+  </data>
+  <data name="LibraryFormat_YearsAgo_Other" xml:space="preserve">
+    <value>{0} years ago</value>
+  </data>
+  <data name="LibraryFormat_PlaytimeAndLastPlayed" xml:space="preserve">
+    <value>{0} · {1}</value>
+    <comment>Playtime · last played.</comment>
+  </data>
+  <data name="LibraryFormat_Bytes_One" xml:space="preserve">
+    <value>{0} byte</value>
+  </data>
+  <data name="LibraryFormat_Bytes_Other" xml:space="preserve">
+    <value>{0} bytes</value>
+  </data>
+  <data name="LibraryFormat_KB" xml:space="preserve">
+    <value>{0} KB</value>
+  </data>
+  <data name="LibraryFormat_MB" xml:space="preserve">
+    <value>{0} MB</value>
+  </data>
+  <data name="LibraryFormat_GB" xml:space="preserve">
+    <value>{0} GB</value>
+  </data>
+  <data name="LibraryFormat_TB" xml:space="preserve">
+    <value>{0} TB</value>
+  </data>
+  <data name="Card_NoAchievements" xml:space="preserve">
+    <value>No achievements</value>
+  </data>
+  <data name="Card_ProgressNotStarted" xml:space="preserve">
+    <value>0 / {0} · Not started</value>
+  </data>
+  <data name="Card_Progress" xml:space="preserve">
+    <value>{0} / {1} · {2}%</value>
+    <comment>Unlocked / total · percent.</comment>
+  </data>
+  <data name="Card_Percent" xml:space="preserve">
+    <value>{0}%</value>
+  </data>
+  <data name="Card_Play" xml:space="preserve">
+    <value>Play</value>
+  </data>
+  <data name="Card_Install" xml:space="preserve">
+    <value>Install</value>
+  </data>
+  <data name="Card_HideGame" xml:space="preserve">
+    <value>Hide game</value>
+  </data>
+  <data name="Card_UnhideGame" xml:space="preserve">
+    <value>Unhide game</value>
+  </data>
+  <data name="Card_AddToFavorites" xml:space="preserve">
+    <value>Add to favorites</value>
+  </data>
+  <data name="Card_RemoveFromFavorites" xml:space="preserve">
+    <value>Remove from favorites</value>
+  </data>
+  <data name="Card_ToolTip" xml:space="preserve">
+    <value>{0} (App ID {1})</value>
+  </data>
+  <data name="Card_ToolTipInstalled" xml:space="preserve">
+    <value>{0} (App ID {1})
+Installed · {2}</value>
+  </data>
+  <data name="Card_InstalledBadge.Text" xml:space="preserve">
+    <value>Installed</value>
+  </data>
+  <data name="Card_MenuOpen" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="Card_MenuUnlockAll" xml:space="preserve">
+    <value>Unlock all achievements…</value>
+  </data>
+  <data name="Card_MenuLockAll" xml:space="preserve">
+    <value>Lock all achievements…</value>
+  </data>
+  <data name="Card_MenuCopyAppId" xml:space="preserve">
+    <value>Copy App ID</value>
+  </data>
+  <data name="Card_MenuStorePage" xml:space="preserve">
+    <value>Open store page</value>
+  </data>
+  <data name="Card_MenuCommunityPage" xml:space="preserve">
+    <value>Open community achievements page</value>
+  </data>
+  <data name="Card_MenuAddToCollection" xml:space="preserve">
+    <value>Add to collection</value>
+  </data>
+  <data name="Card_MenuNewCollection" xml:space="preserve">
+    <value>New collection…</value>
+  </data>
+  <data name="Collections_NewTitle" xml:space="preserve">
+    <value>New collection</value>
+  </data>
+  <data name="Collections_NamePlaceholder" xml:space="preserve">
+    <value>Collection name</value>
+  </data>
+  <data name="Collections_NewNamePlaceholder" xml:space="preserve">
+    <value>New collection name</value>
+  </data>
+  <data name="Collections_SteamReadOnly" xml:space="preserve">
+    <value>Steam collections are read-only here; change them in Steam.</value>
+  </data>
+  <data name="Collections_ManageTitle" xml:space="preserve">
+    <value>Manage collections</value>
+  </data>
+  <data name="Collections_None" xml:space="preserve">
+    <value>You haven't made any collections yet.</value>
+  </data>
+  <data name="Collections_GameCount_One" xml:space="preserve">
+    <value>{0} game</value>
+  </data>
+  <data name="Collections_GameCount_Other" xml:space="preserve">
+    <value>{0} games</value>
+  </data>
+  <data name="Collections_RenameNamed" xml:space="preserve">
+    <value>Rename {0}</value>
+  </data>
+  <data name="Collections_DeleteNamed" xml:space="preserve">
+    <value>Delete {0}</value>
+  </data>
+  <data name="Collections_DeleteConfirm" xml:space="preserve">
+    <value>Delete "{0}"? The games stay in your library.</value>
+  </data>
+  <data name="Collections_SteamFavorites" xml:space="preserve">
+    <value>Favorites (Steam)</value>
+  </data>
+  <data name="Collections_SteamHidden" xml:space="preserve">
+    <value>Hidden (Steam)</value>
+  </data>
+  <data name="Collections_UpdateFailed" xml:space="preserve">
+    <value>Couldn't update the collection</value>
+  </data>
+  <data name="Collections_CreateFailed" xml:space="preserve">
+    <value>Couldn't create the collection</value>
+  </data>
+  <data name="Collections_RenameFailed" xml:space="preserve">
+    <value>Couldn't rename the collection</value>
+  </data>
+  <data name="Collections_DeleteFailed" xml:space="preserve">
+    <value>Couldn't delete the collection</value>
+  </data>
+  <data name="Library_AccountSwitchedKept" xml:space="preserve">
+    <value>A different Steam account is logged in. Cached data from the previous account was kept.</value>
+  </data>
+  <data name="Library_AccountSwitchedCleared" xml:space="preserve">
+    <value>A different Steam account is logged in. Cached data from the previous account was cleared.</value>
+  </data>
+  <data name="Library_SmartLists" xml:space="preserve">
+    <value>Smart lists</value>
+  </data>
+  <data name="Library_SmartAlmostPerfect" xml:space="preserve">
+    <value>Almost perfect</value>
+  </data>
+  <data name="Library_SmartAlmostPerfectHint" xml:space="preserve">
+    <value>80% or more unlocked, fewest remaining first</value>
+  </data>
+  <data name="Library_SmartNeverStarted" xml:space="preserve">
+    <value>Never started</value>
+  </data>
+  <data name="Library_SmartNeverStartedHint" xml:space="preserve">
+    <value>Has achievements but none unlocked, most played first</value>
+  </data>
+  <data name="Library_SmartRarestOwned" xml:space="preserve">
+    <value>Rarest owned</value>
+  </data>
+  <data name="Library_SmartRarestOwnedHint" xml:space="preserve">
+    <value>Ordered by the rarest achievement you've unlocked</value>
+  </data>
+  <data name="Library_SmartBadgeLeft_One" xml:space="preserve">
+    <value>{0} left</value>
+  </data>
+  <data name="Library_SmartBadgeLeft_Other" xml:space="preserve">
+    <value>{0} left</value>
+  </data>
+  <data name="Library_SmartBadgeRarest" xml:space="preserve">
+    <value>Rarest {0}</value>
+  </data>
+  <data name="Library_SmartBadgeNoRarity" xml:space="preserve">
+    <value>No rarity data</value>
+  </data>
+  <data name="Library_RarestLoadFailedTitle" xml:space="preserve">
+    <value>Couldn't load unlock data</value>
+  </data>
+  <data name="Library_RarestLoadFailed" xml:space="preserve">
+    <value>"Rarest owned" needs your unlocked achievements from Steam's local stats cache, which couldn't be read.</value>
+  </data>
+  <data name="Library_SortDescendingLabel" xml:space="preserve">
+    <value>Descending (click for ascending)</value>
+  </data>
+  <data name="Library_SortAscendingLabel" xml:space="preserve">
+    <value>Ascending (click for descending)</value>
+  </data>
+  <data name="Library_GameListDownloadFailed" xml:space="preserve">
+    <value>The game list couldn't be downloaded. Check your internet connection.</value>
+  </data>
+  <data name="Library_ShowingCached" xml:space="preserve">
+    <value>Showing your cached library. {0}</value>
+  </data>
+  <data name="Library_CompletionSummary" xml:space="preserve">
+    <value>{0}% complete</value>
+  </data>
+  <data name="Library_CompletionDetail_One" xml:space="preserve">
+    <value>{1} of {0} achievement unlocked across games with achievements</value>
+  </data>
+  <data name="Library_CompletionDetail_Other" xml:space="preserve">
+    <value>{1} of {0} achievements unlocked across games with achievements</value>
+  </data>
+  <data name="Library_PerfectSummaryText_One" xml:space="preserve">
+    <value>{0} perfect</value>
+  </data>
+  <data name="Library_PerfectSummaryText_Other" xml:space="preserve">
+    <value>{0} perfect</value>
+  </data>
+  <data name="Library_PlaytimeSummaryText" xml:space="preserve">
+    <value>{0} played</value>
+  </data>
+  <data name="Library_GameCount_One" xml:space="preserve">
+    <value>{0} game</value>
+  </data>
+  <data name="Library_GameCount_Other" xml:space="preserve">
+    <value>{0} games</value>
+  </data>
+  <data name="Library_GameCountFiltered_One" xml:space="preserve">
+    <value>{1} of {0} game</value>
+  </data>
+  <data name="Library_GameCountFiltered_Other" xml:space="preserve">
+    <value>{1} of {0} games</value>
+  </data>
+  <data name="Library_SuggestOpenGame" xml:space="preserve">
+    <value>Open {0} (App ID {1})</value>
+  </data>
+  <data name="Library_SuggestOpenAppId" xml:space="preserve">
+    <value>Open App ID {0}</value>
+  </data>
+  <data name="Library_CheckAppIdFailedTitle" xml:space="preserve">
+    <value>Couldn't check App ID</value>
+  </data>
+  <data name="Library_CheckAppIdFailed" xml:space="preserve">
+    <value>Couldn't check whether you own App ID {0}: {1}</value>
+  </data>
+  <data name="Library_NotOwnedTitle" xml:space="preserve">
+    <value>Not owned</value>
+  </data>
+  <data name="Library_NotOwned" xml:space="preserve">
+    <value>You don't own App ID {0}.</value>
+  </data>
+  <data name="Library_SaveFavoritesFailed" xml:space="preserve">
+    <value>Couldn't save favorites</value>
+  </data>
+  <data name="Library_OpenGameFailed" xml:space="preserve">
+    <value>Couldn't open {0}</value>
+  </data>
+  <data name="Library_CopyAppIdFailed" xml:space="preserve">
+    <value>Couldn't copy the App ID</value>
+  </data>
+  <data name="Library_OpenBrowserFailed" xml:space="preserve">
+    <value>Couldn't open the browser</value>
+  </data>
+  <data name="Library_StartGameFailed" xml:space="preserve">
+    <value>Couldn't start {0}</value>
+  </data>
+  <data name="Library_InstallGameFailed" xml:space="preserve">
+    <value>Couldn't install {0}</value>
+  </data>
+  <data name="Library_OpenFileFailed" xml:space="preserve">
+    <value>Couldn't open the file</value>
+  </data>
+  <data name="Library_ClearCacheFailed" xml:space="preserve">
+    <value>Couldn't clear the cache</value>
+  </data>
+  <data name="Library_HideGameFailed" xml:space="preserve">
+    <value>Couldn't hide the game</value>
+  </data>
+  <data name="Library_UnhideGameFailed" xml:space="preserve">
+    <value>Couldn't unhide the game</value>
+  </data>
+  <data name="Library_GameHiddenTitle" xml:space="preserve">
+    <value>{0} is hidden</value>
+  </data>
+  <data name="Library_GameHiddenMessage" xml:space="preserve">
+    <value>Turn on "Show hidden games" in Filters to see it again.</value>
+  </data>
+  <data name="Export_ExportingLibrary" xml:space="preserve">
+    <value>Exporting your library…</value>
+  </data>
+  <data name="Export_LibraryDone_One" xml:space="preserve">
+    <value>Exported {0} game to {1}.</value>
+  </data>
+  <data name="Export_LibraryDone_Other" xml:space="preserve">
+    <value>Exported {0} games to {1}.</value>
+  </data>
+  <data name="Export_ReadingAchievements" xml:space="preserve">
+    <value>Reading achievements…</value>
+  </data>
+  <data name="Export_FetchingPercentages_One" xml:space="preserve">
+    <value>Fetching global unlock percentages ({1} of {0} game)…</value>
+  </data>
+  <data name="Export_FetchingPercentages_Other" xml:space="preserve">
+    <value>Fetching global unlock percentages ({1} of {0} games)…</value>
+  </data>
+  <data name="Export_WritingFile" xml:space="preserve">
+    <value>Writing the file…</value>
+  </data>
+  <data name="Export_AchievementsDone_One" xml:space="preserve">
+    <value>Exported {0} achievement from {1} to {2}.</value>
+    <comment>{1} is Export_FromGames.</comment>
+  </data>
+  <data name="Export_AchievementsDone_Other" xml:space="preserve">
+    <value>Exported {0} achievements from {1} to {2}.</value>
+    <comment>{1} is Export_FromGames.</comment>
+  </data>
+  <data name="Export_FromGames_One" xml:space="preserve">
+    <value>{0} game</value>
+  </data>
+  <data name="Export_FromGames_Other" xml:space="preserve">
+    <value>{0} games</value>
+  </data>
+  <data name="Export_Failed" xml:space="preserve">
+    <value>Couldn't export</value>
+  </data>
+  <data name="Export_ColumnAppId" xml:space="preserve">
+    <value>App ID</value>
+  </data>
+  <data name="Export_ColumnName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Export_ColumnType" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="Export_ColumnAchievementsUnlocked" xml:space="preserve">
+    <value>Achievements Unlocked</value>
+  </data>
+  <data name="Export_ColumnAchievementsTotal" xml:space="preserve">
+    <value>Achievements Total</value>
+  </data>
+  <data name="Export_ColumnCompletion" xml:space="preserve">
+    <value>Completion %</value>
+  </data>
+  <data name="Export_ColumnPlaytimeHours" xml:space="preserve">
+    <value>Playtime (hours)</value>
+  </data>
+  <data name="Export_ColumnLastPlayed" xml:space="preserve">
+    <value>Last Played</value>
+  </data>
+  <data name="Export_ColumnInstalled" xml:space="preserve">
+    <value>Installed</value>
+  </data>
+  <data name="Export_ColumnFavorite" xml:space="preserve">
+    <value>Favorite</value>
+  </data>
+  <data name="Export_ColumnGame" xml:space="preserve">
+    <value>Game</value>
+  </data>
+  <data name="Export_ColumnAchievementId" xml:space="preserve">
+    <value>Achievement ID</value>
+  </data>
+  <data name="Export_ColumnDescription" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Export_ColumnUnlocked" xml:space="preserve">
+    <value>Unlocked</value>
+  </data>
+  <data name="Export_ColumnUnlockTime" xml:space="preserve">
+    <value>Unlock Time</value>
+  </data>
+  <data name="Export_ColumnGlobalPercent" xml:space="preserve">
+    <value>Global Unlock %</value>
+  </data>
+  <data name="Update_UpToDate" xml:space="preserve">
+    <value>You're up to date (version {0}).</value>
+  </data>
+  <data name="Update_AvailableStatus" xml:space="preserve">
+    <value>Version {0} is available.</value>
+  </data>
+  <data name="Update_CheckFailed" xml:space="preserve">
+    <value>Couldn't check for updates.</value>
+  </data>
+  <data name="Update_AvailableTitle" xml:space="preserve">
+    <value>Version {0} is available</value>
+  </data>
+  <data name="Update_YouHave" xml:space="preserve">
+    <value>You have version {0}.</value>
+  </data>
+  <data name="Update_YouHaveWithTitle" xml:space="preserve">
+    <value>{0}. You have version {1}.</value>
+  </data>
+  <data name="Game_TitleSuffix.Text" xml:space="preserve">
+    <value>  ·  Steam Achievement Manager</value>
+    <comment>Title bar after the game name; product name not translated.</comment>
+  </data>
+  <data name="Game_HeaderImage.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Game header image</value>
+  </data>
+  <data name="Game_CompletionRing.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Achievement completion</value>
+  </data>
+  <data name="Game_AchievementsUnlockedCaption.Text" xml:space="preserve">
+    <value>achievements unlocked</value>
+    <comment>Shown under "12 / 40 · 30%".</comment>
+  </data>
+  <data name="Game_LoadErrorBar.Title" xml:space="preserve">
+    <value>Couldn't load achievements</value>
+  </data>
+  <data name="Game_LoadErrorRetry.Content" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="Game_AchievementsTab.Text" xml:space="preserve">
+    <value>Achievements</value>
+  </data>
+  <data name="Game_StatisticsTab.Text" xml:space="preserve">
+    <value>Statistics</value>
+  </data>
+  <data name="Game_UnlockAllButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Unlock all shown achievements (protected ones are skipped)</value>
+  </data>
+  <data name="Game_UnlockAllButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Unlock all</value>
+  </data>
+  <data name="Game_UnlockAllText.Text" xml:space="preserve">
+    <value>Unlock all</value>
+  </data>
+  <data name="Game_LockAllButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Lock all shown achievements (protected ones are skipped)</value>
+  </data>
+  <data name="Game_LockAllButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Lock all</value>
+  </data>
+  <data name="Game_LockAllText.Text" xml:space="preserve">
+    <value>Lock all</value>
+  </data>
+  <data name="Game_InvertButton.Label" xml:space="preserve">
+    <value>Invert</value>
+  </data>
+  <data name="Game_InvertButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Invert all shown achievements (protected ones are skipped)</value>
+  </data>
+  <data name="Game_ReloadButton.Label" xml:space="preserve">
+    <value>Reload</value>
+  </data>
+  <data name="Game_ReloadButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Reload from Steam (F5)</value>
+  </data>
+  <data name="Game_BackupsButton.Label" xml:space="preserve">
+    <value>Backups</value>
+  </data>
+  <data name="Game_BackupsButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Create, restore and delete backups of this game's achievements and stats</value>
+  </data>
+  <data name="Game_CommitButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Write the pending changes to Steam (Ctrl+S)</value>
+  </data>
+  <data name="Game_CommitButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Commit changes</value>
+  </data>
+  <data name="Game_SpoilerToggle.Label" xml:space="preserve">
+    <value>Spoiler protection</value>
+  </data>
+  <data name="Game_SpoilerToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Mask hidden achievements' descriptions until you click them</value>
+  </data>
+  <data name="Game_RevealAllButton.Label" xml:space="preserve">
+    <value>Reveal all hidden</value>
+  </data>
+  <data name="Game_RevealAllButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Show every hidden achievement's description</value>
+  </data>
+  <data name="Game_ResetStatsButton.Label" xml:space="preserve">
+    <value>Reset all stats…</value>
+  </data>
+  <data name="Game_ResetStatsButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Reset every stat for this game, optionally achievements too</value>
+  </data>
+  <data name="Game_SearchBox.PlaceholderText" xml:space="preserve">
+    <value>Search achievements (Ctrl+F)</value>
+  </data>
+  <data name="Game_SearchBox.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Search achievements</value>
+  </data>
+  <data name="Game_StateFilter.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Filter by state</value>
+  </data>
+  <data name="Game_StateFilter.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>State filter</value>
+  </data>
+  <data name="Game_StateAll.Content" xml:space="preserve">
+    <value>All achievements</value>
+  </data>
+  <data name="Game_StateLocked.Content" xml:space="preserve">
+    <value>Locked</value>
+  </data>
+  <data name="Game_StateUnlocked.Content" xml:space="preserve">
+    <value>Unlocked</value>
+  </data>
+  <data name="Game_StatePending.Content" xml:space="preserve">
+    <value>Pending changes</value>
+  </data>
+  <data name="Game_StateHasNotes.Content" xml:space="preserve">
+    <value>Has notes</value>
+  </data>
+  <data name="Game_RarityFilter.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Filter by rarity</value>
+  </data>
+  <data name="Game_RarityFilter.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Rarity filter</value>
+  </data>
+  <data name="Game_RarityAny.Content" xml:space="preserve">
+    <value>Any rarity</value>
+  </data>
+  <data name="Game_RarityCommon.Content" xml:space="preserve">
+    <value>Common</value>
+  </data>
+  <data name="Game_RarityUncommon.Content" xml:space="preserve">
+    <value>Uncommon</value>
+  </data>
+  <data name="Game_RarityRare.Content" xml:space="preserve">
+    <value>Rare</value>
+  </data>
+  <data name="Game_RarityEpic.Content" xml:space="preserve">
+    <value>Epic</value>
+  </data>
+  <data name="Game_RarityLegendary.Content" xml:space="preserve">
+    <value>Legendary</value>
+  </data>
+  <data name="Game_SortBox.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Sort order</value>
+  </data>
+  <data name="Game_SortBox.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Sort order</value>
+  </data>
+  <data name="Game_SortDefault.Content" xml:space="preserve">
+    <value>Sort: Default order</value>
+  </data>
+  <data name="Game_SortName.Content" xml:space="preserve">
+    <value>Sort: Name</value>
+  </data>
+  <data name="Game_SortRarest.Content" xml:space="preserve">
+    <value>Sort: Rarest first</value>
+  </data>
+  <data name="Game_SortCommonest.Content" xml:space="preserve">
+    <value>Sort: Most common first</value>
+  </data>
+  <data name="Game_SortNewest.Content" xml:space="preserve">
+    <value>Sort: Newest unlock first</value>
+  </data>
+  <data name="Game_DateFilter.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Filter unlocked achievements by unlock date</value>
+  </data>
+  <data name="Game_DateFilter.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Unlock date filter</value>
+  </data>
+  <data name="Game_DateAny.Content" xml:space="preserve">
+    <value>Unlocked: any time</value>
+  </data>
+  <data name="Game_DateToday.Content" xml:space="preserve">
+    <value>Unlocked today</value>
+  </data>
+  <data name="Game_Date7Days.Content" xml:space="preserve">
+    <value>Unlocked in the past 7 days</value>
+  </data>
+  <data name="Game_Date30Days.Content" xml:space="preserve">
+    <value>Unlocked in the past 30 days</value>
+  </data>
+  <data name="Game_DateThisYear.Content" xml:space="preserve">
+    <value>Unlocked this year</value>
+  </data>
+  <data name="Game_DateCustom.Content" xml:space="preserve">
+    <value>Unlocked in custom range…</value>
+  </data>
+  <data name="Game_DateFrom.PlaceholderText" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="Game_DateFrom.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Unlocked from</value>
+  </data>
+  <data name="Game_DateTo.PlaceholderText" xml:space="preserve">
+    <value>To</value>
+  </data>
+  <data name="Game_DateTo.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Unlocked to</value>
+  </data>
+  <data name="Game_NoMatches.Text" xml:space="preserve">
+    <value>No achievements match the current filters.</value>
+  </data>
+  <data name="Game_AchievementList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Achievements</value>
+  </data>
+  <data name="Game_RowProtectedIcon.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Protected — only the game's servers can change this</value>
+  </data>
+  <data name="Game_RowProtectedIcon.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Protected</value>
+  </data>
+  <data name="Game_RowSpoilerMask.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Click to reveal the description</value>
+  </data>
+  <data name="Game_RowSpoilerMask.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Hidden achievement description, click to reveal</value>
+  </data>
+  <data name="Game_RowGuideButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Find a guide</value>
+  </data>
+  <data name="Game_RowGuideButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Find a guide</value>
+  </data>
+  <data name="Game_RowAddNote.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Add a note</value>
+  </data>
+  <data name="Game_RowAddNote.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Add a note</value>
+  </data>
+  <data name="Game_RowEditNote.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Edit note</value>
+  </data>
+  <data name="Game_RowEditNote.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Edit note</value>
+  </data>
+  <data name="Game_RowToggle.OnContent" xml:space="preserve">
+    <value>Unlocked</value>
+  </data>
+  <data name="Game_RowToggle.OffContent" xml:space="preserve">
+    <value>Locked</value>
+  </data>
+  <data name="Game_StatsWarning.Title" xml:space="preserve">
+    <value>Edit statistics with care</value>
+  </data>
+  <data name="Game_StatsWarning.Message" xml:space="preserve">
+    <value>Changing stats can break your progress in the game or achievements that depend on them. Stat changes are committed together with achievement changes.</value>
+  </data>
+  <data name="Game_StatsEditToggle.Header" xml:space="preserve">
+    <value>Allow editing</value>
+  </data>
+  <data name="Game_StatsEditToggle.OnContent" xml:space="preserve">
+    <value>I understand the risk — editing enabled</value>
+  </data>
+  <data name="Game_StatsEditToggle.OffContent" xml:space="preserve">
+    <value>Editing disabled</value>
+  </data>
+  <data name="Game_NoStats.Text" xml:space="preserve">
+    <value>This game has no statistics.</value>
+  </data>
+  <data name="Game_StatsList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Statistics</value>
+  </data>
+  <data name="Game_StatUsedBy.Text" xml:space="preserve">
+    <value>Used by</value>
+  </data>
+  <data name="Game_StatResetButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Reset to the original value</value>
+  </data>
+  <data name="Game_StatResetButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Reset to the original value</value>
+  </data>
+  <data name="Game_AppName" xml:space="preserve">
+    <value>App {0}</value>
+    <comment>Fallback game name when Steam has none; {0} = App ID.</comment>
+  </data>
+  <data name="Game_AppIdText" xml:space="preserve">
+    <value>App ID {0}</value>
+  </data>
+  <data name="Game_HoursPlayed" xml:space="preserve">
+    <value>{0} hours played</value>
+    <comment>{0} = hours with one decimal.</comment>
+  </data>
+  <data name="Game_MinutesPlayed_One" xml:space="preserve">
+    <value>{0} minute played</value>
+  </data>
+  <data name="Game_MinutesPlayed_Other" xml:space="preserve">
+    <value>{0} minutes played</value>
+  </data>
+  <data name="Game_LastPlayed" xml:space="preserve">
+    <value>Last played {0}</value>
+    <comment>{0} = date.</comment>
+  </data>
+  <data name="Game_PendingNone" xml:space="preserve">
+    <value>No pending changes</value>
+  </data>
+  <data name="Game_Pending_One" xml:space="preserve">
+    <value>{0} pending change</value>
+  </data>
+  <data name="Game_Pending_Other" xml:space="preserve">
+    <value>{0} pending changes</value>
+  </data>
+  <data name="Game_PendingInvalid_One" xml:space="preserve">
+    <value>{1} · {0} invalid stat value</value>
+    <comment>{1} = pending text.</comment>
+  </data>
+  <data name="Game_PendingInvalid_Other" xml:space="preserve">
+    <value>{1} · {0} invalid stat values</value>
+  </data>
+  <data name="Game_CommitLabel" xml:space="preserve">
+    <value>Commit changes</value>
+  </data>
+  <data name="Game_CommitLabelCount" xml:space="preserve">
+    <value>Commit changes ({0})</value>
+  </data>
+  <data name="Game_ShowingCount" xml:space="preserve">
+    <value>Showing {0} of {1}</value>
+  </data>
+  <data name="Game_UnsavedNone" xml:space="preserve">
+    <value>You have no unsaved changes.</value>
+  </data>
+  <data name="Game_UnsavedSentence" xml:space="preserve">
+    <value>You have {0}.</value>
+    <comment>{0} = the parts below joined with "and".</comment>
+  </data>
+  <data name="Game_UnsavedPending_One" xml:space="preserve">
+    <value>{0} change that hasn't been committed to Steam</value>
+  </data>
+  <data name="Game_UnsavedPending_Other" xml:space="preserve">
+    <value>{0} changes that haven't been committed to Steam</value>
+  </data>
+  <data name="Game_UnsavedInvalid_One" xml:space="preserve">
+    <value>{0} stat edit that isn't valid yet</value>
+  </data>
+  <data name="Game_UnsavedInvalid_Other" xml:space="preserve">
+    <value>{0} stat edits that aren't valid yet</value>
+  </data>
+  <data name="Game_ListSeparator" xml:space="preserve">
+    <value>, </value>
+    <comment>Between list items (note the trailing space).</comment>
+  </data>
+  <data name="Game_ListAnd" xml:space="preserve">
+    <value> and </value>
+    <comment>Before the last list item (note the spaces).</comment>
+  </data>
+  <data name="Game_LoadFailed" xml:space="preserve">
+    <value>Something went wrong while loading this game's achievements: {0}</value>
+  </data>
+  <data name="Game_MissingSchema" xml:space="preserve">
+    <value>This game has no achievements or its schema isn't cached by Steam yet. Launch the game once, then reload.</value>
+  </data>
+  <data name="Game_SummaryUnlock_One" xml:space="preserve">
+    <value>unlock {0} achievement</value>
+    <comment>Parts of "Unlock 3 achievements, lock 1 achievement and change 2 stats."</comment>
+  </data>
+  <data name="Game_SummaryUnlock_Other" xml:space="preserve">
+    <value>unlock {0} achievements</value>
+  </data>
+  <data name="Game_SummaryLock_One" xml:space="preserve">
+    <value>lock {0} achievement</value>
+  </data>
+  <data name="Game_SummaryLock_Other" xml:space="preserve">
+    <value>lock {0} achievements</value>
+  </data>
+  <data name="Game_SummaryStats_One" xml:space="preserve">
+    <value>change {0} stat</value>
+  </data>
+  <data name="Game_SummaryStats_Other" xml:space="preserve">
+    <value>change {0} stats</value>
+  </data>
+  <data name="Game_SummarySentence" xml:space="preserve">
+    <value>{0}.</value>
+  </data>
+  <data name="Game_SummaryNothing" xml:space="preserve">
+    <value>There's nothing to commit.</value>
+  </data>
+  <data name="Game_StoredAchievements_One" xml:space="preserve">
+    <value>{0} achievement</value>
+  </data>
+  <data name="Game_StoredAchievements_Other" xml:space="preserve">
+    <value>{0} achievements</value>
+  </data>
+  <data name="Game_StoredStats_One" xml:space="preserve">
+    <value>{0} stat</value>
+  </data>
+  <data name="Game_StoredStats_Other" xml:space="preserve">
+    <value>{0} stats</value>
+  </data>
+  <data name="Game_StoredMessage" xml:space="preserve">
+    <value>Stored {0}.</value>
+  </data>
+  <data name="Game_ResultStoredTitle" xml:space="preserve">
+    <value>Changes stored</value>
+  </data>
+  <data name="Game_ResultNothingStoredTitle" xml:space="preserve">
+    <value>Nothing stored</value>
+  </data>
+  <data name="Game_ResultFixInvalid" xml:space="preserve">
+    <value>Fix the invalid stat values first.</value>
+  </data>
+  <data name="Game_ResultNoPending" xml:space="preserve">
+    <value>There are no pending changes.</value>
+  </data>
+  <data name="Game_ResultNoBackup" xml:space="preserve">
+    <value>The commit was cancelled because no backup could be created.</value>
+  </data>
+  <data name="Game_ResultStoreFailedTitle" xml:space="preserve">
+    <value>Couldn't store changes</value>
+  </data>
+  <data name="Game_ResultNothingSteamCanStore" xml:space="preserve">
+    <value>There are no changes Steam can store.</value>
+  </data>
+  <data name="Game_FailureRefusedUnlock" xml:space="preserve">
+    <value>Steam refused to unlock "{0}" ({1}).</value>
+  </data>
+  <data name="Game_FailureRefusedLock" xml:space="preserve">
+    <value>Steam refused to lock "{0}" ({1}).</value>
+  </data>
+  <data name="Game_FailureRefusedStat" xml:space="preserve">
+    <value>Steam refused the new value for the stat "{0}" ({1}).</value>
+  </data>
+  <data name="Game_FailurePreparing" xml:space="preserve">
+    <value>Something went wrong while preparing the changes: {0}</value>
+  </data>
+  <data name="Game_NothingWasStored" xml:space="preserve">
+    <value>Nothing was stored. {0}</value>
+  </data>
+  <data name="Game_NotUndone" xml:space="preserve">
+    <value>{0} SAM couldn't undo the change already made to {1}; Steam may upload it the next time this game's stats are stored.</value>
+    <comment>{0} = the message before, {1} = achievement/stat IDs.</comment>
+  </data>
+  <data name="Game_ResetCompleteTitle" xml:space="preserve">
+    <value>Reset complete</value>
+  </data>
+  <data name="Game_ResetAllDone" xml:space="preserve">
+    <value>All stats and achievements were reset.</value>
+  </data>
+  <data name="Game_ResetStatsDone" xml:space="preserve">
+    <value>All stats were reset.</value>
+  </data>
+  <data name="Game_ResetFailedTitle" xml:space="preserve">
+    <value>Reset failed</value>
+  </data>
+  <data name="Game_ResetRefused" xml:space="preserve">
+    <value>Steam refused to reset the stats.</value>
+  </data>
+  <data name="Game_NoteSaveFailed" xml:space="preserve">
+    <value>Couldn't save the note</value>
+  </data>
+  <data name="Game_BrowserFailed" xml:space="preserve">
+    <value>Couldn't open the browser</value>
+  </data>
+  <data name="Game_RestoreAchievementLocked" xml:space="preserve">
+    <value>Achievement "{0}" (protected) — was locked in the backup</value>
+  </data>
+  <data name="Game_RestoreAchievementUnlocked" xml:space="preserve">
+    <value>Achievement "{0}" (protected) — was unlocked in the backup</value>
+  </data>
+  <data name="Game_RestoreStatProtected" xml:space="preserve">
+    <value>Stat "{0}" (protected) — {1} in the backup</value>
+  </data>
+  <data name="Game_RestoreStatAverageRate" xml:space="preserve">
+    <value>Stat "{0}" (average rate) — {1} in the backup</value>
+  </data>
+  <data name="Game_RestoreStatError" xml:space="preserve">
+    <value>Stat "{0}" — {1}</value>
+  </data>
+  <data name="Game_MenuSteamGuide" xml:space="preserve">
+    <value>Find a guide on Steam</value>
+  </data>
+  <data name="Game_MenuWebSearch" xml:space="preserve">
+    <value>Search the web</value>
+  </data>
+  <data name="Game_MenuEditNote" xml:space="preserve">
+    <value>Edit note…</value>
+  </data>
+  <data name="Game_MenuAddNote" xml:space="preserve">
+    <value>Add note…</value>
+  </data>
+  <data name="Game_MenuHideDescription" xml:space="preserve">
+    <value>Hide description</value>
+  </data>
+  <data name="Game_MenuRevealDescription" xml:space="preserve">
+    <value>Reveal description</value>
+  </data>
+  <data name="Game_NotePlaceholder" xml:space="preserve">
+    <value>Tips, requirements, reminders…</value>
+  </data>
+  <data name="Game_NoteName" xml:space="preserve">
+    <value>Note for {0}</value>
+  </data>
+  <data name="Game_NoteHint" xml:space="preserve">
+    <value>Saved when closed · Ctrl+Enter to save and close · clear the text to delete the note</value>
+  </data>
+  <data name="Game_DiscardTitle" xml:space="preserve">
+    <value>Discard pending changes?</value>
+  </data>
+  <data name="Game_DiscardReloadMessage" xml:space="preserve">
+    <value>Reloading replaces your pending changes with the current state from Steam.</value>
+  </data>
+  <data name="Game_DiscardReloadButton" xml:space="preserve">
+    <value>Discard and reload</value>
+  </data>
+  <data name="Game_DiscardRestoreMessage" xml:space="preserve">
+    <value>Restoring a backup replaces your pending changes.</value>
+  </data>
+  <data name="Game_DiscardContinueButton" xml:space="preserve">
+    <value>Discard and continue</value>
+  </data>
+  <data name="Game_CommitDialogTitle" xml:space="preserve">
+    <value>Commit changes?</value>
+  </data>
+  <data name="Game_CommitDialogNote" xml:space="preserve">
+    <value>The changes are written to your Steam account right away.</value>
+  </data>
+  <data name="Game_CommitDialogButton" xml:space="preserve">
+    <value>Commit</value>
+  </data>
+  <data name="Game_BackupFailedTitle" xml:space="preserve">
+    <value>Couldn't create a backup</value>
+  </data>
+  <data name="Game_BackupFailedMessage" xml:space="preserve">
+    <value>Couldn't create a backup ({0}). Commit anyway?</value>
+  </data>
+  <data name="Game_CommitAnywayButton" xml:space="preserve">
+    <value>Commit anyway</value>
+  </data>
+  <data name="Game_RestoreDetails" xml:space="preserve">
+    <value>This restores the backup from {0}. Unlock dates can't be restored: Steam sets the date of every achievement unlocked now to the current time. The changes are written to your Steam account right away, after a "Before restore" backup of the current state.</value>
+    <comment>{0} = date and time.</comment>
+  </data>
+  <data name="Game_RestoreNothing" xml:space="preserve">
+    <value>Nothing to restore: everything that can be changed already matches the backup from {0}.</value>
+  </data>
+  <data name="Game_RestoreCantBeRestored" xml:space="preserve">
+    <value>Can't be restored:</value>
+  </data>
+  <data name="Game_RestoreDialogTitle" xml:space="preserve">
+    <value>Restore backup</value>
+  </data>
+  <data name="Game_RestoreConfirmTitle" xml:space="preserve">
+    <value>Restore backup?</value>
+  </data>
+  <data name="Game_ResetStatsTitle" xml:space="preserve">
+    <value>Reset all stats?</value>
+  </data>
+  <data name="Game_ResetStatsMessage" xml:space="preserve">
+    <value>This resets every statistic for this game on your Steam account — not just achievements. Game progress tracked by stats will be lost. Are you sure you want to reset stats?</value>
+  </data>
+  <data name="Game_Continue" xml:space="preserve">
+    <value>Continue</value>
+  </data>
+  <data name="Game_ResetAchievementsTitle" xml:space="preserve">
+    <value>Reset achievements too?</value>
+  </data>
+  <data name="Game_ResetAchievementsMessage" xml:space="preserve">
+    <value>Do you want to reset this game's achievements as well? Choosing "Only stats" leaves achievements as they are.</value>
+  </data>
+  <data name="Game_ResetAchievementsTooButton" xml:space="preserve">
+    <value>Reset achievements too</value>
+  </data>
+  <data name="Game_OnlyStatsButton" xml:space="preserve">
+    <value>Only stats</value>
+  </data>
+  <data name="Game_ResetSureTitle" xml:space="preserve">
+    <value>Are you absolutely sure?</value>
+  </data>
+  <data name="Game_ResetSureAll" xml:space="preserve">
+    <value>All stats AND all achievements for this game will be reset. This can't be undone.</value>
+  </data>
+  <data name="Game_ResetSureStats" xml:space="preserve">
+    <value>All stats for this game will be reset. This can't be undone.</value>
+  </data>
+  <data name="Game_ResetStatsAndAchievementsButton" xml:space="preserve">
+    <value>Reset stats and achievements</value>
+  </data>
+  <data name="Game_ResetStatsOnlyButton" xml:space="preserve">
+    <value>Reset stats</value>
+  </data>
+  <data name="Game_CloseDiscardTitle" xml:space="preserve">
+    <value>Discard uncommitted changes?</value>
+  </data>
+  <data name="Game_CloseDiscardButton" xml:space="preserve">
+    <value>Discard</value>
+  </data>
+  <data name="Achievement_A11yUnlocked" xml:space="preserve">
+    <value>{0}, unlocked</value>
+    <comment>Screen-reader row name.</comment>
+  </data>
+  <data name="Achievement_A11yLocked" xml:space="preserve">
+    <value>{0}, locked</value>
+  </data>
+  <data name="Achievement_UnlockedAt" xml:space="preserve">
+    <value>Unlocked {0}</value>
+    <comment>{0} = date and time.</comment>
+  </data>
+  <data name="Achievement_Unlocked" xml:space="preserve">
+    <value>Unlocked</value>
+  </data>
+  <data name="Achievement_WillUnlock" xml:space="preserve">
+    <value>Will unlock</value>
+  </data>
+  <data name="Achievement_WillLock" xml:space="preserve">
+    <value>Will lock</value>
+  </data>
+  <data name="Achievement_HiddenClickToReveal" xml:space="preserve">
+    <value>Hidden achievement — click to reveal</value>
+  </data>
+  <data name="Achievement_HiddenHoverToReveal" xml:space="preserve">
+    <value>Hidden achievement — hover or click to reveal</value>
+  </data>
+  <data name="Achievement_Hidden" xml:space="preserve">
+    <value>Hidden achievement</value>
+  </data>
+  <data name="Achievement_PercentOfPlayers" xml:space="preserve">
+    <value>{0:0.#}% of players</value>
+  </data>
+  <data name="Achievement_ProtectedTooltip" xml:space="preserve">
+    <value>Protected — only the game's servers can change this</value>
+  </data>
+  <data name="Achievement_ToggleTooltip" xml:space="preserve">
+    <value>Locked or unlocked state to commit</value>
+  </data>
+  <data name="Rarity_Common" xml:space="preserve">
+    <value>Common</value>
+  </data>
+  <data name="Rarity_Uncommon" xml:space="preserve">
+    <value>Uncommon</value>
+  </data>
+  <data name="Rarity_Rare" xml:space="preserve">
+    <value>Rare</value>
+  </data>
+  <data name="Rarity_Epic" xml:space="preserve">
+    <value>Epic</value>
+  </data>
+  <data name="Rarity_Legendary" xml:space="preserve">
+    <value>Legendary</value>
+  </data>
+  <data name="Stat_KindInteger" xml:space="preserve">
+    <value>Integer</value>
+  </data>
+  <data name="Stat_KindFloat" xml:space="preserve">
+    <value>Float</value>
+  </data>
+  <data name="Stat_KindAverageRate" xml:space="preserve">
+    <value>Average rate</value>
+  </data>
+  <data name="Stat_IncrementOnly" xml:space="preserve">
+    <value>increment-only</value>
+  </data>
+  <data name="Stat_Range" xml:space="preserve">
+    <value>range {0} – {1}</value>
+  </data>
+  <data name="Stat_MaxChange" xml:space="preserve">
+    <value>max change {0}</value>
+  </data>
+  <data name="Stat_ProtectedText" xml:space="preserve">
+    <value>Protected — only the game's servers can change this stat</value>
+  </data>
+  <data name="Stat_AverageRateText" xml:space="preserve">
+    <value>Average rate — Steam only updates these from the game's play sessions, so they can't be edited here</value>
+  </data>
+  <data name="Stat_WasValue" xml:space="preserve">
+    <value>Was {0}</value>
+  </data>
+  <data name="Stat_UsedByTarget" xml:space="preserve">
+    <value>{0} — target {1}</value>
+    <comment>{0} = achievement name, {1} = target value.</comment>
+  </data>
+  <data name="Stat_ErrorNotNumber" xml:space="preserve">
+    <value>Enter a number.</value>
+  </data>
+  <data name="Stat_ErrorProtected" xml:space="preserve">
+    <value>This stat is protected and can't be changed.</value>
+  </data>
+  <data name="Stat_ErrorAverageRate" xml:space="preserve">
+    <value>Average-rate stats can't be changed here.</value>
+  </data>
+  <data name="Stat_ErrorWholeNumbers" xml:space="preserve">
+    <value>This stat takes whole numbers only.</value>
+  </data>
+  <data name="Stat_ErrorIntegerRange" xml:space="preserve">
+    <value>The value is out of range for an integer stat.</value>
+  </data>
+  <data name="Stat_ErrorRange" xml:space="preserve">
+    <value>The value is out of range.</value>
+  </data>
+  <data name="Stat_ErrorMinimum" xml:space="preserve">
+    <value>The minimum is {0}.</value>
+  </data>
+  <data name="Stat_ErrorMaximum" xml:space="preserve">
+    <value>The maximum is {0}.</value>
+  </data>
+  <data name="Stat_ErrorIncrementOnly" xml:space="preserve">
+    <value>This stat can only increase; it can't go below {0}.</value>
+  </data>
+  <data name="Stat_ErrorMaxChange" xml:space="preserve">
+    <value>This stat can change by at most {0} at a time (from {1}).</value>
+  </data>
+  <data name="Stat_Max" xml:space="preserve">
+    <value>max</value>
+  </data>
+  <data name="Stat_Min" xml:space="preserve">
+    <value>min</value>
+  </data>
+  <data name="Backups_Dialog.Title" xml:space="preserve">
+    <value>Backups</value>
+  </data>
+  <data name="Backups_Dialog.CloseButtonText" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Backups_Intro.Text" xml:space="preserve">
+    <value>Snapshots of this game's achievements and stats. Restoring stages the saved state as pending changes and asks before committing.</value>
+  </data>
+  <data name="Backups_CreateButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Save the current state from Steam</value>
+  </data>
+  <data name="Backups_CreateText.Text" xml:space="preserve">
+    <value>Create backup now</value>
+  </data>
+  <data name="Backups_Empty.Text" xml:space="preserve">
+    <value>No backups yet.</value>
+  </data>
+  <data name="Backups_List.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Backups</value>
+  </data>
+  <data name="Backups_RestoreButton.Content" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="Backups_RestoreButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Stage this backup's state and review it before committing</value>
+  </data>
+  <data name="Backups_DeleteButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Delete this backup</value>
+  </data>
+  <data name="Backups_DeleteButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Delete backup</value>
+  </data>
+  <data name="Backups_DeleteConfirm" xml:space="preserve">
+    <value>Delete the backup from {0}? This can't be undone.</value>
+  </data>
+  <data name="Backups_ReasonDefault" xml:space="preserve">
+    <value>Backup</value>
+  </data>
+  <data name="Backups_ReasonBeforeCommit" xml:space="preserve">
+    <value>Before commit</value>
+  </data>
+  <data name="Backups_ReasonBeforeRestore" xml:space="preserve">
+    <value>Before restore</value>
+  </data>
+  <data name="Backups_ReasonManual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="Backups_ReasonBeforeCli" xml:space="preserve">
+    <value>Before command-line commit</value>
+  </data>
+  <data name="Backups_Details" xml:space="preserve">
+    <value>{0} / {1} unlocked · {2}</value>
+    <comment>{2} = stats count text.</comment>
+  </data>
+  <data name="Backups_Stats_One" xml:space="preserve">
+    <value>{0} stat</value>
+  </data>
+  <data name="Backups_Stats_Other" xml:space="preserve">
+    <value>{0} stats</value>
+  </data>
+  <data name="Backups_ReadFailed" xml:space="preserve">
+    <value>Couldn't read the backups: {0}</value>
+  </data>
+  <data name="Backups_CreateFailed" xml:space="preserve">
+    <value>Couldn't create a backup: {0}</value>
+  </data>
+  <data name="Backups_DeleteFailed" xml:space="preserve">
+    <value>Couldn't delete the backup: {0}</value>
+  </data>
+  <data name="Stats_Intro.Text" xml:space="preserve">
+    <value>Your achievement hunting across every game you own.</value>
+  </data>
+  <data name="Pages_Refreshing.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Refreshing</value>
+  </data>
+  <data name="Stats_RefreshButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Recalculate</value>
+  </data>
+  <data name="Stats_RefreshButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Refresh stats</value>
+  </data>
+  <data name="Pages_RefreshLabel.Text" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Stats_Loading.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading stats</value>
+  </data>
+  <data name="Stats_EmptyTitle.Text" xml:space="preserve">
+    <value>No stats yet</value>
+  </data>
+  <data name="Stats_EmptyBody.Text" xml:space="preserve">
+    <value>Your stats appear once your library has loaded. Give it a moment, then refresh.</value>
+  </data>
+  <data name="Stats_EmptyRefresh.Content" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Stats_TileUnlocked.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Achievements unlocked</value>
+  </data>
+  <data name="Stats_TileUnlockedLabel.Text" xml:space="preserve">
+    <value>Achievements unlocked</value>
+  </data>
+  <data name="Stats_TileCompletion.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Overall completion</value>
+  </data>
+  <data name="Stats_TileCompletionLabel.Text" xml:space="preserve">
+    <value>Overall completion</value>
+  </data>
+  <data name="Stats_TilePerfect.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Perfect games</value>
+  </data>
+  <data name="Stats_TilePerfectLabel.Text" xml:space="preserve">
+    <value>Perfect games</value>
+  </data>
+  <data name="Stats_TilePlaytime.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Total playtime</value>
+  </data>
+  <data name="Stats_TilePlaytimeLabel.Text" xml:space="preserve">
+    <value>Total playtime</value>
+  </data>
+  <data name="Stats_TileHunter.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Hunter score</value>
+  </data>
+  <data name="Stats_TileHunterLabel.Text" xml:space="preserve">
+    <value>Hunter score</value>
+  </data>
+  <data name="Stats_HunterProgress.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Hunter score progress</value>
+  </data>
+  <data name="Stats_TimelineErrorBar.Title" xml:space="preserve">
+    <value>Unlock history unavailable</value>
+  </data>
+  <data name="Stats_MonthlyTitle.Text" xml:space="preserve">
+    <value>Unlocks per month</value>
+  </data>
+  <data name="Stats_MonthlyTableToggle.Content" xml:space="preserve">
+    <value>Table</value>
+  </data>
+  <data name="Stats_MonthlyTableToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Show the numbers as a table</value>
+  </data>
+  <data name="Stats_MonthlyTableToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Show unlocks per month as a table</value>
+  </data>
+  <data name="Stats_MonthlyChart.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Unlocks per month over the last 24 months</value>
+  </data>
+  <data name="Stats_MonthlyChart.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
+    <value>Use the left and right arrow keys to read each month, or switch to the table.</value>
+  </data>
+  <data name="Stats_MonthlyTable.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Unlocks per month</value>
+  </data>
+  <data name="Stats_NoChartData.Text" xml:space="preserve">
+    <value>No unlocks to chart yet.</value>
+  </data>
+  <data name="Stats_CumulativeTitle.Text" xml:space="preserve">
+    <value>Achievements unlocked over time</value>
+  </data>
+  <data name="Stats_CumulativeTableToggle.Content" xml:space="preserve">
+    <value>Table</value>
+  </data>
+  <data name="Stats_CumulativeTableToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Show the numbers as a table</value>
+  </data>
+  <data name="Stats_CumulativeTableToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Show achievements unlocked over time as a table</value>
+  </data>
+  <data name="Stats_CumulativeChart.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Total achievements unlocked, month by month</value>
+  </data>
+  <data name="Stats_CumulativeChart.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
+    <value>Use the left and right arrow keys to read each month, or switch to the table.</value>
+  </data>
+  <data name="Stats_CumulativeTable.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Achievements unlocked by the end of each month</value>
+  </data>
+  <data name="Stats_RarestTitle.Text" xml:space="preserve">
+    <value>Rarest unlocks</value>
+  </data>
+  <data name="Stats_RarestSubtitle.Text" xml:space="preserve">
+    <value>Your achievements the fewest players have</value>
+  </data>
+  <data name="Stats_RarestFetching.Text" xml:space="preserve">
+    <value>Fetching global unlock rates…</value>
+  </data>
+  <data name="Stats_RarestEmpty.Text" xml:space="preserve">
+    <value>No unlocks with global stats yet.</value>
+  </data>
+  <data name="Stats_RarestList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Rarest unlocks</value>
+  </data>
+  <data name="Stats_TopCompletionTitle.Text" xml:space="preserve">
+    <value>Most complete games</value>
+  </data>
+  <data name="Stats_TopCompletionSubtitle.Text" xml:space="preserve">
+    <value>Started games, by share of achievements unlocked</value>
+  </data>
+  <data name="Stats_TopCompletionEmpty.Text" xml:space="preserve">
+    <value>No games started yet.</value>
+  </data>
+  <data name="Stats_TopCompletionList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Most complete games</value>
+  </data>
+  <data name="Stats_TopPlaytimeTitle.Text" xml:space="preserve">
+    <value>Most played games</value>
+  </data>
+  <data name="Stats_TopPlaytimeSubtitle.Text" xml:space="preserve">
+    <value>By total playtime</value>
+  </data>
+  <data name="Stats_TopPlaytimeEmpty.Text" xml:space="preserve">
+    <value>No playtime recorded yet.</value>
+  </data>
+  <data name="Stats_TopPlaytimeList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Most played games</value>
+  </data>
+  <data name="Activity_Search.PlaceholderText" xml:space="preserve">
+    <value>Filter by game or achievement</value>
+  </data>
+  <data name="Activity_Search.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Filter by game or achievement</value>
+  </data>
+  <data name="Activity_Range.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Date range</value>
+  </data>
+  <data name="Activity_RefreshButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Re-read your unlocks</value>
+  </data>
+  <data name="Activity_RefreshButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Refresh activity</value>
+  </data>
+  <data name="Activity_Loading.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading activity</value>
+  </data>
+  <data name="Activity_Feed.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Recent unlocks</value>
+  </data>
+  <data name="Activity_ErrorTitle.Text" xml:space="preserve">
+    <value>Couldn't load your activity</value>
+  </data>
+  <data name="Pages_TryAgain.Content" xml:space="preserve">
+    <value>Try again</value>
+  </data>
+  <data name="Activity_EmptyTitle.Text" xml:space="preserve">
+    <value>No unlocks yet</value>
+  </data>
+  <data name="Activity_EmptyBody.Text" xml:space="preserve">
+    <value>Achievements you unlock show up here, newest first. Steam keeps unlock times for games you've played on this PC.</value>
+  </data>
+  <data name="Activity_NoMatchesTitle.Text" xml:space="preserve">
+    <value>No unlocks match</value>
+  </data>
+  <data name="Activity_NoMatchesBody.Text" xml:space="preserve">
+    <value>Try a different search or a longer date range.</value>
+  </data>
+  <data name="Pages_ClearFilters.Content" xml:space="preserve">
+    <value>Clear filters</value>
+  </data>
+  <data name="History_Search.PlaceholderText" xml:space="preserve">
+    <value>Filter by game</value>
+  </data>
+  <data name="History_Search.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Filter by game</value>
+  </data>
+  <data name="History_Source.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Source</value>
+  </data>
+  <data name="History_RefreshButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Re-read the commit history</value>
+  </data>
+  <data name="History_RefreshButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Refresh history</value>
+  </data>
+  <data name="History_BackupsHint.Text" xml:space="preserve">
+    <value>Looking for backups? Each game's backups are in its own window. Click a game's name below to open it, then restore from there.</value>
+  </data>
+  <data name="History_Loading.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading history</value>
+  </data>
+  <data name="History_List.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Commit history</value>
+  </data>
+  <data name="History_SourceBadge.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Where this commit came from</value>
+  </data>
+  <data name="History_NoChangesRecorded.Text" xml:space="preserve">
+    <value>No achievement or stat changes were recorded for this commit.</value>
+  </data>
+  <data name="History_ErrorLabel.Text" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="History_ErrorTitle.Text" xml:space="preserve">
+    <value>Couldn't load the history</value>
+  </data>
+  <data name="History_EmptyTitle.Text" xml:space="preserve">
+    <value>No commits yet</value>
+  </data>
+  <data name="History_EmptyBody.Text" xml:space="preserve">
+    <value>Whenever you save achievement or stat changes in SAM, the commit shows up here with what changed and whether it worked.</value>
+  </data>
+  <data name="History_NoMatchesTitle.Text" xml:space="preserve">
+    <value>No commits match</value>
+  </data>
+  <data name="History_NoMatchesBody.Text" xml:space="preserve">
+    <value>Try a different game or source.</value>
+  </data>
+  <data name="Pages_Today" xml:space="preserve">
+    <value>Today</value>
+  </data>
+  <data name="Pages_Yesterday" xml:space="preserve">
+    <value>Yesterday</value>
+  </data>
+  <data name="Pages_OpenGame" xml:space="preserve">
+    <value>Open {0}</value>
+    <comment>Tooltip/screen-reader name of a game link; {0} is the game name.</comment>
+  </data>
+  <data name="Pages_AppFallbackName" xml:space="preserve">
+    <value>App {0}</value>
+    <comment>Shown when a game's name is unknown; {0} is the App ID.</comment>
+  </data>
+  <data name="Pages_Unlocks_One" xml:space="preserve">
+    <value>{0} unlock</value>
+  </data>
+  <data name="Pages_Unlocks_Other" xml:space="preserve">
+    <value>{0} unlocks</value>
+  </data>
+  <data name="Pages_TimelineUnavailable" xml:space="preserve">
+    <value>Unlock history isn't available in this build yet.</value>
+  </data>
+  <data name="Pages_TimelineError" xml:space="preserve">
+    <value>Couldn't read your unlock history. {0}</value>
+  </data>
+  <data name="Pages_RarityToolTip" xml:space="preserve">
+    <value>{0}: {1} of players have this achievement</value>
+    <comment>{0} is the rarity tier, {1} a percentage.</comment>
+  </data>
+  <data name="Pages_RarityCommon" xml:space="preserve">
+    <value>Common</value>
+  </data>
+  <data name="Pages_RarityUncommon" xml:space="preserve">
+    <value>Uncommon</value>
+  </data>
+  <data name="Pages_RarityRare" xml:space="preserve">
+    <value>Rare</value>
+  </data>
+  <data name="Pages_RarityEpic" xml:space="preserve">
+    <value>Epic</value>
+  </data>
+  <data name="Pages_RarityLegendary" xml:space="preserve">
+    <value>Legendary</value>
+  </data>
+  <data name="Chart_TickThousands" xml:space="preserve">
+    <value>{0}K</value>
+    <comment>Compact axis label, e.g. 2.5K.</comment>
+  </data>
+  <data name="Chart_TickMillions" xml:space="preserve">
+    <value>{0}M</value>
+    <comment>Compact axis label, e.g. 1.2M.</comment>
+  </data>
+  <data name="Stats_RankedAchievements_One" xml:space="preserve">
+    <value>{1} / {0} achievement</value>
+    <comment>{1} unlocked of {0} total.</comment>
+  </data>
+  <data name="Stats_RankedAchievements_Other" xml:space="preserve">
+    <value>{1} / {0} achievements</value>
+    <comment>{1} unlocked of {0} total.</comment>
+  </data>
+  <data name="Stats_PlaytimeShare" xml:space="preserve">
+    <value>{0} of your playtime</value>
+  </data>
+  <data name="Stats_UnlockedDetail_One" xml:space="preserve">
+    <value>of {0} achievement</value>
+  </data>
+  <data name="Stats_UnlockedDetail_Other" xml:space="preserve">
+    <value>of {0} achievements</value>
+  </data>
+  <data name="Stats_NoGamesStarted" xml:space="preserve">
+    <value>No games started yet</value>
+  </data>
+  <data name="Stats_AverageStarted" xml:space="preserve">
+    <value>Average started game: {0}</value>
+  </data>
+  <data name="Stats_PerfectDetail_One" xml:space="preserve">
+    <value>of {0} game with achievements</value>
+  </data>
+  <data name="Stats_PerfectDetail_Other" xml:space="preserve">
+    <value>of {0} games with achievements</value>
+  </data>
+  <data name="Stats_PlaytimeDetail_One" xml:space="preserve">
+    <value>across {0} played game</value>
+  </data>
+  <data name="Stats_PlaytimeDetail_Other" xml:space="preserve">
+    <value>across {0} played games</value>
+  </data>
+  <data name="Stats_MonthlyPoint" xml:space="preserve">
+    <value>{0}: {1}</value>
+    <comment>Chart tooltip: month, unlock count.</comment>
+  </data>
+  <data name="Stats_MonthlySummary" xml:space="preserve">
+    <value>{0} in the last {1} months</value>
+    <comment>{0} is e.g. "12 unlocks".</comment>
+  </data>
+  <data name="Stats_CumulativePoint" xml:space="preserve">
+    <value>End of {0}: {1} unlocked</value>
+    <comment>{0} is a month and year.</comment>
+  </data>
+  <data name="Stats_CumulativeSummary_One" xml:space="preserve">
+    <value>{0} unlock with a known date since {1}</value>
+    <comment>{1} is a month and year.</comment>
+  </data>
+  <data name="Stats_CumulativeSummary_Other" xml:space="preserve">
+    <value>{0} unlocks with a known date since {1}</value>
+    <comment>{1} is a month and year.</comment>
+  </data>
+  <data name="Stats_HunterNeedsTimeline" xml:space="preserve">
+    <value>Needs your unlock history</value>
+  </data>
+  <data name="Stats_HunterCalculating" xml:space="preserve">
+    <value>Calculating… {0} of {1} games</value>
+  </data>
+  <data name="Stats_HunterNoUnlocks" xml:space="preserve">
+    <value>No unlocks yet</value>
+  </data>
+  <data name="Stats_HunterFrom_One" xml:space="preserve">
+    <value>From {0} unlock with global stats</value>
+  </data>
+  <data name="Stats_HunterFrom_Other" xml:space="preserve">
+    <value>From {0} unlocks with global stats</value>
+  </data>
+  <data name="Stats_HunterExplanation" xml:space="preserve">
+    <value>Hunter score rewards rare unlocks. Each unlocked achievement earns 100 ÷ the percentage of players who have it: 1 point if everyone has it, 10 points at 10%, 100 points at 1%, up to 1,000 points at 0.1% or rarer. Achievements without global stats don't count.</value>
+  </data>
+  <data name="Activity_RangeLast7Days" xml:space="preserve">
+    <value>Last 7 days</value>
+  </data>
+  <data name="Activity_RangeLast30Days" xml:space="preserve">
+    <value>Last 30 days</value>
+  </data>
+  <data name="Activity_RangeLast90Days" xml:space="preserve">
+    <value>Last 90 days</value>
+  </data>
+  <data name="Activity_RangeAllTime" xml:space="preserve">
+    <value>All time</value>
+  </data>
+  <data name="Activity_ShownOfTotal_One" xml:space="preserve">
+    <value>{1} of {0} unlock</value>
+    <comment>{1} shown of {0} total.</comment>
+  </data>
+  <data name="Activity_ShownOfTotal_Other" xml:space="preserve">
+    <value>{1} of {0} unlocks</value>
+    <comment>{1} shown of {0} total.</comment>
+  </data>
+  <data name="History_StatusSucceeded" xml:space="preserve">
+    <value>Succeeded</value>
+  </data>
+  <data name="History_StatusFailed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="History_SummaryUnlocked_One" xml:space="preserve">
+    <value>unlocked {0}</value>
+    <comment>Joined with ", "; the first part is capitalized in English.</comment>
+  </data>
+  <data name="History_SummaryUnlocked_Other" xml:space="preserve">
+    <value>unlocked {0}</value>
+    <comment>Joined with ", "; the first part is capitalized in English.</comment>
+  </data>
+  <data name="History_SummaryLocked_One" xml:space="preserve">
+    <value>locked {0}</value>
+  </data>
+  <data name="History_SummaryLocked_Other" xml:space="preserve">
+    <value>locked {0}</value>
+  </data>
+  <data name="History_SummaryStats_One" xml:space="preserve">
+    <value>changed {0} stat</value>
+  </data>
+  <data name="History_SummaryStats_Other" xml:space="preserve">
+    <value>changed {0} stats</value>
+  </data>
+  <data name="History_NoChanges" xml:space="preserve">
+    <value>No changes</value>
+  </data>
+  <data name="History_DetailUnlocked" xml:space="preserve">
+    <value>Unlocked</value>
+  </data>
+  <data name="History_DetailLocked" xml:space="preserve">
+    <value>Locked</value>
+  </data>
+  <data name="History_DetailStats" xml:space="preserve">
+    <value>Stats</value>
+  </data>
+  <data name="History_AllSources" xml:space="preserve">
+    <value>All sources</value>
+  </data>
+  <data name="History_SourceManual" xml:space="preserve">
+    <value>Manual</value>
+  </data>
+  <data name="History_SourceRestore" xml:space="preserve">
+    <value>Restore</value>
+  </data>
+  <data name="History_SourceCommandLine" xml:space="preserve">
+    <value>Command line</value>
+  </data>
+  <data name="History_SourceFarm" xml:space="preserve">
+    <value>Farm</value>
+  </data>
+  <data name="History_SourceUnknown" xml:space="preserve">
+    <value>Unknown</value>
+  </data>
+  <data name="History_Unavailable" xml:space="preserve">
+    <value>Commit history isn't available in this build yet.</value>
+  </data>
+  <data name="History_LoadError" xml:space="preserve">
+    <value>Couldn't read the commit history. {0}</value>
+  </data>
+  <data name="History_Commits_One" xml:space="preserve">
+    <value>{0} commit</value>
+  </data>
+  <data name="History_Commits_Other" xml:space="preserve">
+    <value>{0} commits</value>
+  </data>
+  <data name="History_ShownOfTotal_One" xml:space="preserve">
+    <value>{1} of {0} commit</value>
+    <comment>{1} shown of {0} total.</comment>
+  </data>
+  <data name="History_ShownOfTotal_Other" xml:space="preserve">
+    <value>{1} of {0} commits</value>
+    <comment>{1} shown of {0} total.</comment>
+  </data>
+</root>

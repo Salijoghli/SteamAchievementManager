@@ -55,8 +55,7 @@ public sealed record GameOperationResult(bool Success, string Title, string Mess
 /// </summary>
 public sealed partial class GameViewModel : ObservableObject
 {
-    public const string MissingSchemaMessage =
-        "This game has no achievements or its schema isn't cached by Steam yet. Launch the game once, then reload.";
+    public static string MissingSchemaMessage => Strings.Get("Game_MissingSchema");
 
     /// <summary>Above this many row changes the visible list is replaced in one go (see <see cref="Sync"/>).</summary>
     private const int MaxIncrementalChanges = 150;
@@ -84,7 +83,7 @@ public sealed partial class GameViewModel : ObservableObject
             Diagnostics.Log($"Couldn't read the name of app {appId}", e);
         }
 
-        this.GameName = string.IsNullOrWhiteSpace(name) ? $"App {appId}" : name;
+        this.GameName = string.IsNullOrWhiteSpace(name) ? Strings.Format("Game_AppName", appId) : name;
         this._isSpoilerProtectionOn = services.Settings.SpoilerProtection;
     }
 
@@ -92,7 +91,7 @@ public sealed partial class GameViewModel : ObservableObject
 
     public string GameName { get; }
 
-    public string AppIdText => $"App ID {this.AppId}";
+    public string AppIdText => Strings.Format("Game_AppIdText", this.AppId);
 
     #region Load state
     [ObservableProperty]
@@ -203,19 +202,15 @@ public sealed partial class GameViewModel : ObservableObject
             var parts = new List<string>();
             if (this.PendingCount > 0)
             {
-                parts.Add(this.PendingCount == 1
-                    ? "1 change that hasn't been committed to Steam"
-                    : $"{this.PendingCount} changes that haven't been committed to Steam");
+                parts.Add(Strings.Plural("Game_UnsavedPending", this.PendingCount));
             }
 
             if (this.InvalidStatCount > 0)
             {
-                parts.Add(this.InvalidStatCount == 1
-                    ? "1 stat edit that isn't valid yet"
-                    : $"{this.InvalidStatCount} stat edits that aren't valid yet");
+                parts.Add(Strings.Plural("Game_UnsavedInvalid", this.InvalidStatCount));
             }
 
-            return parts.Count == 0 ? "You have no unsaved changes." : $"You have {string.Join(" and ", parts)}.";
+            return parts.Count == 0 ? Strings.Get("Game_UnsavedNone") : Strings.Format("Game_UnsavedSentence", JoinList(parts));
         }
     }
 
@@ -223,17 +218,14 @@ public sealed partial class GameViewModel : ObservableObject
     {
         get
         {
-            var text = this.PendingCount switch
-            {
-                0 => "No pending changes",
-                1 => "1 pending change",
-                var n => $"{n} pending changes",
-            };
-            return this.HasInvalidStats ? $"{text} · {this.InvalidStatCount} invalid stat value(s)" : text;
+            var text = this.PendingCount == 0 ? Strings.Get("Game_PendingNone") : Strings.Plural("Game_Pending", this.PendingCount);
+            return this.HasInvalidStats ? Strings.Plural("Game_PendingInvalid", this.InvalidStatCount, text) : text;
         }
     }
 
-    public string CommitLabel => this.PendingCount > 0 ? $"Commit changes ({this.PendingCount})" : "Commit changes";
+    public string CommitLabel => this.PendingCount > 0
+        ? Strings.Format("Game_CommitLabelCount", this.PendingCount)
+        : Strings.Get("Game_CommitLabel");
 
     /// <summary>Raised by the commit command; the window shows the confirmation dialog.</summary>
     public event EventHandler? CommitRequested;
@@ -456,7 +448,7 @@ public sealed partial class GameViewModel : ObservableObject
         };
 
         Sync(this.VisibleAchievements, items.ToList());
-        this.ShowingText = $"Showing {this.VisibleAchievements.Count} of {this._achievements.Count}";
+        this.ShowingText = Strings.Format("Game_ShowingCount", this.VisibleAchievements.Count, this._achievements.Count);
         this.HasNoVisibleAchievements = this.IsLoaded && this.VisibleAchievements.Count == 0;
     }
 
@@ -592,7 +584,7 @@ public sealed partial class GameViewModel : ObservableObject
         catch (Exception e)
         {
             Diagnostics.Log($"Loading achievements for app {this.AppId} failed", e);
-            this.LoadError = $"Something went wrong while loading this game's achievements: {e.Message}";
+            this.LoadError = Strings.Format("Game_LoadFailed", e.Message);
         }
         finally
         {
@@ -765,13 +757,13 @@ public sealed partial class GameViewModel : ObservableObject
         if (info.Playtime > TimeSpan.Zero)
         {
             parts.Add(info.Playtime.TotalHours >= 1
-                ? string.Format(CultureInfo.CurrentCulture, "{0:0.#} hours played", info.Playtime.TotalHours)
-                : $"{(int)info.Playtime.TotalMinutes} minutes played");
+                ? Strings.Format("Game_HoursPlayed", info.Playtime.TotalHours.ToString("0.#", CultureInfo.CurrentCulture))
+                : Strings.Plural("Game_MinutesPlayed", (int)info.Playtime.TotalMinutes));
         }
 
         if (info.LastPlayed is { } last)
         {
-            parts.Add("Last played " + last.ToLocalTime().ToString("d MMM yyyy", CultureInfo.CurrentCulture));
+            parts.Add(Strings.Format("Game_LastPlayed", last.ToLocalTime().ToString("d MMM yyyy", CultureInfo.CurrentCulture)));
         }
 
         return string.Join(" · ", parts);
@@ -971,7 +963,7 @@ public sealed partial class GameViewModel : ObservableObject
         catch (Exception e)
         {
             Diagnostics.Log($"Couldn't save the note for achievement {achievement.Id} of app {this.AppId}", e);
-            this.ShowStatus(new GameOperationResult(false, "Couldn't save the note", e.Message));
+            this.ShowStatus(new GameOperationResult(false, Strings.Get("Game_NoteSaveFailed"), e.Message));
             return;
         }
 
@@ -1104,8 +1096,9 @@ public sealed partial class GameViewModel : ObservableObject
 
                 if (achievement.IsProtected)
                 {
-                    notRestorable.Add($"Achievement \"{achievement.Name}\" (protected) — " +
-                        (saved.Achieved ? "was unlocked in the backup" : "was locked in the backup"));
+                    notRestorable.Add(Strings.Format(
+                        saved.Achieved ? "Game_RestoreAchievementUnlocked" : "Game_RestoreAchievementLocked",
+                        achievement.Name));
                     continue;
                 }
 
@@ -1122,15 +1115,17 @@ public sealed partial class GameViewModel : ObservableObject
 
                 if (stat.IsReadOnly)
                 {
-                    notRestorable.Add($"Stat \"{stat.DisplayName}\" ({(stat.IsProtected ? "protected" : "average rate")}) — " +
-                        $"{FormatStatValue(saved.Value)} in the backup");
+                    notRestorable.Add(Strings.Format(
+                        stat.IsProtected ? "Game_RestoreStatProtected" : "Game_RestoreStatAverageRate",
+                        stat.DisplayName,
+                        FormatStatValue(saved.Value)));
                     continue;
                 }
 
                 stat.EditValue = stat.IsInteger ? Math.Round(saved.Value) : (float)saved.Value;
                 if (stat.HasError)
                 {
-                    notRestorable.Add($"Stat \"{stat.DisplayName}\" — {stat.Error}");
+                    notRestorable.Add(Strings.Format("Game_RestoreStatError", stat.DisplayName, stat.Error));
                     stat.ResetToOriginal();
                 }
             }
@@ -1164,31 +1159,43 @@ public sealed partial class GameViewModel : ObservableObject
         var parts = new List<string>();
         if (this.UnlockPendingCount > 0)
         {
-            parts.Add($"unlock {Plural(this.UnlockPendingCount, "achievement")}");
+            parts.Add(Strings.Plural("Game_SummaryUnlock", this.UnlockPendingCount));
         }
 
         if (this.LockPendingCount > 0)
         {
-            parts.Add($"lock {Plural(this.LockPendingCount, "achievement")}");
+            parts.Add(Strings.Plural("Game_SummaryLock", this.LockPendingCount));
         }
 
         if (this.ModifiedStatCount > 0)
         {
-            parts.Add($"change {Plural(this.ModifiedStatCount, "stat")}");
+            parts.Add(Strings.Plural("Game_SummaryStats", this.ModifiedStatCount));
         }
 
         if (parts.Count == 0)
         {
-            return "There's nothing to commit.";
+            return Strings.Get("Game_SummaryNothing");
         }
 
-        var text = parts.Count == 1
-            ? parts[0]
-            : string.Join(", ", parts.Take(parts.Count - 1)) + " and " + parts[^1];
-        return char.ToUpper(text[0], CultureInfo.CurrentCulture) + text[1..] + ".";
+        var text = JoinList(parts);
+
+        // Only Latin lowercase is capitalized: Georgian has no sentence case (char.ToUpper would
+        // turn Mkhedruli into Mtavruli).
+        if (char.IsAsciiLetterLower(text[0]))
+        {
+            text = char.ToUpperInvariant(text[0]) + text[1..];
+        }
+
+        return Strings.Format("Game_SummarySentence", text);
     }
 
-    private static string Plural(int count, string noun) => count == 1 ? $"1 {noun}" : $"{count} {noun}s";
+    /// <summary>"a, b and c" in the UI language.</summary>
+    private static string JoinList(IReadOnlyList<string> parts) => parts.Count switch
+    {
+        0 => "",
+        1 => parts[0],
+        _ => string.Join(Strings.Get("Game_ListSeparator"), parts.Take(parts.Count - 1)) + Strings.Get("Game_ListAnd") + parts[^1],
+    };
 
     /// <summary>
     /// Writes the pending changes to Steam: SetAchievement for each changed achievement,
@@ -1215,9 +1222,9 @@ public sealed partial class GameViewModel : ObservableObject
     {
         if (this.CanCommit() == false)
         {
-            return new GameOperationResult(false, "Nothing stored", this.HasInvalidStats
-                ? "Fix the invalid stat values first."
-                : "There are no pending changes.");
+            return new GameOperationResult(false, Strings.Get("Game_ResultNothingStoredTitle"), this.HasInvalidStats
+                ? Strings.Get("Game_ResultFixInvalid")
+                : Strings.Get("Game_ResultNoPending"));
         }
 
         this.IsWorking = true;
@@ -1229,7 +1236,7 @@ public sealed partial class GameViewModel : ObservableObject
             if (await this.BackUpBeforeCommitAsync(source, confirmWithoutBackup) == false)
             {
                 // Nothing staged, nothing sent; the edits stay for a retry.
-                return new GameOperationResult(false, "Nothing stored", "The commit was cancelled because no backup could be created.");
+                return new GameOperationResult(false, Strings.Get("Game_ResultNothingStoredTitle"), Strings.Get("Game_ResultNoBackup"));
             }
 
             var achievements = this._achievements.Where(a => a.IsPending && a.IsProtected == false).ToList();
@@ -1257,7 +1264,7 @@ public sealed partial class GameViewModel : ObservableObject
             {
                 // E.g. a timeout: the upload may or may not have happened, so reload.
                 Diagnostics.Log($"Storing stats for app {this.AppId} failed", e);
-                result = new GameOperationResult(false, "Couldn't store changes", e.Message);
+                result = new GameOperationResult(false, Strings.Get("Game_ResultStoreFailedTitle"), e.Message);
             }
         }
         finally
@@ -1338,7 +1345,7 @@ public sealed partial class GameViewModel : ObservableObject
         var steam = this._services.Steam;
         if (achievements.Count == 0 && stats.Count == 0)
         {
-            return (new GameOperationResult(false, "Nothing stored", "There are no changes Steam can store."), false);
+            return (new GameOperationResult(false, Strings.Get("Game_ResultNothingStoredTitle"), Strings.Get("Game_ResultNothingSteamCanStore")), false);
         }
 
         var staged = new List<StagedChange>();
@@ -1349,8 +1356,10 @@ public sealed partial class GameViewModel : ObservableObject
             {
                 if (steam.SetAchievement(achievement.Id, achievement.IsChecked) == false)
                 {
-                    failure = $"Steam refused to {(achievement.IsChecked ? "unlock" : "lock")} " +
-                        $"\"{achievement.Name}\" ({achievement.Id}).";
+                    failure = Strings.Format(
+                        achievement.IsChecked ? "Game_FailureRefusedUnlock" : "Game_FailureRefusedLock",
+                        achievement.Name,
+                        achievement.Id);
                     break;
                 }
 
@@ -1364,7 +1373,7 @@ public sealed partial class GameViewModel : ObservableObject
                 {
                     if (SetStatValue(steam, stat, stat.Value) == false)
                     {
-                        failure = $"Steam refused the new value for the stat \"{stat.DisplayName}\" ({stat.Id}).";
+                        failure = Strings.Format("Game_FailureRefusedStat", stat.DisplayName, stat.Id);
                         break;
                     }
 
@@ -1376,7 +1385,7 @@ public sealed partial class GameViewModel : ObservableObject
         catch (Exception e)
         {
             Diagnostics.Log($"Setting achievements/stats for app {this.AppId} failed", e);
-            failure = $"Something went wrong while preparing the changes: {e.Message}";
+            failure = Strings.Format("Game_FailurePreparing", e.Message);
         }
 
         if (failure != null)
@@ -1413,15 +1422,15 @@ public sealed partial class GameViewModel : ObservableObject
         var parts = new List<string>();
         if (achievements.Count > 0)
         {
-            parts.Add(Plural(achievements.Count, "achievement"));
+            parts.Add(Strings.Plural("Game_StoredAchievements", achievements.Count));
         }
 
         if (stats.Count > 0)
         {
-            parts.Add(Plural(stats.Count, "stat"));
+            parts.Add(Strings.Plural("Game_StoredStats", stats.Count));
         }
 
-        return (new GameOperationResult(true, "Changes stored", $"Stored {string.Join(" and ", parts)}."), true);
+        return (new GameOperationResult(true, Strings.Get("Game_ResultStoredTitle"), Strings.Format("Game_StoredMessage", JoinList(parts))), true);
     }
 
     private static bool SetStatValue(SteamSession steam, StatViewModel stat, double value) => stat.IsInteger
@@ -1451,15 +1460,14 @@ public sealed partial class GameViewModel : ObservableObject
             }
         }
 
-        var message = $"Nothing was stored. {failure}";
+        var message = Strings.Format("Game_NothingWasStored", failure);
         if (notUndone.Count > 0)
         {
             notUndone.Reverse();
-            message += $" SAM couldn't undo the change already made to {string.Join(", ", notUndone)}; " +
-                "Steam may upload it the next time this game's stats are stored.";
+            message = Strings.Format("Game_NotUndone", message, string.Join(", ", notUndone));
         }
 
-        return new GameOperationResult(false, "Couldn't store changes", message);
+        return new GameOperationResult(false, Strings.Get("Game_ResultStoreFailedTitle"), message);
     }
 
     /// <summary>Resets every stat for this game (and optionally its achievements) on Steam, then reloads.</summary>
@@ -1470,15 +1478,15 @@ public sealed partial class GameViewModel : ObservableObject
         try
         {
             result = this._services.Steam.ResetAllStats(achievementsToo)
-                ? new GameOperationResult(true, "Reset complete", achievementsToo
-                    ? "All stats and achievements were reset."
-                    : "All stats were reset.")
-                : new GameOperationResult(false, "Reset failed", "Steam refused to reset the stats.");
+                ? new GameOperationResult(true, Strings.Get("Game_ResetCompleteTitle"), achievementsToo
+                    ? Strings.Get("Game_ResetAllDone")
+                    : Strings.Get("Game_ResetStatsDone"))
+                : new GameOperationResult(false, Strings.Get("Game_ResetFailedTitle"), Strings.Get("Game_ResetRefused"));
         }
         catch (Exception e)
         {
             Diagnostics.Log($"Resetting stats for app {this.AppId} failed", e);
-            result = new GameOperationResult(false, "Reset failed", e.Message);
+            result = new GameOperationResult(false, Strings.Get("Game_ResetFailedTitle"), e.Message);
         }
         finally
         {

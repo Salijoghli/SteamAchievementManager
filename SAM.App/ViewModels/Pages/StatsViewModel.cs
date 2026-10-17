@@ -166,10 +166,7 @@ public sealed partial class StatsViewModel : ObservableObject
 
     public bool IsFetchingRarest => this.RarestCount == 0 && this.IsHunterCalculating;
 
-    public static string HunterScoreExplanation =>
-        "Hunter score rewards rare unlocks. Each unlocked achievement earns 100 ÷ the percentage of " +
-        "players who have it: 1 point if everyone has it, 10 points at 10%, 100 points at 1%, up to " +
-        "1,000 points at 0.1% or rarer. Achievements without global stats don't count.";
+    public static string HunterScoreExplanation => Strings.Get("Stats_HunterExplanation");
 
     /// <summary>Points for one unlocked achievement with the given global percentage.</summary>
     public static double HunterPoints(double percent) => 100 / Math.Max(percent, RarityFloorPercent);
@@ -333,7 +330,7 @@ public sealed partial class StatsViewModel : ObservableObject
                 x.Game.Name,
                 FormatPercent(x.Progress!.Value.Fraction * 100),
                 x.Progress!.Value.Fraction * 100,
-                $"{LibraryFormat.Count(x.Progress!.Value.Unlocked)} / {LibraryFormat.Count(x.Progress!.Value.Total)} achievements"))
+                Strings.Plural("Stats_RankedAchievements", x.Progress!.Value.Total, LibraryFormat.Count(x.Progress!.Value.Unlocked))))
             .ToList();
 
         var byPlaytime = games
@@ -353,7 +350,7 @@ public sealed partial class StatsViewModel : ObservableObject
                     x.Game.Name,
                     LibraryFormat.Playtime(x.Time),
                     maxTime > 0 ? x.Time.TotalHours / maxTime * 100 : 0,
-                    $"{FormatPercent(share)} of your playtime");
+                    Strings.Format("Stats_PlaytimeShare", FormatPercent(share)));
             })
             .ToList();
 
@@ -371,8 +368,8 @@ public sealed partial class StatsViewModel : ObservableObject
             {
                 Diagnostics.Log("Stats: couldn't load the unlock timeline", e);
                 timelineError = e is NotImplementedException
-                    ? "Unlock history isn't available in this build yet."
-                    : $"Couldn't read your unlock history. {e.Message}";
+                    ? Strings.Get("Pages_TimelineUnavailable")
+                    : Strings.Format("Pages_TimelineError", e.Message);
             }
         }
 
@@ -383,15 +380,15 @@ public sealed partial class StatsViewModel : ObservableObject
     {
         var percent = s.Total == 0 ? 0 : (double)s.Unlocked / s.Total * 100;
         this.UnlockedText = LibraryFormat.Count(s.Unlocked);
-        this.UnlockedDetail = $"of {LibraryFormat.Count(s.Total)} achievements";
+        this.UnlockedDetail = Strings.Plural("Stats_UnlockedDetail", s.Total);
         this.CompletionText = FormatPercent(percent);
         this.CompletionDetail = s.StartedFractions.Count == 0
-            ? "No games started yet"
-            : $"Average started game: {FormatPercent(s.StartedFractions.Average() * 100)}";
+            ? Strings.Get("Stats_NoGamesStarted")
+            : Strings.Format("Stats_AverageStarted", FormatPercent(s.StartedFractions.Average() * 100));
         this.PerfectText = LibraryFormat.Count(s.Perfect);
-        this.PerfectDetail = $"of {LibraryFormat.Count(s.GamesWithAchievements)} games with achievements";
+        this.PerfectDetail = Strings.Plural("Stats_PerfectDetail", s.GamesWithAchievements);
         this.PlaytimeText = LibraryFormat.Playtime(s.Playtime);
-        this.PlaytimeDetail = $"across {LibraryFormat.Count(s.PlayedGames)} played games";
+        this.PlaytimeDetail = Strings.Plural("Stats_PlaytimeDetail", s.PlayedGames);
         this.TopCompletion = s.TopCompletion;
         this.TopPlaytime = s.TopPlaytime;
 
@@ -430,13 +427,13 @@ public sealed partial class StatsViewModel : ObservableObject
             monthly.Add(new ChartPoint(
                 axis,
                 count,
-                $"{month.ToString("MMMM yyyy", culture)}: {Unlocks(count)}",
-                month.ToString("MMMM yyyy", culture),
+                Strings.Format("Stats_MonthlyPoint", MonthTitle(month), Unlocks(count)),
+                MonthTitle(month),
                 LibraryFormat.Count(count)));
         }
 
         this.MonthlyPoints = monthly;
-        this.MonthlySummary = $"{Unlocks(recentTotal)} in the last {MonthsShown} months";
+        this.MonthlySummary = Strings.Format("Stats_MonthlySummary", Unlocks(recentTotal), MonthsShown);
 
         // Cumulative unlocks, monthly, from the first known unlock to now; label each January.
         var cumulative = new List<ChartPoint>();
@@ -451,12 +448,12 @@ public sealed partial class StatsViewModel : ObservableObject
                 cumulative.Add(new ChartPoint(
                     axis,
                     running,
-                    $"End of {month.ToString("MMMM yyyy", culture)}: {LibraryFormat.Count(running)} unlocked",
-                    month.ToString("MMMM yyyy", culture),
+                    Strings.Format("Stats_CumulativePoint", MonthTitle(month), LibraryFormat.Count(running)),
+                    MonthTitle(month),
                     LibraryFormat.Count(running)));
             }
 
-            this.CumulativeSummary = $"{LibraryFormat.Count(running)} unlocks with a known date since {first.ToString("MMMM yyyy", culture)}";
+            this.CumulativeSummary = Strings.Plural("Stats_CumulativeSummary", running, MonthTitle(first));
         }
         else
         {
@@ -478,7 +475,7 @@ public sealed partial class StatsViewModel : ObservableObject
         if (this.TimelineError != null)
         {
             this.HunterScoreText = "—";
-            this.HunterScoreDetail = "Needs your unlock history";
+            this.HunterScoreDetail = Strings.Get("Stats_HunterNeedsTimeline");
             this.IsHunterCalculating = false;
             return;
         }
@@ -492,7 +489,9 @@ public sealed partial class StatsViewModel : ObservableObject
         this.HunterScoreText = "0";
         this.IsHunterCalculating = byGame.Count > 0;
         this.HunterProgress = 0;
-        this.HunterScoreDetail = byGame.Count > 0 ? $"Calculating… 0 of {LibraryFormat.Count(byGame.Count)} games" : "No unlocks yet";
+        this.HunterScoreDetail = byGame.Count > 0
+            ? Strings.Format("Stats_HunterCalculating", LibraryFormat.Count(0), LibraryFormat.Count(byGame.Count))
+            : Strings.Get("Stats_HunterNoUnlocks");
 
         var queue = new Queue<IGrouping<uint, UnlockEvent>>(byGame);
         var rarestChanged = false;
@@ -535,8 +534,8 @@ public sealed partial class StatsViewModel : ObservableObject
                 this.HunterScoreText = Math.Round(score).ToString("N0", CultureInfo.CurrentCulture);
                 this.HunterProgress = (double)done / byGame.Count * 100;
                 this.HunterScoreDetail = done < byGame.Count
-                    ? $"Calculating… {LibraryFormat.Count(done)} of {LibraryFormat.Count(byGame.Count)} games"
-                    : $"From {LibraryFormat.Count(rated)} unlocks with global stats";
+                    ? Strings.Format("Stats_HunterCalculating", LibraryFormat.Count(done), LibraryFormat.Count(byGame.Count))
+                    : Strings.Plural("Stats_HunterFrom", rated);
                 if (rarestChanged)
                 {
                     rarestChanged = false;
@@ -579,7 +578,10 @@ public sealed partial class StatsViewModel : ObservableObject
         this.RarestCount = this.RarestUnlocks.Count;
     }
 
-    private static string Unlocks(int count) => count == 1 ? "1 unlock" : $"{LibraryFormat.Count(count)} unlocks";
+    private static string Unlocks(int count) => Strings.Plural("Pages_Unlocks", count);
+
+    /// <summary>"October 2026" in the current culture (stand-alone month name, e.g. Georgian "ოქტომბერი 2026").</summary>
+    private static string MonthTitle(DateTime month) => month.ToString("Y", CultureInfo.CurrentCulture);
 
     /// <summary>Rounded down, so 99.6% never reads as 100%.</summary>
     private static string FormatPercent(double percent) => percent is > 0 and < 10

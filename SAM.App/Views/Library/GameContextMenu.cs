@@ -25,24 +25,24 @@ internal static class GameContextMenu
         flyout.Items.Clear();
         var items = flyout.Items;
 
-        items.Add(Item("Open", "", () => card?.OpenCommand.Execute(null)));
-        items.Add(Item(card?.PlayLabel ?? "Play", card?.PlayGlyph ?? "", () => card?.PlayCommand.Execute(null)));
+        items.Add(Item(Strings.Get("Card_MenuOpen"), "", () => card?.OpenCommand.Execute(null)));
+        items.Add(Item(card?.PlayLabel ?? Strings.Get("Card_Play"), card?.PlayGlyph ?? "", () => card?.PlayCommand.Execute(null)));
         items.Add(new MenuFlyoutSeparator());
-        items.Add(Item("Unlock all achievements…", "", () => card?.UnlockAllCommand.Execute(null)));
-        items.Add(Item("Lock all achievements…", "", () => card?.LockAllCommand.Execute(null)));
+        items.Add(Item(Strings.Get("Card_MenuUnlockAll"), "", () => card?.UnlockAllCommand.Execute(null)));
+        items.Add(Item(Strings.Get("Card_MenuLockAll"), "", () => card?.LockAllCommand.Execute(null)));
         items.Add(new MenuFlyoutSeparator());
-        items.Add(Item(card?.FavoriteLabel ?? "Add to favorites", card?.FavoriteGlyph ?? "", () => card?.ToggleFavoriteCommand.Execute(null)));
+        items.Add(Item(card?.FavoriteLabel ?? Strings.Get("Card_AddToFavorites"), card?.FavoriteGlyph ?? "", () => card?.ToggleFavoriteCommand.Execute(null)));
         items.Add(CollectionsSubMenu(owner, card));
-        items.Add(Item(card?.HiddenLabel ?? "Hide game", card?.HiddenGlyph ?? "", () => card?.ToggleHiddenCommand.Execute(null)));
-        items.Add(Item("Copy App ID", "", () => card?.CopyAppIdCommand.Execute(null)));
+        items.Add(Item(card?.HiddenLabel ?? Strings.Get("Card_HideGame"), card?.HiddenGlyph ?? "", () => card?.ToggleHiddenCommand.Execute(null)));
+        items.Add(Item(Strings.Get("Card_MenuCopyAppId"), "", () => card?.CopyAppIdCommand.Execute(null)));
         items.Add(new MenuFlyoutSeparator());
-        items.Add(Item("Open store page", "", () => card?.OpenStorePageCommand.Execute(null)));
-        items.Add(Item("Open community achievements page", "", () => card?.OpenAchievementsPageCommand.Execute(null)));
+        items.Add(Item(Strings.Get("Card_MenuStorePage"), "", () => card?.OpenStorePageCommand.Execute(null)));
+        items.Add(Item(Strings.Get("Card_MenuCommunityPage"), "", () => card?.OpenAchievementsPageCommand.Execute(null)));
     }
 
     private static MenuFlyoutSubItem CollectionsSubMenu(FrameworkElement owner, GameCardViewModel? card)
     {
-        var sub = new MenuFlyoutSubItem { Text = "Add to collection", Icon = new FontIcon { Glyph = "" } };
+        var sub = new MenuFlyoutSubItem { Text = Strings.Get("Card_MenuAddToCollection"), Icon = new FontIcon { Glyph = "" } };
         if (card == null)
         {
             return sub;
@@ -66,11 +66,11 @@ internal static class GameContextMenu
             sub.Items.Add(new MenuFlyoutSeparator());
         }
 
-        sub.Items.Add(Item("New collection…", "", async () =>
+        sub.Items.Add(Item(Strings.Get("Card_MenuNewCollection"), "", async () =>
         {
             try
             {
-                var name = await CollectionDialogs.PromptNameAsync(owner.XamlRoot, library.RequestedTheme, "New collection", "", "Create");
+                var name = await CollectionDialogs.PromptNameAsync(owner.XamlRoot, library.RequestedTheme, Strings.Get("Collections_NewTitle"), "", Strings.Get("Common_Create"));
                 if (name != null)
                 {
                     library.CreateCollection(name, card);

@@ -49,8 +49,9 @@ public sealed class AppSettings
     public string Theme { get; set; } = "System";
 
     /// <summary>
-    /// Culture for dates and numbers (and, later, UI text), e.g. "en-US". The UI is English-only
-    /// for now, so this defaults to English rather than following the Windows region format.
+    /// UI language and culture for dates and numbers: "en-US" or "ka-GE" (Settings offers these;
+    /// another culture formats dates and numbers with English text). Defaults to English rather
+    /// than following Windows. Takes effect when SAM starts.
     /// </summary>
     public string Language { get; set; } = "en-US";
 

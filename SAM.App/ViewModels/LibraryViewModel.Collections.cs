@@ -118,7 +118,7 @@ public sealed partial class LibraryViewModel
         catch (Exception e)
         {
             Diagnostics.Log("Couldn't update a collection", e);
-            this.ShowNotice("Couldn't update the collection", e.Message, InfoBarSeverity.Error);
+            this.ShowNotice(Strings.Get("Collections_UpdateFailed"), e.Message, InfoBarSeverity.Error);
         }
 
         this.ReloadCustomCollections();
@@ -145,7 +145,7 @@ public sealed partial class LibraryViewModel
         catch (Exception e)
         {
             Diagnostics.Log("Couldn't create a collection", e);
-            this.ShowNotice("Couldn't create the collection", e.Message, InfoBarSeverity.Error);
+            this.ShowNotice(Strings.Get("Collections_CreateFailed"), e.Message, InfoBarSeverity.Error);
         }
 
         this.ReloadCustomCollections();
@@ -167,7 +167,7 @@ public sealed partial class LibraryViewModel
         catch (Exception e)
         {
             Diagnostics.Log("Couldn't rename a collection", e);
-            this.ShowNotice("Couldn't rename the collection", e.Message, InfoBarSeverity.Error);
+            this.ShowNotice(Strings.Get("Collections_RenameFailed"), e.Message, InfoBarSeverity.Error);
         }
 
         this.ReloadCustomCollections();
@@ -182,7 +182,7 @@ public sealed partial class LibraryViewModel
         catch (Exception e)
         {
             Diagnostics.Log("Couldn't delete a collection", e);
-            this.ShowNotice("Couldn't delete the collection", e.Message, InfoBarSeverity.Error);
+            this.ShowNotice(Strings.Get("Collections_DeleteFailed"), e.Message, InfoBarSeverity.Error);
             return;
         }
 
@@ -205,7 +205,7 @@ public sealed partial class LibraryViewModel
         catch (Exception e)
         {
             Diagnostics.Log("Couldn't update hidden games", e);
-            this.ShowNotice(hidden ? "Couldn't hide the game" : "Couldn't unhide the game", e.Message, InfoBarSeverity.Error);
+            this.ShowNotice(Strings.Get(hidden ? "Library_HideGameFailed" : "Library_UnhideGameFailed"), e.Message, InfoBarSeverity.Error);
             return;
         }
 
@@ -213,8 +213,8 @@ public sealed partial class LibraryViewModel
         if (hidden && this.ShowHidden == false)
         {
             this.ShowNotice(
-                $"{card.Name} is hidden",
-                "Turn on \"Show hidden games\" in Filters to see it again.",
+                Strings.Format("Library_GameHiddenTitle", card.Name),
+                Strings.Get("Library_GameHiddenMessage"),
                 InfoBarSeverity.Informational);
         }
     }

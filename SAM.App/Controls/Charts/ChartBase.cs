@@ -185,8 +185,8 @@ public abstract class ChartBase : UserControl
     /// <summary>Compact tick text: 0, 500, 1K, 2.5K, 1M.</summary>
     internal static string FormatTick(double value) => value switch
     {
-        >= 1_000_000 => (value / 1_000_000).ToString("0.#", CultureInfo.CurrentCulture) + "M",
-        >= 1_000 => (value / 1_000).ToString("0.#", CultureInfo.CurrentCulture) + "K",
+        >= 1_000_000 => Strings.Format("Chart_TickMillions", (value / 1_000_000).ToString("0.#", CultureInfo.CurrentCulture)),
+        >= 1_000 => Strings.Format("Chart_TickThousands", (value / 1_000).ToString("0.#", CultureInfo.CurrentCulture)),
         _ => value.ToString("0", CultureInfo.CurrentCulture),
     };
 

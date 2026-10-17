@@ -28,8 +28,8 @@ public static class PageActions
         var days = (DateTime.Now.Date - localDate.Date).Days;
         return days switch
         {
-            0 => "Today",
-            1 => "Yesterday",
+            0 => Strings.Get("Pages_Today"),
+            1 => Strings.Get("Pages_Yesterday"),
             _ => localDate.ToString(shortDate ? "d" : "D", CultureInfo.CurrentCulture),
         };
     }

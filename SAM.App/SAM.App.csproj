@@ -36,6 +36,10 @@
     <Content Include="Assets\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
+    <!-- English UI text, also embedded so Strings works where the resource system isn't available (e.g. tests). -->
+    <EmbeddedResource Include="Strings\en-US\Resources.resw" LogicalName="SAM.App.Strings.en-US.Resources.resw" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.9" />
     <!-- WinUI 2.3.9 asks for InteractiveExperiences >= 2.1.8, which was never published. -->
     <PackageReference Include="Microsoft.WindowsAppSDK.InteractiveExperiences" Version="2.1.9" />

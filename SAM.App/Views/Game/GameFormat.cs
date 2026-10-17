@@ -19,7 +19,7 @@ public static class GameFormat
     public static double Opacity(bool visible) => visible ? 1.0 : 0.0;
 
     public static string ProtectedTooltip(bool isProtected) =>
-        isProtected ? "Protected — only the game's servers can change this" : "Locked or unlocked state to commit";
+        Strings.Get(isProtected ? "Achievement_ProtectedTooltip" : "Achievement_ToggleTooltip");
 
     /// <summary>
     /// A flyout presenter style that follows <paramref name="theme"/>: flyouts open in a popup,

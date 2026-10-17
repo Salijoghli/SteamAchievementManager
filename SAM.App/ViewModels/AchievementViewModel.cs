@@ -59,7 +59,7 @@ public sealed partial class AchievementViewModel : ObservableObject
     public string Name => string.IsNullOrWhiteSpace(this.Definition.Name) ? this.Definition.Id : this.Definition.Name;
 
     /// <summary>Screen readers announce list rows by their item's ToString.</summary>
-    public override string ToString() => $"{this.Name}, {(this.IsChecked ? "unlocked" : "locked")}";
+    public override string ToString() => Strings.Format(this.IsChecked ? "Achievement_A11yUnlocked" : "Achievement_A11yLocked", this.Name);
 
     public string Description => this.Definition.Description;
 
@@ -75,8 +75,8 @@ public sealed partial class AchievementViewModel : ObservableObject
     public DateTimeOffset? UnlockTime { get; }
 
     public string UnlockTimeText => this.UnlockTime is { } time
-        ? "Unlocked " + time.ToLocalTime().ToString("d MMM yyyy, HH:mm", CultureInfo.CurrentCulture)
-        : this.IsAchieved ? "Unlocked" : "";
+        ? Strings.Format("Achievement_UnlockedAt", time.ToLocalTime().ToString("d MMM yyyy, HH:mm", CultureInfo.CurrentCulture))
+        : this.IsAchieved ? Strings.Get("Achievement_Unlocked") : "";
 
     public bool HasUnlockTimeText => this.UnlockTimeText.Length > 0;
 
@@ -88,7 +88,7 @@ public sealed partial class AchievementViewModel : ObservableObject
 
     public bool IsPending => this.IsChecked != this.IsAchieved;
 
-    public string PendingText => this.IsPending == false ? "" : this.IsChecked ? "Will unlock" : "Will lock";
+    public string PendingText => this.IsPending == false ? "" : Strings.Get(this.IsChecked ? "Achievement_WillUnlock" : "Achievement_WillLock");
 
     partial void OnIsCheckedChanged(bool value) => this._changed();
 
@@ -139,10 +139,8 @@ public sealed partial class AchievementViewModel : ObservableObject
     public bool IsSpoilerMasked => this.IsDescriptionConcealed && this.IsSpoilerProtectionOn;
 
     public string DisplayDescription => this.IsDescriptionConcealed
-        ? (this.IsSpoilerProtectionOn
-            ? "Hidden achievement — click to reveal"
-            : "Hidden achievement — hover or click to reveal")
-        : string.IsNullOrEmpty(this.Description) ? (this.IsHidden ? "Hidden achievement" : "") : this.Description;
+        ? Strings.Get(this.IsSpoilerProtectionOn ? "Achievement_HiddenClickToReveal" : "Achievement_HiddenHoverToReveal")
+        : string.IsNullOrEmpty(this.Description) ? (this.IsHidden ? Strings.Get("Achievement_Hidden") : "") : this.Description;
     #endregion
 
     #region Row actions and note
@@ -189,10 +187,21 @@ public sealed partial class AchievementViewModel : ObservableObject
     public AchievementRarity Rarity => GetRarity(this.GlobalPercent);
 
     public string RarityText => this.GlobalPercent is { } p
-        ? string.Format(CultureInfo.CurrentCulture, "{0:0.#}% of players", p)
+        ? Strings.Format("Achievement_PercentOfPlayers", p)
         : "";
 
-    public string RarityTierText => this.Rarity == AchievementRarity.Unknown ? "" : this.Rarity.ToString();
+    public string RarityTierText => RarityName(this.Rarity);
+
+    /// <summary>The localized name of a rarity tier ("" for Unknown).</summary>
+    public static string RarityName(AchievementRarity rarity) => rarity switch
+    {
+        AchievementRarity.Common => Strings.Get("Rarity_Common"),
+        AchievementRarity.Uncommon => Strings.Get("Rarity_Uncommon"),
+        AchievementRarity.Rare => Strings.Get("Rarity_Rare"),
+        AchievementRarity.Epic => Strings.Get("Rarity_Epic"),
+        AchievementRarity.Legendary => Strings.Get("Rarity_Legendary"),
+        _ => "",
+    };
 
     public static AchievementRarity GetRarity(double? percent) => percent switch
     {

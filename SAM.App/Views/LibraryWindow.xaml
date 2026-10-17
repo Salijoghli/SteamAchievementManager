@@ -84,8 +84,8 @@
             </Grid.ColumnDefinitions>
             <Image Source="ms-appx:///Assets/SAM.ico" Width="16" Height="16" VerticalAlignment="Center" />
             <TextBlock
+                x:Uid="Library_AppTitle"
                 Grid.Column="1"
-                Text="Steam Achievement Manager"
                 Style="{StaticResource CaptionTextBlockStyle}"
                 VerticalAlignment="Center" />
         </Grid>
@@ -98,22 +98,22 @@
             MaxWidth="{StaticResource ContentMaxWidth}"
             HorizontalAlignment="Stretch"
             SelectionChanged="OnPageSelectionChanged">
-            <SelectorBarItem x:Name="LibraryPageItem" Text="Library" Tag="library" IsSelected="True">
+            <SelectorBarItem x:Name="LibraryPageItem" x:Uid="Library_PageLibrary" Tag="library" IsSelected="True">
                 <SelectorBarItem.Icon>
                     <FontIcon Glyph="&#xE8F1;" />
                 </SelectorBarItem.Icon>
             </SelectorBarItem>
-            <SelectorBarItem Text="Stats" Tag="stats">
+            <SelectorBarItem x:Uid="Library_PageStats" Tag="stats">
                 <SelectorBarItem.Icon>
                     <FontIcon Glyph="&#xE9D2;" />
                 </SelectorBarItem.Icon>
             </SelectorBarItem>
-            <SelectorBarItem Text="Activity" Tag="activity">
+            <SelectorBarItem x:Uid="Library_PageActivity" Tag="activity">
                 <SelectorBarItem.Icon>
                     <FontIcon Glyph="&#xE7C1;" />
                 </SelectorBarItem.Icon>
             </SelectorBarItem>
-            <SelectorBarItem Text="History" Tag="history">
+            <SelectorBarItem x:Uid="Library_PageHistory" Tag="history">
                 <SelectorBarItem.Icon>
                     <FontIcon Glyph="&#xE81C;" />
                 </SelectorBarItem.Icon>
@@ -149,24 +149,21 @@
                 </Grid.ColumnDefinitions>
                 <AutoSuggestBox
                     x:Name="SearchBox"
+                    x:Uid="Library_SearchBox"
                     MaxWidth="720"
                     HorizontalAlignment="Stretch"
-                    PlaceholderText="Search games or App ID"
                     QueryIcon="Find"
                     UpdateTextOnSelect="False"
                     Text="{x:Bind ViewModel.SearchText, Mode=OneWay}"
-                    AutomationProperties.Name="Search games or App ID"
-                    ToolTipService.ToolTip="Search games or App ID (Ctrl+F)"
                     TextChanged="OnSearchTextChanged"
                     QuerySubmitted="OnSearchQuerySubmitted"
                     PreviewKeyDown="OnSearchPreviewKeyDown" />
 
                 <!-- Collection picker. -->
                 <DropDownButton
+                    x:Uid="Library_CollectionPicker"
                     Grid.Column="1"
-                    Height="34"
-                    AutomationProperties.Name="Collection"
-                    ToolTipService.ToolTip="Show a collection">
+                    Height="34">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE8F4;" FontSize="14" />
                         <TextBlock
@@ -176,17 +173,16 @@
                     </StackPanel>
                     <DropDownButton.Flyout>
                         <MenuFlyout x:Name="CollectionMenu" Placement="BottomEdgeAlignedLeft" Opening="OnCollectionMenuOpening">
-                            <MenuFlyoutItem Text="All games" />
+                            <MenuFlyoutItem x:Uid="Library_AllGamesItem" />
                         </MenuFlyout>
                     </DropDownButton.Flyout>
                 </DropDownButton>
 
                 <!-- Smart lists. -->
                 <DropDownButton
+                    x:Uid="Library_SmartListPicker"
                     Grid.Column="2"
-                    Height="34"
-                    AutomationProperties.Name="Smart lists"
-                    ToolTipService.ToolTip="Smart lists">
+                    Height="34">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE945;" FontSize="14" />
                         <TextBlock Text="{x:Bind ViewModel.SmartListName, Mode=OneWay}" />
@@ -198,7 +194,7 @@
                     </StackPanel>
                     <DropDownButton.Flyout>
                         <MenuFlyout x:Name="SmartListMenu" Placement="BottomEdgeAlignedLeft" Opening="OnSmartListMenuOpening">
-                            <MenuFlyoutItem Text="None" />
+                            <MenuFlyoutItem x:Uid="Library_SmartListNoneItem" />
                         </MenuFlyout>
                     </DropDownButton.Flyout>
                 </DropDownButton>
@@ -207,22 +203,20 @@
                 <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2">
                     <ToggleButton
                         x:Name="GridModeButton"
+                        x:Uid="Library_GridView"
                         Width="36"
                         Height="34"
                         Padding="0"
-                        Click="OnGridModeClick"
-                        AutomationProperties.Name="Grid view"
-                        ToolTipService.ToolTip="Grid view">
+                        Click="OnGridModeClick">
                         <FontIcon Glyph="&#xF0E2;" FontSize="14" />
                     </ToggleButton>
                     <ToggleButton
                         x:Name="ListModeButton"
+                        x:Uid="Library_ListView"
                         Width="36"
                         Height="34"
                         Padding="0"
-                        Click="OnListModeClick"
-                        AutomationProperties.Name="List view"
-                        ToolTipService.ToolTip="List view">
+                        Click="OnListModeClick">
                         <FontIcon Glyph="&#xE8FD;" FontSize="14" />
                     </ToggleButton>
                 </StackPanel>
@@ -230,31 +224,29 @@
                 <Button
                     Grid.Column="4"
                     Style="{StaticResource IconButtonStyle}"
-                    Command="{x:Bind ViewModel.RefreshCommand}"
-                    AutomationProperties.Name="Refresh library"
-                    ToolTipService.ToolTip="Refresh library (F5)">
+                    x:Uid="Library_RefreshButton"
+                    Command="{x:Bind ViewModel.RefreshCommand}">
                     <FontIcon Glyph="&#xE72C;" FontSize="16" />
                 </Button>
                 <Button
                     Grid.Column="5"
                     Style="{StaticResource IconButtonStyle}"
-                    AutomationProperties.Name="More options"
-                    ToolTipService.ToolTip="More options">
+                    x:Uid="Library_MoreOptions">
                     <FontIcon Glyph="&#xE712;" FontSize="16" />
                     <Button.Flyout>
                         <MenuFlyout Placement="BottomEdgeAlignedRight">
-                            <MenuFlyoutItem Text="Export library (CSV)…" Click="OnExportLibraryClick" IsEnabled="{x:Bind vm:LibraryFormat.Not(ViewModel.IsExporting), Mode=OneWay}">
+                            <MenuFlyoutItem x:Uid="Library_ExportLibraryItem" Click="OnExportLibraryClick" IsEnabled="{x:Bind vm:LibraryFormat.Not(ViewModel.IsExporting), Mode=OneWay}">
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon Glyph="&#xEDE1;" />
                                 </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
-                            <MenuFlyoutItem Text="Export all achievements (CSV)…" Click="OnExportAchievementsClick" IsEnabled="{x:Bind vm:LibraryFormat.Not(ViewModel.IsExporting), Mode=OneWay}">
+                            <MenuFlyoutItem x:Uid="Library_ExportAchievementsItem" Click="OnExportAchievementsClick" IsEnabled="{x:Bind vm:LibraryFormat.Not(ViewModel.IsExporting), Mode=OneWay}">
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon Glyph="&#xEDE1;" />
                                 </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
                             <MenuFlyoutSeparator />
-                            <MenuFlyoutItem Text="Manage collections…" Click="OnManageCollectionsClick">
+                            <MenuFlyoutItem x:Uid="Library_ManageCollectionsItem" Click="OnManageCollectionsClick">
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon Glyph="&#xE8F4;" />
                                 </MenuFlyoutItem.Icon>
@@ -265,9 +257,8 @@
                 <Button
                     Grid.Column="6"
                     Style="{StaticResource IconButtonStyle}"
-                    Click="OnSettingsClick"
-                    AutomationProperties.Name="Settings"
-                    ToolTipService.ToolTip="Settings">
+                    x:Uid="Library_SettingsButton"
+                    Click="OnSettingsClick">
                     <FontIcon Glyph="&#xE713;" FontSize="16" />
                 </Button>
             </Grid>
@@ -307,37 +298,35 @@
                             <FontIcon Glyph="&#xE9D5;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             <TextBlock Text="{x:Bind ViewModel.CompletionText, Mode=OneWay}" Style="{StaticResource SummaryTextStyle}" />
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="6" ToolTipService.ToolTip="Games with every achievement unlocked">
+                        <StackPanel x:Uid="Library_PerfectSummary" Orientation="Horizontal" Spacing="6">
                             <FontIcon Glyph="&#xE7C1;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             <TextBlock Text="{x:Bind ViewModel.PerfectText, Mode=OneWay}" Style="{StaticResource SummaryTextStyle}" />
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="6" ToolTipService.ToolTip="Total playtime">
+                        <StackPanel x:Uid="Library_PlaytimeSummary" Orientation="Horizontal" Spacing="6">
                             <FontIcon Glyph="&#xE823;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             <TextBlock Text="{x:Bind ViewModel.TotalPlaytimeText, Mode=OneWay}" Style="{StaticResource SummaryTextStyle}" />
                         </StackPanel>
                     </StackPanel>
                     <ProgressRing
+                        x:Uid="Library_RefreshingRing"
                         Width="16"
                         Height="16"
                         IsActive="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}"
-                        Visibility="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}"
-                        AutomationProperties.Name="Refreshing library"
-                        ToolTipService.ToolTip="Refreshing library…" />
+                        Visibility="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}" />
                 </StackPanel>
 
                 <!-- Sort and filters. -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
                     <ComboBox
+                        x:Uid="Library_SortBy"
                         Width="170"
                         IsEnabled="{x:Bind ViewModel.IsSortEnabled, Mode=OneWay}"
-                        SelectedIndex="{x:Bind ViewModel.SortIndex, Mode=TwoWay}"
-                        AutomationProperties.Name="Sort by"
-                        ToolTipService.ToolTip="Sort by">
-                        <x:String>Name</x:String>
-                        <x:String>App ID</x:String>
-                        <x:String>Recently played</x:String>
-                        <x:String>Playtime</x:String>
-                        <x:String>Completion %</x:String>
+                        SelectedIndex="{x:Bind ViewModel.SortIndex, Mode=TwoWay}">
+                        <ComboBoxItem x:Uid="Library_SortName" />
+                        <ComboBoxItem x:Uid="Library_SortAppId" />
+                        <ComboBoxItem x:Uid="Library_SortRecentlyPlayed" />
+                        <ComboBoxItem x:Uid="Library_SortPlaytime" />
+                        <ComboBoxItem x:Uid="Library_SortCompletion" />
                     </ComboBox>
                     <ToggleButton
                         Width="36"
@@ -345,7 +334,7 @@
                         Padding="0"
                         IsEnabled="{x:Bind ViewModel.IsSortEnabled, Mode=OneWay}"
                         IsChecked="{x:Bind ViewModel.SortDescending, Mode=TwoWay}"
-                        AutomationProperties.Name="Sort descending"
+                        x:Uid="Library_SortDescending"
                         ToolTipService.ToolTip="{x:Bind ViewModel.SortDirectionLabel, Mode=OneWay}">
                         <FontIcon Glyph="{x:Bind ViewModel.SortDirectionGlyph, Mode=OneWay}" FontSize="14" />
                     </ToggleButton>
@@ -355,14 +344,13 @@
                         Padding="0"
                         IsEnabled="{x:Bind ViewModel.IsSortEnabled, Mode=OneWay}"
                         IsChecked="{x:Bind ViewModel.PinFavorites, Mode=TwoWay}"
-                        AutomationProperties.Name="Pin favorites to top"
-                        ToolTipService.ToolTip="Pin favorites to top">
+                        x:Uid="Library_PinFavorites">
                         <FontIcon Glyph="&#xE718;" FontSize="14" />
                     </ToggleButton>
-                    <DropDownButton AutomationProperties.Name="Filters" ToolTipService.ToolTip="Filters">
+                    <DropDownButton x:Uid="Library_FiltersButton">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <FontIcon Glyph="&#xE71C;" FontSize="14" />
-                            <TextBlock Text="Filters" />
+                            <TextBlock x:Uid="Library_FiltersLabel" />
                             <InfoBadge
                                 Value="{x:Bind ViewModel.ActiveFilterBadge, Mode=OneWay}"
                                 Visibility="{x:Bind ViewModel.HasActiveFilters, Mode=OneWay}"
@@ -372,47 +360,47 @@
                             <Flyout Placement="BottomEdgeAlignedRight">
                                 <StackPanel Width="300" Spacing="16">
                                     <StackPanel Spacing="4">
-                                        <TextBlock Text="Show" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                                        <CheckBox Content="Games" IsChecked="{x:Bind ViewModel.ShowGames, Mode=TwoWay}" />
-                                        <CheckBox Content="Demos" IsChecked="{x:Bind ViewModel.ShowDemos, Mode=TwoWay}" />
-                                        <CheckBox Content="Mods" IsChecked="{x:Bind ViewModel.ShowMods, Mode=TwoWay}" />
-                                        <CheckBox Content="Junk" IsChecked="{x:Bind ViewModel.ShowJunk, Mode=TwoWay}" />
+                                        <TextBlock x:Uid="Library_FilterShow" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                        <CheckBox x:Uid="Library_FilterGames" IsChecked="{x:Bind ViewModel.ShowGames, Mode=TwoWay}" />
+                                        <CheckBox x:Uid="Library_FilterDemos" IsChecked="{x:Bind ViewModel.ShowDemos, Mode=TwoWay}" />
+                                        <CheckBox x:Uid="Library_FilterMods" IsChecked="{x:Bind ViewModel.ShowMods, Mode=TwoWay}" />
+                                        <CheckBox x:Uid="Library_FilterJunk" IsChecked="{x:Bind ViewModel.ShowJunk, Mode=TwoWay}" />
                                     </StackPanel>
                                     <StackPanel>
-                                        <ToggleSwitch Header="Favorites only" IsOn="{x:Bind ViewModel.FavoritesOnly, Mode=TwoWay}" />
-                                        <ToggleSwitch Header="Installed only" IsOn="{x:Bind ViewModel.InstalledOnly, Mode=TwoWay}" />
-                                        <ToggleSwitch Header="Show hidden games" IsOn="{x:Bind ViewModel.ShowHidden, Mode=TwoWay}" />
+                                        <ToggleSwitch x:Uid="Library_FilterFavoritesOnly" IsOn="{x:Bind ViewModel.FavoritesOnly, Mode=TwoWay}" />
+                                        <ToggleSwitch x:Uid="Library_FilterInstalledOnly" IsOn="{x:Bind ViewModel.InstalledOnly, Mode=TwoWay}" />
+                                        <ToggleSwitch x:Uid="Library_FilterShowHidden" IsOn="{x:Bind ViewModel.ShowHidden, Mode=TwoWay}" />
                                     </StackPanel>
                                     <StackPanel Spacing="4">
                                         <ComboBox
-                                            Header="Achievements"
+                                            x:Uid="Library_FilterCompletion"
                                             HorizontalAlignment="Stretch"
                                             IsEnabled="{x:Bind ViewModel.IsSortEnabled, Mode=OneWay}"
                                             SelectedIndex="{x:Bind ViewModel.CompletionFilterIndex, Mode=TwoWay}">
-                                            <x:String>All</x:String>
-                                            <x:String>Has achievements</x:String>
-                                            <x:String>Not started</x:String>
-                                            <x:String>In progress</x:String>
-                                            <x:String>Perfect</x:String>
+                                            <ComboBoxItem x:Uid="Library_CompletionAll" />
+                                            <ComboBoxItem x:Uid="Library_CompletionHasAchievements" />
+                                            <ComboBoxItem x:Uid="Library_CompletionNotStarted" />
+                                            <ComboBoxItem x:Uid="Library_CompletionInProgress" />
+                                            <ComboBoxItem x:Uid="Library_CompletionPerfect" />
                                         </ComboBox>
                                         <TextBlock
-                                            Text="Ignored while a smart list is active."
+                                            x:Uid="Library_SmartListIgnoresFilter"
                                             Style="{StaticResource CaptionTextBlockStyle}"
                                             Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                             Visibility="{x:Bind ViewModel.IsSmartListActive, Mode=OneWay}" />
                                     </StackPanel>
                                     <StackPanel Spacing="8">
                                         <ComboBox
-                                            Header="Last played"
+                                            x:Uid="Library_FilterLastPlayed"
                                             HorizontalAlignment="Stretch"
                                             SelectedIndex="{x:Bind ViewModel.LastPlayedFilterIndex, Mode=TwoWay}">
-                                            <x:String>Any time</x:String>
-                                            <x:String>Today</x:String>
-                                            <x:String>Past 7 days</x:String>
-                                            <x:String>Past 30 days</x:String>
-                                            <x:String>This year</x:String>
-                                            <x:String>Never played</x:String>
-                                            <x:String>Custom range</x:String>
+                                            <ComboBoxItem x:Uid="Library_LastPlayedAny" />
+                                            <ComboBoxItem x:Uid="Library_LastPlayedToday" />
+                                            <ComboBoxItem x:Uid="Library_LastPlayedPast7Days" />
+                                            <ComboBoxItem x:Uid="Library_LastPlayedPast30Days" />
+                                            <ComboBoxItem x:Uid="Library_LastPlayedThisYear" />
+                                            <ComboBoxItem x:Uid="Library_LastPlayedNever" />
+                                            <ComboBoxItem x:Uid="Library_LastPlayedCustom" />
                                         </ComboBox>
                                         <Grid ColumnSpacing="8" Visibility="{x:Bind ViewModel.IsCustomRange, Mode=OneWay}">
                                             <Grid.ColumnDefinitions>
@@ -420,20 +408,18 @@
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
                                             <CalendarDatePicker
-                                                Header="From"
-                                                PlaceholderText="Any"
+                                                x:Uid="Library_FilterFrom"
                                                 HorizontalAlignment="Stretch"
                                                 Date="{x:Bind ViewModel.CustomFrom, Mode=TwoWay}" />
                                             <CalendarDatePicker
+                                                x:Uid="Library_FilterTo"
                                                 Grid.Column="1"
-                                                Header="To"
-                                                PlaceholderText="Any"
                                                 HorizontalAlignment="Stretch"
                                                 Date="{x:Bind ViewModel.CustomTo, Mode=TwoWay}" />
                                         </Grid>
                                     </StackPanel>
                                     <Button
-                                        Content="Reset filters"
+                                        x:Uid="Library_ResetFilters"
                                         HorizontalAlignment="Right"
                                         Command="{x:Bind ViewModel.ResetFiltersCommand}"
                                         IsEnabled="{x:Bind ViewModel.HasActiveFilters, Mode=OneWay}" />
@@ -450,25 +436,25 @@
             <ProgressBar
                 IsIndeterminate="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}"
                 Opacity="{x:Bind vm:LibraryFormat.OpacityIf(ViewModel.IsRefreshing), Mode=OneWay}"
-                AutomationProperties.Name="Refreshing library" />
+                x:Uid="Library_RefreshingBar" />
             <InfoBar
-                Title="Couldn't load your library"
+                x:Uid="Library_LoadErrorBar"
                 Message="{x:Bind ViewModel.LoadError, Mode=OneWay}"
                 Severity="Error"
                 IsOpen="{x:Bind ViewModel.IsLoadErrorOpen, Mode=TwoWay}"
                 Visibility="{x:Bind ViewModel.IsLoadErrorOpen, Mode=OneWay}">
                 <InfoBar.ActionButton>
-                    <Button Content="Retry" Command="{x:Bind ViewModel.RefreshCommand}" />
+                    <Button x:Uid="Library_RetryButton" Command="{x:Bind ViewModel.RefreshCommand}" />
                 </InfoBar.ActionButton>
             </InfoBar>
             <InfoBar
-                Title="Couldn't refresh"
+                x:Uid="Library_RefreshWarningBar"
                 Message="{x:Bind ViewModel.RefreshWarning, Mode=OneWay}"
                 Severity="Warning"
                 IsOpen="{x:Bind ViewModel.IsRefreshWarningOpen, Mode=TwoWay}"
                 Visibility="{x:Bind ViewModel.IsRefreshWarningOpen, Mode=OneWay}">
                 <InfoBar.ActionButton>
-                    <Button Content="Retry" Command="{x:Bind ViewModel.RefreshCommand}" />
+                    <Button x:Uid="Library_RetryButton" Command="{x:Bind ViewModel.RefreshCommand}" />
                 </InfoBar.ActionButton>
             </InfoBar>
             <InfoBar
@@ -483,14 +469,14 @@
                 IsOpen="{x:Bind ViewModel.IsUpdateOpen, Mode=TwoWay}"
                 Visibility="{x:Bind ViewModel.IsUpdateOpen, Mode=OneWay}">
                 <InfoBar.ActionButton>
-                    <Button Content="Download" Style="{StaticResource AccentButtonStyle}" Command="{x:Bind ViewModel.DownloadUpdateCommand}" />
+                    <Button x:Uid="Library_UpdateDownload" Style="{StaticResource AccentButtonStyle}" Command="{x:Bind ViewModel.DownloadUpdateCommand}" />
                 </InfoBar.ActionButton>
                 <InfoBar.Content>
-                    <Button Content="Skip this version" Margin="0,0,0,12" Command="{x:Bind ViewModel.SkipUpdateCommand}" />
+                    <Button x:Uid="Library_UpdateSkip" Margin="0,0,0,12" Command="{x:Bind ViewModel.SkipUpdateCommand}" />
                 </InfoBar.Content>
             </InfoBar>
             <InfoBar
-                Title="Exporting"
+                x:Uid="Library_ExportingBar"
                 Message="{x:Bind ViewModel.ExportProgressText, Mode=OneWay}"
                 Severity="Informational"
                 IsClosable="False"
@@ -501,16 +487,16 @@
                 </InfoBar.Content>
             </InfoBar>
             <InfoBar
-                Title="Export complete"
+                x:Uid="Library_ExportDoneBar"
                 Message="{x:Bind ViewModel.ExportDoneMessage, Mode=OneWay}"
                 Severity="Success"
                 IsOpen="{x:Bind ViewModel.IsExportDoneOpen, Mode=TwoWay}"
                 Visibility="{x:Bind ViewModel.IsExportDoneOpen, Mode=OneWay}">
                 <InfoBar.ActionButton>
-                    <Button Content="Open file" Command="{x:Bind ViewModel.OpenExportedFileCommand}" />
+                    <Button x:Uid="Library_OpenExportedFile" Command="{x:Bind ViewModel.OpenExportedFileCommand}" />
                 </InfoBar.ActionButton>
                 <InfoBar.Content>
-                    <Button Content="Open folder" Margin="0,0,0,12" Command="{x:Bind ViewModel.OpenExportedFolderCommand}" />
+                    <Button x:Uid="Library_OpenExportedFolder" Margin="0,0,0,12" Command="{x:Bind ViewModel.OpenExportedFolderCommand}" />
                 </InfoBar.Content>
             </InfoBar>
             <InfoBar
@@ -533,7 +519,7 @@
                 IsTabStop="False"
                 ItemContainerStyle="{StaticResource CardContainerStyle}"
                 Visibility="{x:Bind ViewModel.IsGridSkeletonShown, Mode=OneWay}"
-                AutomationProperties.Name="Loading games">
+                x:Uid="Library_LoadingGames">
                 <GridView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <ItemsWrapGrid Orientation="Horizontal" Loaded="OnCardPanelLoaded" />
@@ -578,7 +564,7 @@
                 ContainerContentChanging="OnContainerContentChanging"
                 ItemContainerStyle="{StaticResource CardContainerStyle}"
                 Visibility="{x:Bind ViewModel.IsGridViewShown, Mode=OneWay}"
-                AutomationProperties.Name="Games">
+                x:Uid="Library_GamesGrid">
                 <GridView.ItemsPanel>
                     <ItemsPanelTemplate>
                         <ItemsWrapGrid Orientation="Horizontal" Loaded="OnCardPanelLoaded" />
@@ -618,13 +604,13 @@
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="1" Tag="name" Style="{StaticResource ColumnHeaderButtonStyle}" Click="OnColumnHeaderClick" IsEnabled="{x:Bind ViewModel.IsSortEnabled, Mode=OneWay}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="Name" />
+                            <TextBlock x:Uid="Library_ColumnName" />
                             <FontIcon FontSize="10" Glyph="{x:Bind vm:LibraryFormat.SortGlyph(ViewModel.ActiveSortColumn, ViewModel.SortDescending, 'name'), Mode=OneWay}" />
                         </StackPanel>
                     </Button>
                     <Button Grid.Column="2" Tag="progress" Style="{StaticResource ColumnHeaderButtonStyle}" Click="OnColumnHeaderClick" IsEnabled="{x:Bind ViewModel.IsSortEnabled, Mode=OneWay}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="Progress" />
+                            <TextBlock x:Uid="Library_ColumnProgress" />
                             <FontIcon FontSize="10" Glyph="{x:Bind vm:LibraryFormat.SortGlyph(ViewModel.ActiveSortColumn, ViewModel.SortDescending, 'progress'), Mode=OneWay}" />
                         </StackPanel>
                     </Button>
@@ -633,19 +619,19 @@
                     </Button>
                     <Button Grid.Column="4" Tag="playtime" Style="{StaticResource ColumnHeaderButtonStyle}" Click="OnColumnHeaderClick" IsEnabled="{x:Bind ViewModel.IsSortEnabled, Mode=OneWay}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="Playtime" />
+                            <TextBlock x:Uid="Library_ColumnPlaytime" />
                             <FontIcon FontSize="10" Glyph="{x:Bind vm:LibraryFormat.SortGlyph(ViewModel.ActiveSortColumn, ViewModel.SortDescending, 'playtime'), Mode=OneWay}" />
                         </StackPanel>
                     </Button>
                     <Button Grid.Column="5" Tag="lastplayed" Style="{StaticResource ColumnHeaderButtonStyle}" Click="OnColumnHeaderClick" IsEnabled="{x:Bind ViewModel.IsSortEnabled, Mode=OneWay}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="Last played" />
+                            <TextBlock x:Uid="Library_ColumnLastPlayed" />
                             <FontIcon FontSize="10" Glyph="{x:Bind vm:LibraryFormat.SortGlyph(ViewModel.ActiveSortColumn, ViewModel.SortDescending, 'lastplayed'), Mode=OneWay}" />
                         </StackPanel>
                     </Button>
                     <Button Grid.Column="6" Tag="installed" Style="{StaticResource ColumnHeaderButtonStyle}" Click="OnColumnHeaderClick" IsEnabled="{x:Bind ViewModel.IsSortEnabled, Mode=OneWay}">
                         <StackPanel Orientation="Horizontal" Spacing="6">
-                            <TextBlock Text="Installed" />
+                            <TextBlock x:Uid="Library_ColumnInstalled" />
                             <FontIcon FontSize="10" Glyph="{x:Bind vm:LibraryFormat.SortGlyph(ViewModel.ActiveSortColumn, ViewModel.SortDescending, 'installed'), Mode=OneWay}" />
                         </StackPanel>
                     </Button>
@@ -655,8 +641,7 @@
                         Style="{StaticResource ColumnHeaderButtonStyle}"
                         Click="OnColumnHeaderClick"
                         IsEnabled="{x:Bind ViewModel.IsSortEnabled, Mode=OneWay}"
-                        AutomationProperties.Name="Favorite"
-                        ToolTipService.ToolTip="Favorite">
+                        x:Uid="Library_ColumnFavorite">
                         <FontIcon FontSize="12" Glyph="{x:Bind vm:LibraryFormat.FavoriteHeaderGlyph(ViewModel.ActiveSortColumn, ViewModel.SortDescending), Mode=OneWay}" />
                     </Button>
                 </Grid>
@@ -671,7 +656,7 @@
                     IsTabStop="False"
                     ItemContainerStyle="{StaticResource RowContainerStyle}"
                     Visibility="{x:Bind ViewModel.IsListSkeletonShown, Mode=OneWay}"
-                    AutomationProperties.Name="Loading games">
+                    x:Uid="Library_LoadingGamesList">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="x:Int32">
                             <Grid Height="44" Padding="12,0,12,0" ColumnSpacing="12">
@@ -699,7 +684,7 @@
                     ContainerContentChanging="OnContainerContentChanging"
                     ItemContainerStyle="{StaticResource RowContainerStyle}"
                     Visibility="{x:Bind ViewModel.IsListViewShown, Mode=OneWay}"
-                    AutomationProperties.Name="Games">
+                    x:Uid="Library_GamesList">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="vm:GameCardViewModel">
                             <library:GameListRow Card="{x:Bind}" AutomationProperties.Name="{x:Bind Name, Mode=OneWay}" />
@@ -715,13 +700,13 @@
                 Spacing="12"
                 Visibility="{x:Bind ViewModel.IsNoMatches, Mode=OneWay}">
                 <FontIcon Glyph="&#xE721;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-                <TextBlock Text="No games match" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+                <TextBlock x:Uid="Library_NoMatchesTitle" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
                 <TextBlock
-                    Text="Try a different search or loosen your filters."
+                    x:Uid="Library_NoMatchesHint"
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     HorizontalAlignment="Center" />
                 <Button
-                    Content="Clear search and filters"
+                    x:Uid="Library_ClearSearchAndFilters"
                     HorizontalAlignment="Center"
                     Style="{StaticResource AccentButtonStyle}"
                     Command="{x:Bind ViewModel.ClearSearchAndFiltersCommand}" />
@@ -734,14 +719,14 @@
                 Spacing="12"
                 Visibility="{x:Bind ViewModel.IsLibraryEmpty, Mode=OneWay}">
                 <FontIcon Glyph="&#xE7FC;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-                <TextBlock Text="No games found" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+                <TextBlock x:Uid="Library_EmptyTitle" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
                 <TextBlock
-                    Text="None of the games in SAM's list are owned by this Steam account. Search for an App ID to add one."
+                    x:Uid="Library_EmptyHint"
                     TextWrapping="Wrap"
                     MaxWidth="420"
                     TextAlignment="Center"
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                <Button Content="Refresh" HorizontalAlignment="Center" Command="{x:Bind ViewModel.RefreshCommand}" />
+                <Button x:Uid="Library_EmptyRefresh" HorizontalAlignment="Center" Command="{x:Bind ViewModel.RefreshCommand}" />
             </StackPanel>
         </Grid>
     </Grid>
