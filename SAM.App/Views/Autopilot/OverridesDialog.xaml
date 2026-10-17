@@ -1,0 +1,177 @@
+<ContentDialog
+    x:Class="SAM.App.Views.Autopilot.OverridesDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:SAM.App.Controls"
+    xmlns:pages="using:SAM.App.ViewModels.Pages"
+    x:Uid="Autopilot_OverridesDialog"
+    DefaultButton="Primary"
+    Style="{StaticResource DefaultContentDialogStyle}">
+
+    <ContentDialog.Resources>
+        <x:Double x:Key="ContentDialogMaxWidth">820</x:Double>
+        <Style x:Key="RowStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+            <Setter Property="Padding" Value="8,2" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+    </ContentDialog.Resources>
+
+    <Grid Width="700" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Text="{x:Bind ViewModel.GameName}"
+            Style="{StaticResource BodyStrongTextBlockStyle}"
+            TextTrimming="CharacterEllipsis" />
+
+        <!-- Rules overrides. -->
+        <Grid Grid.Row="1" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <ComboBox
+                x:Uid="Autopilot_OverrideProfile"
+                HorizontalAlignment="Stretch"
+                ItemsSource="{x:Bind ViewModel.ProfileOptions}"
+                SelectedIndex="{x:Bind ViewModel.ProfileIndex, Mode=TwoWay}" />
+            <StackPanel Grid.Column="1" Spacing="6">
+                <ComboBox
+                    x:Uid="Autopilot_OverrideTarget"
+                    HorizontalAlignment="Stretch"
+                    ItemsSource="{x:Bind pages:AutopilotOverridesViewModel.TargetOptions}"
+                    SelectedIndex="{x:Bind ViewModel.TargetIndex, Mode=TwoWay}" />
+                <NumberBox
+                    x:Uid="Autopilot_OverrideTargetHours"
+                    Minimum="0.1"
+                    Maximum="100000"
+                    SmallChange="1"
+                    LargeChange="10"
+                    SpinButtonPlacementMode="Compact"
+                    Value="{x:Bind ViewModel.TargetHours, Mode=TwoWay}"
+                    Visibility="{x:Bind ViewModel.HasTargetHours, Mode=OneWay}" />
+            </StackPanel>
+            <ComboBox
+                x:Uid="Autopilot_OverrideRare"
+                Grid.Column="2"
+                HorizontalAlignment="Stretch"
+                ItemsSource="{x:Bind pages:AutopilotOverridesViewModel.RareOptions}"
+                SelectedIndex="{x:Bind ViewModel.RareIndex, Mode=TwoWay}" />
+        </Grid>
+
+        <!-- Achievement list mode. -->
+        <StackPanel Grid.Row="2" Spacing="4">
+            <RadioButtons
+                x:Uid="Autopilot_OverrideMode"
+                MaxColumns="3"
+                SelectedIndex="{x:Bind ViewModel.ModeIndex, Mode=TwoWay}">
+                <RadioButton x:Uid="Autopilot_OverrideModeNone" />
+                <RadioButton x:Uid="Autopilot_OverrideModeOnly" />
+                <RadioButton x:Uid="Autopilot_OverrideModeExclude" />
+            </RadioButtons>
+            <TextBlock
+                Text="{x:Bind ViewModel.ModeHint, Mode=OneWay}"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                TextWrapping="Wrap" />
+        </StackPanel>
+
+        <Grid Grid.Row="3" RowSpacing="8" IsHitTestVisible="{x:Bind ViewModel.IsListEnabled, Mode=OneWay}" Opacity="{x:Bind pages:AutopilotFormat.DimUnless(ViewModel.IsListEnabled), Mode=OneWay}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="320" />
+            </Grid.RowDefinitions>
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <AutoSuggestBox
+                    x:Uid="Autopilot_OverrideSearch"
+                    QueryIcon="Find"
+                    IsEnabled="{x:Bind ViewModel.IsListEnabled, Mode=OneWay}"
+                    Text="{x:Bind ViewModel.SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBlock
+                    Grid.Column="1"
+                    Text="{x:Bind ViewModel.CountText, Mode=OneWay}"
+                    VerticalAlignment="Center"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <Button Grid.Column="2" x:Uid="Autopilot_OverrideCheckAll" IsEnabled="{x:Bind ViewModel.IsListEnabled, Mode=OneWay}" Command="{x:Bind ViewModel.CheckAllCommand}" />
+                <Button Grid.Column="3" x:Uid="Autopilot_OverrideCheckNone" IsEnabled="{x:Bind ViewModel.IsListEnabled, Mode=OneWay}" Command="{x:Bind ViewModel.CheckNoneCommand}" />
+            </Grid>
+
+            <!-- Column headers. -->
+            <Grid Grid.Row="1" Padding="8,0" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="32" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="110" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="1" x:Uid="Autopilot_ColumnAchievement" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                <TextBlock Grid.Column="2" x:Uid="Autopilot_ColumnRarity" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Right" />
+                <TextBlock Grid.Column="3" x:Uid="Autopilot_ColumnStatus" Style="{StaticResource CaptionTextBlockStyle}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </Grid>
+
+            <StackPanel Grid.Row="2" Spacing="10" Padding="8,6" Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}" x:Uid="Autopilot_OverrideLoading">
+                <controls:Skeleton Width="320" Height="14" HorizontalAlignment="Left" />
+                <controls:Skeleton Width="260" Height="14" HorizontalAlignment="Left" />
+                <controls:Skeleton Width="300" Height="14" HorizontalAlignment="Left" />
+                <controls:Skeleton Width="220" Height="14" HorizontalAlignment="Left" />
+                <controls:Skeleton Width="280" Height="14" HorizontalAlignment="Left" />
+            </StackPanel>
+
+            <TextBlock
+                Grid.Row="2"
+                Text="{x:Bind ViewModel.Error, Mode=OneWay}"
+                TextWrapping="Wrap"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Visibility="{x:Bind ViewModel.HasError, Mode=OneWay}" />
+
+            <ListView
+                Grid.Row="2"
+                x:Uid="Autopilot_OverrideList"
+                SelectionMode="None"
+                ItemsSource="{x:Bind ViewModel.Achievements}"
+                ItemContainerStyle="{StaticResource RowStyle}"
+                Visibility="{x:Bind ViewModel.IsListVisible, Mode=OneWay}">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="pages:AutopilotAchievementRow">
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="32" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="110" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox
+                                MinWidth="0"
+                                IsChecked="{x:Bind IsChecked, Mode=TwoWay}"
+                                AutomationProperties.Name="{x:Bind Name}" />
+                            <TextBlock Grid.Column="1" Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" ToolTipService.ToolTip="{x:Bind Id}" />
+                            <TextBlock Grid.Column="2" Text="{x:Bind PercentText}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            <TextBlock
+                                Grid.Column="3"
+                                Text="{x:Bind StatusText}"
+                                VerticalAlignment="Center"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                TextTrimming="CharacterEllipsis" />
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+    </Grid>
+</ContentDialog>

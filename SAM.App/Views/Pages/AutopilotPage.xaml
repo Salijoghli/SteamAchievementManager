@@ -1,7 +1,895 @@
 <UserControl
     x:Class="SAM.App.Views.Pages.AutopilotPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- TODO(autopilot-ui): placeholder. -->
-    <TextBlock Text="Autopilot" Margin="24" />
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:autopilot="using:SAM.App.Views.Autopilot"
+    xmlns:pages="using:SAM.App.ViewModels.Pages">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <!-- Curve chart colours: the same validated single-series blue as the Stats charts. -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Default">
+                    <SolidColorBrush x:Key="ChartSeriesBrush" Color="#3987E5" />
+                    <SolidColorBrush x:Key="ChartGridBrush" Color="#17FFFFFF" />
+                    <SolidColorBrush x:Key="ChartBaselineBrush" Color="#40FFFFFF" />
+                    <SolidColorBrush x:Key="ChartSurfaceBrush" Color="#2C2C2C" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="ChartSeriesBrush" Color="#2A78D6" />
+                    <SolidColorBrush x:Key="ChartGridBrush" Color="#14000000" />
+                    <SolidColorBrush x:Key="ChartBaselineBrush" Color="#40000000" />
+                    <SolidColorBrush x:Key="ChartSurfaceBrush" Color="#FCFCFC" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
+            <Style x:Key="PanelStyle" TargetType="Border">
+                <Setter Property="Background" Value="{ThemeResource CardBackgroundBrush}" />
+                <Setter Property="BorderBrush" Value="{ThemeResource CardBorderBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
+                <Setter Property="Padding" Value="16" />
+            </Style>
+
+            <Style x:Key="SectionExpanderStyle" TargetType="Expander">
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            </Style>
+
+            <Style x:Key="SectionTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}" />
+
+            <Style x:Key="GroupTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
+                <Setter Property="Margin" Value="0,0,0,4" />
+            </Style>
+
+            <Style x:Key="HintStyle" TargetType="TextBlock" BasedOn="{StaticResource CaptionTextBlockStyle}">
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style>
+
+            <Style x:Key="ErrorStyle" TargetType="TextBlock" BasedOn="{StaticResource CaptionTextBlockStyle}">
+                <Setter Property="Foreground" Value="{ThemeResource SystemFillColorCriticalBrush}" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style>
+
+            <Style x:Key="WarningStyle" TargetType="TextBlock" BasedOn="{StaticResource CaptionTextBlockStyle}">
+                <Setter Property="Foreground" Value="{ThemeResource SystemFillColorCautionBrush}" />
+                <Setter Property="TextWrapping" Value="Wrap" />
+            </Style>
+
+            <Style x:Key="IconButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                <Setter Property="Width" Value="32" />
+                <Setter Property="Height" Value="32" />
+                <Setter Property="Padding" Value="0" />
+            </Style>
+
+            <Style x:Key="GameRowStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+                <Setter Property="Padding" Value="8,4" />
+                <Setter Property="MinHeight" Value="0" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            </Style>
+
+            <!-- A game in the excluded / overrides lists. -->
+            <DataTemplate x:Key="SimpleGameTemplate" x:DataType="pages:AutopilotGameItem">
+                <Grid ColumnSpacing="10" Padding="0,3" AutomationProperties.Name="{x:Bind Name}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="48" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="48" Height="22" CornerRadius="3" Background="{ThemeResource SubtleFillColorSecondaryBrush}">
+                        <Image Source="{x:Bind Image, Mode=OneWay}" Stretch="UniformToFill" />
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" />
+                        <TextBlock
+                            Text="{x:Bind Detail}"
+                            Style="{StaticResource HintStyle}"
+                            TextWrapping="NoWrap"
+                            TextTrimming="CharacterEllipsis"
+                            Visibility="{x:Bind HasDetail}" />
+                    </StackPanel>
+                    <Button
+                        Grid.Column="2"
+                        Style="{StaticResource IconButtonStyle}"
+                        Command="{x:Bind EditOverridesCommand}"
+                        Visibility="{x:Bind CanEditOverrides}"
+                        ToolTipService.ToolTip="{x:Bind OverridesLabel}"
+                        AutomationProperties.Name="{x:Bind OverridesLabel}">
+                        <FontIcon Glyph="&#xE70F;" FontSize="14" />
+                    </Button>
+                    <Button
+                        Grid.Column="3"
+                        Style="{StaticResource IconButtonStyle}"
+                        Command="{x:Bind RemoveCommand}"
+                        ToolTipService.ToolTip="{x:Bind RemoveLabel}"
+                        AutomationProperties.Name="{x:Bind RemoveLabel}">
+                        <FontIcon Glyph="&#xE711;" FontSize="14" />
+                    </Button>
+                </Grid>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollViewer MaxWidth="2400" HorizontalScrollMode="Disabled" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="Column" Padding="24,4,24,24" Spacing="16" SizeChanged="OnColumnSizeChanged">
+
+                <!-- 1. Header. -->
+                <Border Style="{StaticResource PanelStyle}">
+                    <Grid ColumnSpacing="24" RowSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Spacing="4">
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <FontIcon Glyph="&#xE945;" FontSize="20" />
+                                <TextBlock x:Uid="Autopilot_Title" Style="{StaticResource SubtitleTextBlockStyle}" />
+                            </StackPanel>
+                            <TextBlock x:Uid="Autopilot_Intro" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock
+                                Margin="0,6,0,0"
+                                Text="{x:Bind ViewModel.StateText, Mode=OneWay}"
+                                Style="{StaticResource BodyStrongTextBlockStyle}"
+                                TextWrapping="Wrap"
+                                AutomationProperties.LiveSetting="Polite" />
+                            <TextBlock x:Uid="Autopilot_Disclosure" Style="{StaticResource HintStyle}" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Center">
+                            <Button
+                                MinWidth="160"
+                                MinHeight="44"
+                                HorizontalAlignment="Stretch"
+                                Style="{StaticResource AccentButtonStyle}"
+                                IsEnabled="{x:Bind ViewModel.CanToggleRunning, Mode=OneWay}"
+                                Command="{x:Bind ViewModel.ToggleRunningCommand}"
+                                AutomationProperties.Name="{x:Bind ViewModel.StartStopLabel, Mode=OneWay}">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <FontIcon Glyph="{x:Bind ViewModel.StartStopGlyph, Mode=OneWay}" FontSize="16" />
+                                    <TextBlock Text="{x:Bind ViewModel.StartStopLabel, Mode=OneWay}" FontSize="16" FontWeight="SemiBold" />
+                                    <ProgressRing Width="16" Height="16" IsActive="{x:Bind ViewModel.IsToggling, Mode=OneWay}" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                                </StackPanel>
+                            </Button>
+                            <Button HorizontalAlignment="Stretch" Command="{x:Bind ViewModel.PreviewAllCommand}" x:Uid="Autopilot_PreviewAllButton">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE9D9;" FontSize="14" />
+                                    <TextBlock x:Uid="Autopilot_PreviewAllLabel" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Spacing="8">
+                            <InfoBar
+                                x:Uid="Autopilot_EngineErrorBar"
+                                Severity="Warning"
+                                IsClosable="False"
+                                Message="{x:Bind ViewModel.EngineError, Mode=OneWay}"
+                                IsOpen="{x:Bind ViewModel.HasEngineError, Mode=OneWay}" />
+                            <InfoBar
+                                x:Uid="Autopilot_ActionErrorBar"
+                                Severity="Error"
+                                Message="{x:Bind ViewModel.ActionError, Mode=OneWay}"
+                                IsOpen="{x:Bind ViewModel.HasActionError, Mode=TwoWay}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 2. Status. -->
+                <StackPanel Spacing="10">
+                    <TextBlock x:Uid="Autopilot_StatusTitle" Style="{StaticResource SectionTitleStyle}" />
+                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.Status}" x:Uid="Autopilot_StatusList">
+                        <ItemsRepeater.Layout>
+                            <UniformGridLayout MinItemWidth="380" MinColumnSpacing="12" MinRowSpacing="12" ItemsStretch="Fill" />
+                        </ItemsRepeater.Layout>
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate x:DataType="pages:AutopilotStatusItem">
+                                <Border Style="{StaticResource PanelStyle}" Padding="12" AutomationProperties.Name="{x:Bind AutomationName, Mode=OneWay}">
+                                    <Grid RowSpacing="8">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <Grid ColumnSpacing="12">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="92" />
+                                                <ColumnDefinition Width="*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Border Width="92" Height="43" CornerRadius="4" Background="{ThemeResource SubtleFillColorSecondaryBrush}">
+                                                <Image Source="{x:Bind Image, Mode=OneWay}" Stretch="UniformToFill" />
+                                            </Border>
+                                            <StackPanel Grid.Column="1" Spacing="4" VerticalAlignment="Center">
+                                                <TextBlock Text="{x:Bind Name, Mode=OneWay}" Style="{StaticResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis" />
+                                                <Border Padding="7,1,8,2" CornerRadius="9" HorizontalAlignment="Left" Background="{x:Bind KindBrush, Mode=OneWay}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                                        <FontIcon Glyph="{x:Bind KindGlyph, Mode=OneWay}" FontSize="10" Foreground="White" />
+                                                        <TextBlock Text="{x:Bind KindText, Mode=OneWay}" FontSize="11" FontWeight="SemiBold" Foreground="White" />
+                                                    </StackPanel>
+                                                </Border>
+                                            </StackPanel>
+                                        </Grid>
+                                        <StackPanel Grid.Row="1" Spacing="4">
+                                            <ProgressBar
+                                                Maximum="{x:Bind ProgressMaximum, Mode=OneWay}"
+                                                Value="{x:Bind ProgressValue, Mode=OneWay}"
+                                                Visibility="{x:Bind HasTarget, Mode=OneWay}"
+                                                AutomationProperties.Name="{x:Bind ProgressText, Mode=OneWay}" />
+                                            <TextBlock Text="{x:Bind ProgressText, Mode=OneWay}" Style="{StaticResource HintStyle}" />
+                                            <TextBlock Text="{x:Bind CountsText, Mode=OneWay}" Style="{StaticResource CaptionTextBlockStyle}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="6" Visibility="{x:Bind HasNext, Mode=OneWay}">
+                                            <FontIcon Glyph="&#xE823;" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock Text="{x:Bind NextText, Mode=OneWay}" Style="{StaticResource HintStyle}" />
+                                        </StackPanel>
+                                        <TextBlock
+                                            Grid.Row="3"
+                                            Text="{x:Bind Message, Mode=OneWay}"
+                                            Style="{StaticResource HintStyle}"
+                                            Visibility="{x:Bind HasMessage, Mode=OneWay}" />
+                                        <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="6">
+                                            <Button Command="{x:Bind TogglePauseCommand}" AutomationProperties.Name="{x:Bind PauseLabel, Mode=OneWay}">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <FontIcon Glyph="{x:Bind PauseGlyph, Mode=OneWay}" FontSize="12" />
+                                                    <TextBlock Text="{x:Bind PauseLabel, Mode=OneWay}" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{x:Bind PreviewCommand}" x:Uid="Autopilot_CardPreview">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <FontIcon Glyph="&#xE9D9;" FontSize="12" />
+                                                    <TextBlock x:Uid="Autopilot_CardPreviewLabel" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Style="{StaticResource IconButtonStyle}" x:Uid="Autopilot_CardMore">
+                                                <FontIcon Glyph="&#xE712;" FontSize="14" />
+                                                <Button.Flyout>
+                                                    <MenuFlyout Placement="Bottom">
+                                                        <MenuFlyoutItem x:Uid="Autopilot_CardOverrides" Command="{x:Bind EditOverridesCommand}">
+                                                            <MenuFlyoutItem.Icon>
+                                                                <FontIcon Glyph="&#xE70F;" />
+                                                            </MenuFlyoutItem.Icon>
+                                                        </MenuFlyoutItem>
+                                                        <MenuFlyoutItem x:Uid="Autopilot_CardOpenGame" Command="{x:Bind OpenGameCommand}">
+                                                            <MenuFlyoutItem.Icon>
+                                                                <FontIcon Glyph="&#xE8A7;" />
+                                                            </MenuFlyoutItem.Icon>
+                                                        </MenuFlyoutItem>
+                                                        <MenuFlyoutSeparator />
+                                                        <MenuFlyoutItem x:Uid="Autopilot_CardReset" Command="{x:Bind ResetCommand}">
+                                                            <MenuFlyoutItem.Icon>
+                                                                <FontIcon Glyph="&#xE777;" />
+                                                            </MenuFlyoutItem.Icon>
+                                                        </MenuFlyoutItem>
+                                                        <MenuFlyoutItem x:Uid="Autopilot_CardRemove" Command="{x:Bind RemoveFromAutopilotCommand}">
+                                                            <MenuFlyoutItem.Icon>
+                                                                <FontIcon Glyph="&#xE711;" />
+                                                            </MenuFlyoutItem.Icon>
+                                                        </MenuFlyoutItem>
+                                                    </MenuFlyout>
+                                                </Button.Flyout>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+
+                    <!-- Nothing configured. -->
+                    <Border Style="{StaticResource PanelStyle}" Padding="24" Visibility="{x:Bind ViewModel.IsStatusEmpty, Mode=OneWay}">
+                        <StackPanel HorizontalAlignment="Center" Spacing="10">
+                            <FontIcon Glyph="&#xE945;" FontSize="40" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                            <TextBlock x:Uid="Autopilot_EmptyTitle" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" />
+                            <TextBlock
+                                x:Uid="Autopilot_EmptyBody"
+                                MaxWidth="460"
+                                TextAlignment="Center"
+                                TextWrapping="Wrap"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <Button
+                                HorizontalAlignment="Center"
+                                Style="{StaticResource AccentButtonStyle}"
+                                Command="{x:Bind ViewModel.AddGamesCommand}"
+                                x:Uid="Autopilot_EmptyAddGames" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- 3. Games. -->
+                <Expander Style="{StaticResource SectionExpanderStyle}" IsExpanded="True">
+                    <Expander.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="12" Padding="0,10">
+                            <FontIcon Glyph="&#xE7FC;" FontSize="16" />
+                            <StackPanel>
+                                <TextBlock x:Uid="Autopilot_GamesTitle" Style="{StaticResource SectionTitleStyle}" />
+                                <TextBlock x:Uid="Autopilot_GamesSubtitle" Style="{StaticResource HintStyle}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander.Header>
+                    <Grid x:Name="GamesColumns" ColumnSpacing="32" RowSpacing="24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Source and the manual queue. -->
+                        <StackPanel Spacing="10">
+                            <ComboBox
+                                x:Uid="Autopilot_Source"
+                                MinWidth="280"
+                                ItemsSource="{x:Bind pages:AutopilotViewModel.SourceOptions}"
+                                SelectedIndex="{x:Bind ViewModel.SourceIndex, Mode=TwoWay}" />
+                            <ComboBox
+                                x:Uid="Autopilot_Collection"
+                                MinWidth="280"
+                                ItemsSource="{x:Bind ViewModel.CollectionOptions, Mode=OneWay}"
+                                SelectedIndex="{x:Bind ViewModel.CollectionIndex, Mode=TwoWay}"
+                                Visibility="{x:Bind ViewModel.IsCollectionSource, Mode=OneWay}" />
+                            <TextBlock Text="{x:Bind ViewModel.CollectionError, Mode=OneWay}" Style="{StaticResource ErrorStyle}" Visibility="{x:Bind ViewModel.HasCollectionError, Mode=OneWay}" />
+                            <ComboBox
+                                x:Uid="Autopilot_SmartList"
+                                MinWidth="280"
+                                ItemsSource="{x:Bind pages:AutopilotViewModel.SmartListOptions}"
+                                SelectedIndex="{x:Bind ViewModel.SmartListIndex, Mode=TwoWay}"
+                                Visibility="{x:Bind ViewModel.IsSmartListSource, Mode=OneWay}" />
+                            <TextBlock Text="{x:Bind ViewModel.SourceSummary, Mode=OneWay}" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.VisibleIfText(ViewModel.SourceSummary), Mode=OneWay}" />
+
+                            <StackPanel Spacing="8" Visibility="{x:Bind ViewModel.IsManualSource, Mode=OneWay}">
+                                <Grid Margin="0,6,0,0">
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock x:Uid="Autopilot_ManualTitle" Style="{StaticResource GroupTitleStyle}" Margin="0" />
+                                        <TextBlock x:Uid="Autopilot_ManualHint" Style="{StaticResource HintStyle}" />
+                                    </StackPanel>
+                                    <Button HorizontalAlignment="Right" VerticalAlignment="Center" Command="{x:Bind ViewModel.AddGamesCommand}" x:Uid="Autopilot_AddGamesButton">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <FontIcon Glyph="&#xE710;" FontSize="14" />
+                                            <TextBlock x:Uid="Autopilot_AddGamesLabel" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                                <ListView
+                                    x:Uid="Autopilot_ManualList"
+                                    MaxHeight="440"
+                                    SelectionMode="None"
+                                    CanDragItems="True"
+                                    CanReorderItems="True"
+                                    AllowDrop="True"
+                                    ItemsSource="{x:Bind ViewModel.ManualGames}"
+                                    ItemContainerStyle="{StaticResource GameRowStyle}"
+                                    Visibility="{x:Bind ViewModel.HasManualGames, Mode=OneWay}">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate x:DataType="pages:AutopilotGameItem">
+                                            <Grid ColumnSpacing="10" AutomationProperties.Name="{x:Bind Name}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="64" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <FontIcon Glyph="&#xE76F;" FontSize="12" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                                <Border Grid.Column="1" Width="64" Height="30" CornerRadius="3" Background="{ThemeResource SubtleFillColorSecondaryBrush}">
+                                                    <Image Source="{x:Bind Image, Mode=OneWay}" Stretch="UniformToFill" />
+                                                </Border>
+                                                <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <TextBlock Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" />
+                                                        <Border
+                                                            Padding="6,0,6,1"
+                                                            CornerRadius="8"
+                                                            VerticalAlignment="Center"
+                                                            Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                                            Visibility="{x:Bind HasOverride, Mode=OneWay}">
+                                                            <TextBlock x:Uid="Autopilot_OverrideBadge" FontSize="11" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
+                                                        </Border>
+                                                    </StackPanel>
+                                                    <TextBlock Text="{x:Bind Detail}" Style="{StaticResource HintStyle}" Visibility="{x:Bind HasDetail}" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2">
+                                                    <Button
+                                                        Style="{StaticResource IconButtonStyle}"
+                                                        IsEnabled="{x:Bind CanMoveUp, Mode=OneWay}"
+                                                        Command="{x:Bind MoveUpCommand}"
+                                                        ToolTipService.ToolTip="{x:Bind MoveUpLabel}"
+                                                        AutomationProperties.Name="{x:Bind MoveUpLabel}">
+                                                        <FontIcon Glyph="&#xE70E;" FontSize="12" />
+                                                    </Button>
+                                                    <Button
+                                                        Style="{StaticResource IconButtonStyle}"
+                                                        IsEnabled="{x:Bind CanMoveDown, Mode=OneWay}"
+                                                        Command="{x:Bind MoveDownCommand}"
+                                                        ToolTipService.ToolTip="{x:Bind MoveDownLabel}"
+                                                        AutomationProperties.Name="{x:Bind MoveDownLabel}">
+                                                        <FontIcon Glyph="&#xE70D;" FontSize="12" />
+                                                    </Button>
+                                                    <Button
+                                                        Style="{StaticResource IconButtonStyle}"
+                                                        Command="{x:Bind EditOverridesCommand}"
+                                                        ToolTipService.ToolTip="{x:Bind OverridesLabel}"
+                                                        AutomationProperties.Name="{x:Bind OverridesLabel}">
+                                                        <FontIcon Glyph="&#xE70F;" FontSize="12" />
+                                                    </Button>
+                                                    <Button
+                                                        Style="{StaticResource IconButtonStyle}"
+                                                        Command="{x:Bind RemoveCommand}"
+                                                        ToolTipService.ToolTip="{x:Bind RemoveLabel}"
+                                                        AutomationProperties.Name="{x:Bind RemoveLabel}">
+                                                        <FontIcon Glyph="&#xE711;" FontSize="12" />
+                                                    </Button>
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                                <TextBlock x:Uid="Autopilot_ManualEmpty" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.HasManualGames), Mode=OneWay}" />
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Exclusions, overrides and concurrency. -->
+                        <StackPanel Grid.Column="1" Spacing="20">
+                            <StackPanel Spacing="6">
+                                <Grid>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock x:Uid="Autopilot_ExcludedTitle" Style="{StaticResource GroupTitleStyle}" Margin="0" />
+                                        <TextBlock x:Uid="Autopilot_ExcludedHint" Style="{StaticResource HintStyle}" />
+                                    </StackPanel>
+                                    <Button HorizontalAlignment="Right" VerticalAlignment="Center" Command="{x:Bind ViewModel.AddExcludedCommand}" x:Uid="Autopilot_AddExcludedButton" />
+                                </Grid>
+                                <ItemsControl ItemsSource="{x:Bind ViewModel.ExcludedGames}" ItemTemplate="{StaticResource SimpleGameTemplate}" />
+                                <TextBlock x:Uid="Autopilot_NoneYet" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.HasExcludedGames), Mode=OneWay}" />
+                            </StackPanel>
+
+                            <StackPanel Spacing="6">
+                                <Grid>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock x:Uid="Autopilot_OverridesTitle" Style="{StaticResource GroupTitleStyle}" Margin="0" />
+                                        <TextBlock x:Uid="Autopilot_OverridesHint" Style="{StaticResource HintStyle}" />
+                                    </StackPanel>
+                                    <Button HorizontalAlignment="Right" VerticalAlignment="Center" Command="{x:Bind ViewModel.AddOverrideCommand}" x:Uid="Autopilot_AddOverrideButton" />
+                                </Grid>
+                                <ItemsControl ItemsSource="{x:Bind ViewModel.OverrideGames}" ItemTemplate="{StaticResource SimpleGameTemplate}" />
+                                <TextBlock x:Uid="Autopilot_NoneYet" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.HasOverrideGames), Mode=OneWay}" />
+                            </StackPanel>
+
+                            <StackPanel Spacing="4">
+                                <NumberBox
+                                    x:Uid="Autopilot_MaxConcurrent"
+                                    HorizontalAlignment="Left"
+                                    MinWidth="200"
+                                    Minimum="1"
+                                    Maximum="32"
+                                    SmallChange="1"
+                                    LargeChange="4"
+                                    SpinButtonPlacementMode="Inline"
+                                    Value="{x:Bind ViewModel.MaxConcurrentGames, Mode=TwoWay}" />
+                                <TextBlock x:Uid="Autopilot_MaxConcurrentHint" Style="{StaticResource HintStyle}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                </Expander>
+
+                <!-- 4. Rules. -->
+                <Expander Style="{StaticResource SectionExpanderStyle}">
+                    <Expander.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="12" Padding="0,10">
+                            <FontIcon Glyph="&#xE9E9;" FontSize="16" />
+                            <StackPanel>
+                                <TextBlock x:Uid="Autopilot_RulesTitle" Style="{StaticResource SectionTitleStyle}" />
+                                <TextBlock x:Uid="Autopilot_RulesSubtitle" Style="{StaticResource HintStyle}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander.Header>
+                    <StackPanel Spacing="16">
+                        <!-- Profile picker. -->
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <ComboBox
+                                x:Uid="Autopilot_Profile"
+                                MinWidth="260"
+                                ItemsSource="{x:Bind ViewModel.ProfileOptions, Mode=OneWay}"
+                                SelectedIndex="{x:Bind ViewModel.ProfileIndex, Mode=TwoWay}" />
+                            <Button VerticalAlignment="Bottom" Command="{x:Bind ViewModel.NewProfileCommand}" x:Uid="Autopilot_NewProfile">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE710;" FontSize="14" />
+                                    <TextBlock x:Uid="Autopilot_NewProfileLabel" />
+                                </StackPanel>
+                            </Button>
+                            <Button VerticalAlignment="Bottom" Command="{x:Bind ViewModel.DuplicateProfileCommand}" x:Uid="Autopilot_DuplicateProfile" />
+                            <Button VerticalAlignment="Bottom" Command="{x:Bind ViewModel.RenameProfileCommand}" x:Uid="Autopilot_RenameProfile" />
+                            <Button VerticalAlignment="Bottom" Command="{x:Bind ViewModel.DeleteProfileCommand}" x:Uid="Autopilot_DeleteProfile" />
+                        </StackPanel>
+                        <InfoBar
+                            x:Uid="Autopilot_BuiltInBar"
+                            Severity="Informational"
+                            IsClosable="False"
+                            IsOpen="{x:Bind ViewModel.IsBuiltInProfile, Mode=OneWay}">
+                            <InfoBar.ActionButton>
+                                <Button x:Uid="Autopilot_DuplicateToEdit" Command="{x:Bind ViewModel.DuplicateProfileCommand}" />
+                            </InfoBar.ActionButton>
+                        </InfoBar>
+
+                        <Grid x:Name="RulesColumns" ColumnSpacing="16" RowSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Spacing="16">
+                                <!-- What to unlock. -->
+                                <Border Style="{StaticResource PanelStyle}">
+                                    <ContentControl HorizontalContentAlignment="Stretch" IsTabStop="False" IsEnabled="{x:Bind ViewModel.Profile.IsEditable, Mode=OneWay}">
+                                        <StackPanel Spacing="10">
+                                            <TextBlock x:Uid="Autopilot_WhatTitle" Style="{StaticResource GroupTitleStyle}" />
+                                            <NumberBox
+                                                x:Uid="Autopilot_MinGlobalPercent"
+                                                HorizontalAlignment="Left"
+                                                MinWidth="200"
+                                                Minimum="0"
+                                                Maximum="100"
+                                                SmallChange="1"
+                                                LargeChange="5"
+                                                SpinButtonPlacementMode="Compact"
+                                                Value="{x:Bind ViewModel.Profile.MinGlobalPercent, Mode=TwoWay}" />
+                                            <TextBlock x:Uid="Autopilot_MinGlobalPercentHint" Style="{StaticResource HintStyle}" Margin="0,-6,0,0" />
+                                            <ToggleSwitch x:Uid="Autopilot_IncludeRare" IsOn="{x:Bind ViewModel.Profile.IncludeRare, Mode=TwoWay}" />
+                                            <NumberBox
+                                                x:Uid="Autopilot_RareThreshold"
+                                                HorizontalAlignment="Left"
+                                                MinWidth="200"
+                                                Minimum="0"
+                                                Maximum="100"
+                                                SmallChange="0.5"
+                                                LargeChange="5"
+                                                SpinButtonPlacementMode="Compact"
+                                                Value="{x:Bind ViewModel.Profile.RareThresholdPercent, Mode=TwoWay}" />
+                                            <TextBlock Text="{x:Bind ViewModel.Profile.RareWarning, Mode=OneWay}" Style="{StaticResource WarningStyle}" Visibility="{x:Bind pages:AutopilotFormat.VisibleIfText(ViewModel.Profile.RareWarning), Mode=OneWay}" />
+                                            <ToggleSwitch x:Uid="Autopilot_IncludeUnknown" IsOn="{x:Bind ViewModel.Profile.IncludeUnknownRarity, Mode=TwoWay}" />
+                                            <NumberBox
+                                                x:Uid="Autopilot_UnknownAs"
+                                                HorizontalAlignment="Left"
+                                                MinWidth="200"
+                                                Minimum="0.01"
+                                                Maximum="100"
+                                                SmallChange="1"
+                                                LargeChange="5"
+                                                SpinButtonPlacementMode="Compact"
+                                                Value="{x:Bind ViewModel.Profile.UnknownPercentAs, Mode=TwoWay}"
+                                                Visibility="{x:Bind ViewModel.Profile.IncludeUnknownRarity, Mode=OneWay}" />
+                                            <ToggleSwitch x:Uid="Autopilot_SkipHidden" IsOn="{x:Bind ViewModel.Profile.SkipHidden, Mode=TwoWay}" />
+                                            <ToggleSwitch x:Uid="Autopilot_UpdateLinkedStats" IsOn="{x:Bind ViewModel.Profile.UpdateLinkedStats, Mode=TwoWay}" />
+                                            <TextBlock x:Uid="Autopilot_UpdateLinkedStatsHint" Style="{StaticResource HintStyle}" Margin="0,-6,0,0" />
+                                        </StackPanel>
+                                    </ContentControl>
+                                </Border>
+
+                                <!-- How long. -->
+                                <Border Style="{StaticResource PanelStyle}">
+                                    <ContentControl HorizontalContentAlignment="Stretch" IsTabStop="False" IsEnabled="{x:Bind ViewModel.Profile.IsEditable, Mode=OneWay}">
+                                        <StackPanel Spacing="10">
+                                            <TextBlock x:Uid="Autopilot_HowLongTitle" Style="{StaticResource GroupTitleStyle}" />
+                                            <ComboBox
+                                                x:Uid="Autopilot_TargetMode"
+                                                MinWidth="260"
+                                                ItemsSource="{x:Bind pages:AutopilotProfileEditor.TargetModeOptions}"
+                                                SelectedIndex="{x:Bind ViewModel.Profile.TargetModeIndex, Mode=TwoWay}" />
+                                            <NumberBox
+                                                x:Uid="Autopilot_TargetHours"
+                                                HorizontalAlignment="Left"
+                                                MinWidth="200"
+                                                Minimum="0.1"
+                                                Maximum="100000"
+                                                SmallChange="1"
+                                                LargeChange="10"
+                                                SpinButtonPlacementMode="Compact"
+                                                Value="{x:Bind ViewModel.Profile.TargetHours, Mode=TwoWay}"
+                                                Visibility="{x:Bind ViewModel.Profile.HasTargetHours, Mode=OneWay}" />
+                                            <ToggleSwitch x:Uid="Autopilot_StopWhenAllUnlocked" IsOn="{x:Bind ViewModel.Profile.StopWhenAllUnlocked, Mode=TwoWay}" />
+                                        </StackPanel>
+                                    </ContentControl>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Pacing. -->
+                            <Border Grid.Column="1" Style="{StaticResource PanelStyle}">
+                                <ContentControl HorizontalContentAlignment="Stretch" IsTabStop="False" IsEnabled="{x:Bind ViewModel.Profile.IsEditable, Mode=OneWay}">
+                                    <StackPanel Spacing="10">
+                                        <TextBlock x:Uid="Autopilot_PacingTitle" Style="{StaticResource GroupTitleStyle}" />
+                                        <RadioButtons
+                                            x:Uid="Autopilot_Pacing"
+                                            MaxColumns="2"
+                                            ItemsSource="{x:Bind pages:AutopilotProfileEditor.PacingOptions}"
+                                            SelectedIndex="{x:Bind ViewModel.Profile.PacingIndex, Mode=TwoWay}" />
+
+                                        <!-- Playtime curve: table + chart. -->
+                                        <StackPanel Spacing="8" Visibility="{x:Bind ViewModel.Profile.IsPlaytimePacing, Mode=OneWay}">
+                                            <TextBlock x:Uid="Autopilot_CurveHint" Style="{StaticResource HintStyle}" />
+                                            <Grid x:Name="CurveColumns" ColumnSpacing="16" RowSpacing="12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Spacing="6">
+                                                    <Grid ColumnSpacing="8">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="32" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock x:Uid="Autopilot_CurvePercentHeader" Style="{StaticResource HintStyle}" />
+                                                        <TextBlock Grid.Column="1" x:Uid="Autopilot_CurveHoursHeader" Style="{StaticResource HintStyle}" />
+                                                    </Grid>
+                                                    <ItemsControl ItemsSource="{x:Bind ViewModel.Profile.Points, Mode=OneWay}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate x:DataType="pages:AutopilotCurvePointItem">
+                                                                <StackPanel Spacing="2" Margin="0,0,0,6">
+                                                                    <Grid ColumnSpacing="8">
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="*" />
+                                                                            <ColumnDefinition Width="*" />
+                                                                            <ColumnDefinition Width="32" />
+                                                                        </Grid.ColumnDefinitions>
+                                                                        <NumberBox
+                                                                            x:Uid="Autopilot_CurvePercentBox"
+                                                                            Minimum="0.01"
+                                                                            Maximum="100"
+                                                                            SmallChange="1"
+                                                                            SpinButtonPlacementMode="Hidden"
+                                                                            Value="{x:Bind Percent, Mode=TwoWay}" />
+                                                                        <NumberBox
+                                                                            Grid.Column="1"
+                                                                            x:Uid="Autopilot_CurveHoursBox"
+                                                                            Minimum="0"
+                                                                            Maximum="100000"
+                                                                            SmallChange="1"
+                                                                            SpinButtonPlacementMode="Hidden"
+                                                                            Value="{x:Bind Hours, Mode=TwoWay}" />
+                                                                        <Button
+                                                                            Grid.Column="2"
+                                                                            Style="{StaticResource IconButtonStyle}"
+                                                                            Command="{x:Bind RemoveCommand}"
+                                                                            ToolTipService.ToolTip="{x:Bind RemoveLabel}"
+                                                                            AutomationProperties.Name="{x:Bind RemoveLabel}">
+                                                                            <FontIcon Glyph="&#xE711;" FontSize="12" />
+                                                                        </Button>
+                                                                    </Grid>
+                                                                    <TextBlock Text="{x:Bind Error, Mode=OneWay}" Style="{StaticResource ErrorStyle}" Visibility="{x:Bind HasError, Mode=OneWay}" />
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <Button Command="{x:Bind ViewModel.Profile.AddPointCommand, Mode=OneWay}" x:Uid="Autopilot_CurveAdd">
+                                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                                <FontIcon Glyph="&#xE710;" FontSize="12" />
+                                                                <TextBlock x:Uid="Autopilot_CurveAddLabel" />
+                                                            </StackPanel>
+                                                        </Button>
+                                                        <Button Command="{x:Bind ViewModel.Profile.SortCurveCommand, Mode=OneWay}" x:Uid="Autopilot_CurveSort" />
+                                                        <Button Command="{x:Bind ViewModel.Profile.ResetCurveCommand, Mode=OneWay}" x:Uid="Autopilot_CurveReset" />
+                                                    </StackPanel>
+                                                    <TextBlock Text="{x:Bind ViewModel.Profile.CurveError, Mode=OneWay}" Style="{StaticResource ErrorStyle}" Visibility="{x:Bind pages:AutopilotFormat.VisibleIfText(ViewModel.Profile.CurveError), Mode=OneWay}" />
+                                                    <TextBlock Text="{x:Bind ViewModel.Profile.CurveWarning, Mode=OneWay}" Style="{StaticResource WarningStyle}" Visibility="{x:Bind pages:AutopilotFormat.VisibleIfText(ViewModel.Profile.CurveWarning), Mode=OneWay}" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Spacing="4">
+                                                    <TextBlock x:Uid="Autopilot_CurveChartTitle" Style="{StaticResource HintStyle}" />
+                                                    <autopilot:CurveChart
+                                                        x:Uid="Autopilot_CurveChart"
+                                                        Height="220"
+                                                        Points="{x:Bind ViewModel.Profile.ChartPoints, Mode=OneWay}"
+                                                        SeriesBrush="{ThemeResource ChartSeriesBrush}"
+                                                        GridBrush="{ThemeResource ChartGridBrush}"
+                                                        BaselineBrush="{ThemeResource ChartBaselineBrush}"
+                                                        AxisLabelBrush="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        SurfaceBrush="{ThemeResource ChartSurfaceBrush}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </StackPanel>
+
+                                        <NumberBox
+                                            x:Uid="Autopilot_IntervalMinutes"
+                                            HorizontalAlignment="Left"
+                                            MinWidth="200"
+                                            Minimum="1"
+                                            Maximum="10080"
+                                            SmallChange="5"
+                                            LargeChange="30"
+                                            SpinButtonPlacementMode="Compact"
+                                            Value="{x:Bind ViewModel.Profile.IntervalMinutes, Mode=TwoWay}"
+                                            Visibility="{x:Bind ViewModel.Profile.IsIntervalPacing, Mode=OneWay}" />
+
+                                        <StackPanel Spacing="0">
+                                            <TextBlock Text="{x:Bind ViewModel.Profile.JitterText, Mode=OneWay}" />
+                                            <Slider
+                                                x:Uid="Autopilot_Jitter"
+                                                MaxWidth="360"
+                                                HorizontalAlignment="Left"
+                                                Width="360"
+                                                Minimum="0"
+                                                Maximum="100"
+                                                StepFrequency="5"
+                                                Value="{x:Bind ViewModel.Profile.JitterPercent, Mode=TwoWay}" />
+                                            <TextBlock x:Uid="Autopilot_JitterHint" Style="{StaticResource HintStyle}" />
+                                        </StackPanel>
+                                        <ComboBox
+                                            x:Uid="Autopilot_Order"
+                                            MinWidth="260"
+                                            ItemsSource="{x:Bind pages:AutopilotProfileEditor.OrderOptions}"
+                                            SelectedIndex="{x:Bind ViewModel.Profile.OrderIndex, Mode=TwoWay}" />
+                                        <StackPanel Orientation="Horizontal" Spacing="12">
+                                            <NumberBox
+                                                x:Uid="Autopilot_MinMinutesBetween"
+                                                MinWidth="160"
+                                                Minimum="0"
+                                                Maximum="1440"
+                                                SmallChange="5"
+                                                SpinButtonPlacementMode="Compact"
+                                                Value="{x:Bind ViewModel.Profile.MinMinutesBetweenUnlocks, Mode=TwoWay}" />
+                                            <NumberBox
+                                                x:Uid="Autopilot_MaxPerHour"
+                                                MinWidth="140"
+                                                Minimum="0"
+                                                Maximum="10000"
+                                                SmallChange="1"
+                                                SpinButtonPlacementMode="Compact"
+                                                Value="{x:Bind ViewModel.Profile.MaxUnlocksPerHour, Mode=TwoWay}" />
+                                            <NumberBox
+                                                x:Uid="Autopilot_MaxPerDay"
+                                                MinWidth="140"
+                                                Minimum="0"
+                                                Maximum="10000"
+                                                SmallChange="1"
+                                                SpinButtonPlacementMode="Compact"
+                                                Value="{x:Bind ViewModel.Profile.MaxUnlocksPerDay, Mode=TwoWay}" />
+                                        </StackPanel>
+                                        <TextBlock x:Uid="Autopilot_LimitsHint" Style="{StaticResource HintStyle}" />
+                                    </StackPanel>
+                                </ContentControl>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Expander>
+
+                <!-- 5. Schedule. -->
+                <Expander Style="{StaticResource SectionExpanderStyle}">
+                    <Expander.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="12" Padding="0,10">
+                            <FontIcon Glyph="&#xE787;" FontSize="16" />
+                            <StackPanel>
+                                <TextBlock x:Uid="Autopilot_ScheduleTitle" Style="{StaticResource SectionTitleStyle}" />
+                                <TextBlock x:Uid="Autopilot_ScheduleSubtitle" Style="{StaticResource HintStyle}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander.Header>
+                    <Grid x:Name="ScheduleColumns" ColumnSpacing="32" RowSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Spacing="10">
+                            <ToggleSwitch x:Uid="Autopilot_AllDay" IsOn="{x:Bind ViewModel.IsAllDay, Mode=TwoWay}" />
+                            <StackPanel Orientation="Horizontal" Spacing="12" Visibility="{x:Bind ViewModel.HasActiveWindow, Mode=OneWay}">
+                                <TimePicker x:Uid="Autopilot_ActiveFrom" MinuteIncrement="5" Time="{x:Bind ViewModel.ActiveFrom, Mode=TwoWay}" />
+                                <TimePicker x:Uid="Autopilot_ActiveTo" MinuteIncrement="5" Time="{x:Bind ViewModel.ActiveTo, Mode=TwoWay}" />
+                            </StackPanel>
+                            <TextBlock x:Uid="Autopilot_WindowHint" Style="{StaticResource HintStyle}" Visibility="{x:Bind ViewModel.HasActiveWindow, Mode=OneWay}" />
+                            <TextBlock Text="{x:Bind ViewModel.ScheduleError, Mode=OneWay}" Style="{StaticResource ErrorStyle}" Visibility="{x:Bind ViewModel.HasScheduleError, Mode=OneWay}" />
+
+                            <TextBlock x:Uid="Autopilot_DaysTitle" Margin="0,8,0,0" />
+                            <ItemsControl ItemsSource="{x:Bind ViewModel.Days}" x:Uid="Autopilot_DaysList">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" Spacing="6" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="pages:AutopilotDayToggle">
+                                        <ToggleButton
+                                            MinWidth="48"
+                                            Padding="10,4"
+                                            CornerRadius="14"
+                                            Content="{x:Bind Name}"
+                                            IsChecked="{x:Bind IsChecked, Mode=TwoWay}"
+                                            ToolTipService.ToolTip="{x:Bind FullName}"
+                                            AutomationProperties.Name="{x:Bind FullName}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="{x:Bind ViewModel.DaysError, Mode=OneWay}" Style="{StaticResource ErrorStyle}" Visibility="{x:Bind ViewModel.HasDaysError, Mode=OneWay}" />
+                            <TextBlock Text="{x:Bind ViewModel.ScheduleSummary, Mode=OneWay}" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.VisibleIfText(ViewModel.ScheduleSummary), Mode=OneWay}" />
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Spacing="10">
+                            <ToggleSwitch x:Uid="Autopilot_QuietHours" IsOn="{x:Bind ViewModel.HasQuietHours, Mode=TwoWay}" />
+                            <StackPanel Orientation="Horizontal" Spacing="12" Visibility="{x:Bind ViewModel.HasQuietHours, Mode=OneWay}">
+                                <TimePicker x:Uid="Autopilot_QuietFrom" MinuteIncrement="5" Time="{x:Bind ViewModel.QuietFrom, Mode=TwoWay}" />
+                                <TimePicker x:Uid="Autopilot_QuietTo" MinuteIncrement="5" Time="{x:Bind ViewModel.QuietTo, Mode=TwoWay}" />
+                            </StackPanel>
+                            <TextBlock x:Uid="Autopilot_QuietHint" Style="{StaticResource HintStyle}" />
+                            <TextBlock Text="{x:Bind ViewModel.QuietError, Mode=OneWay}" Style="{StaticResource ErrorStyle}" Visibility="{x:Bind ViewModel.HasQuietError, Mode=OneWay}" />
+                            <NumberBox
+                                x:Uid="Autopilot_MaxHoursPerDay"
+                                Margin="0,8,0,0"
+                                HorizontalAlignment="Left"
+                                MinWidth="200"
+                                Minimum="0"
+                                Maximum="24"
+                                SmallChange="0.5"
+                                LargeChange="2"
+                                SpinButtonPlacementMode="Compact"
+                                Value="{x:Bind ViewModel.MaxHoursPerGamePerDay, Mode=TwoWay}" />
+                            <TextBlock x:Uid="Autopilot_MaxHoursPerDayHint" Style="{StaticResource HintStyle}" />
+                            <ToggleSwitch x:Uid="Autopilot_PauseWhileGaming" IsOn="{x:Bind ViewModel.PauseWhileGaming, Mode=TwoWay}" />
+                            <TextBlock x:Uid="Autopilot_PauseWhileGamingHint" Style="{StaticResource HintStyle}" Margin="0,-6,0,0" />
+                        </StackPanel>
+                    </Grid>
+                </Expander>
+
+                <!-- 6. Behaviour. -->
+                <Expander Style="{StaticResource SectionExpanderStyle}">
+                    <Expander.Header>
+                        <StackPanel Orientation="Horizontal" Spacing="12" Padding="0,10">
+                            <FontIcon Glyph="&#xE713;" FontSize="16" />
+                            <StackPanel>
+                                <TextBlock x:Uid="Autopilot_BehaviourTitle" Style="{StaticResource SectionTitleStyle}" />
+                                <TextBlock x:Uid="Autopilot_BehaviourSubtitle" Style="{StaticResource HintStyle}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Expander.Header>
+                    <Grid x:Name="BehaviourColumns" ColumnSpacing="32" RowSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Spacing="10">
+                            <RadioButtons
+                                x:Uid="Autopilot_Notify"
+                                ItemsSource="{x:Bind pages:AutopilotViewModel.NotifyOptions}"
+                                SelectedIndex="{x:Bind ViewModel.NotifyIndex, Mode=TwoWay}" />
+                            <ToggleSwitch x:Uid="Autopilot_BackupBeforeUnlock" IsOn="{x:Bind ViewModel.BackupBeforeUnlock, Mode=TwoWay}" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="10">
+                            <ToggleSwitch x:Uid="Autopilot_StartWithWindows" IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}" />
+                            <TextBlock x:Uid="Autopilot_StartWithWindowsHint" Style="{StaticResource HintStyle}" Margin="0,-6,0,0" />
+                            <ToggleSwitch x:Uid="Autopilot_ResumeOnStartup" IsOn="{x:Bind ViewModel.ResumeOnStartup, Mode=TwoWay}" />
+                        </StackPanel>
+                    </Grid>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Unsaved changes. -->
+        <Border
+            Grid.Row="1"
+            Padding="24,10"
+            BorderThickness="0,1,0,0"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            Background="{ThemeResource SolidBackgroundFillColorSecondaryBrush}"
+            Visibility="{x:Bind ViewModel.IsDirty, Mode=OneWay}">
+            <Grid MaxWidth="2352" ColumnSpacing="12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel VerticalAlignment="Center" Spacing="2">
+                    <TextBlock x:Uid="Autopilot_UnsavedTitle" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                    <TextBlock x:Uid="Autopilot_UnsavedHint" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.HasErrors), Mode=OneWay}" />
+                    <TextBlock Text="{x:Bind ViewModel.ErrorsText, Mode=OneWay}" Style="{StaticResource ErrorStyle}" Visibility="{x:Bind ViewModel.HasErrors, Mode=OneWay}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <Button Command="{x:Bind ViewModel.PreviewAllCommand}" x:Uid="Autopilot_SaveBarPreview" />
+                    <Button Command="{x:Bind ViewModel.DiscardCommand}" x:Uid="Autopilot_Discard" />
+                    <Button Style="{StaticResource AccentButtonStyle}" Command="{x:Bind ViewModel.SaveCommand}" x:Uid="Autopilot_Save" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
 </UserControl>

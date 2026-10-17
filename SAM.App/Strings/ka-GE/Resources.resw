@@ -2163,4 +2163,955 @@
   <data name="History_ShownOfTotal_Other" xml:space="preserve">
     <value>{1} / {0} შენახვა</value>
   </data>
+  <data name="Autopilot_GameWarning.Title" xml:space="preserve">
+    <value>ამ თამაშს ავტოპილოტი უშვებს</value>
+  </data>
+  <data name="Autopilot_GameWarning.Message" xml:space="preserve">
+    <value>აქ შენახული ცვლილებები შეიძლება ავტოპილოტს შეეჯახოს — ჯერ ავტოპილოტში დააპაუზეთ ეს თამაში.</value>
+  </data>
+  <data name="Autopilot_Title.Text" xml:space="preserve">
+    <value>ავტოპილოტი</value>
+  </data>
+  <data name="Autopilot_Intro.Text" xml:space="preserve">
+    <value>უშვებს თამაშებს ფონურ რეჟიმში, რომ Steam-მა თამაშის დრო ჩაითვალოს, და მიღწევებს თანდათან განბლოკავს ქვემოთ მოცემული წესებით.</value>
+  </data>
+  <data name="Autopilot_Disclosure.Text" xml:space="preserve">
+    <value>ავტოპილოტი განბლოკვებს ისე აჩვენებს, თითქოს დროთა განმავლობაში იყოს მოპოვებული. ეს Steam-ის წესებს ეწინააღმდეგება — გადაწყვეტილება თქვენზეა.</value>
+  </data>
+  <data name="Autopilot_Start" xml:space="preserve">
+    <value>დაწყება</value>
+  </data>
+  <data name="Autopilot_Stop" xml:space="preserve">
+    <value>გაჩერება</value>
+  </data>
+  <data name="Autopilot_PreviewAllButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>სიის ყველა თამაშის გეგმის გადახედვა შეუნახავი ცვლილებებით</value>
+  </data>
+  <data name="Autopilot_PreviewAllButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ყველას გადახედვა</value>
+  </data>
+  <data name="Autopilot_CardPreview.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>გადახედვა</value>
+  </data>
+  <data name="Autopilot_AddGamesButton.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თამაშების დამატება</value>
+  </data>
+  <data name="Autopilot_NewProfile.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ახალი პროფილი</value>
+  </data>
+  <data name="Autopilot_CurveAdd.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>წერტილის დამატება</value>
+  </data>
+  <data name="Autopilot_PreviewAllLabel.Text" xml:space="preserve">
+    <value>ყველას გადახედვა</value>
+  </data>
+  <data name="Autopilot_EngineErrorBar.Title" xml:space="preserve">
+    <value>ავტოპილოტი მიუწვდომელია</value>
+  </data>
+  <data name="Autopilot_ActionErrorBar.Title" xml:space="preserve">
+    <value>რაღაც შეცდომა მოხდა</value>
+  </data>
+  <data name="Autopilot_EngineUnavailable" xml:space="preserve">
+    <value>ავტოპილოტი ამ ვერსიაში ჯერ მიუწვდომელია. პარამეტრების დათვალიერება მაინც შეგიძლიათ.</value>
+  </data>
+  <data name="Autopilot_ErrorDetail" xml:space="preserve">
+    <value>ავტოპილოტის შეცდომა: {0}</value>
+  </data>
+  <data name="Autopilot_StateStopped" xml:space="preserve">
+    <value>გაჩერებულია</value>
+  </data>
+  <data name="Autopilot_StateUnavailable" xml:space="preserve">
+    <value>მიუწვდომელია</value>
+  </data>
+  <data name="Autopilot_StateRunning_One" xml:space="preserve">
+    <value>ეშვება {0} თამაში</value>
+  </data>
+  <data name="Autopilot_StateRunning_Other" xml:space="preserve">
+    <value>ეშვება {0} თამაში</value>
+  </data>
+  <data name="Autopilot_StateIdle" xml:space="preserve">
+    <value>ჩართულია, ამჟამად არცერთი თამაში არ არის აქტიური</value>
+  </data>
+  <data name="Autopilot_StateRunningNext" xml:space="preserve">
+    <value>{0} · შემდეგი განბლოკვა {1}</value>
+  </data>
+  <data name="Autopilot_EtaNow" xml:space="preserve">
+    <value>ნებისმიერ წამს</value>
+  </data>
+  <data name="Autopilot_EtaMinutes_One" xml:space="preserve">
+    <value>{0} წთ-ში</value>
+  </data>
+  <data name="Autopilot_EtaMinutes_Other" xml:space="preserve">
+    <value>{0} წთ-ში</value>
+  </data>
+  <data name="Autopilot_EtaHours_One" xml:space="preserve">
+    <value>{0} სთ-ში</value>
+  </data>
+  <data name="Autopilot_EtaHours_Other" xml:space="preserve">
+    <value>{0} სთ-ში</value>
+  </data>
+  <data name="Autopilot_EtaDays_One" xml:space="preserve">
+    <value>{0} დღეში</value>
+  </data>
+  <data name="Autopilot_EtaDays_Other" xml:space="preserve">
+    <value>{0} დღეში</value>
+  </data>
+  <data name="Autopilot_StatusTitle.Text" xml:space="preserve">
+    <value>მდგომარეობა</value>
+  </data>
+  <data name="Autopilot_StatusList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ავტოპილოტის თამაშები</value>
+  </data>
+  <data name="Autopilot_StatusQueued" xml:space="preserve">
+    <value>რიგშია</value>
+  </data>
+  <data name="Autopilot_StatusStarting" xml:space="preserve">
+    <value>ეშვება</value>
+  </data>
+  <data name="Autopilot_StatusRunning" xml:space="preserve">
+    <value>მუშაობს</value>
+  </data>
+  <data name="Autopilot_StatusWaitingForSchedule" xml:space="preserve">
+    <value>განრიგს ელოდება</value>
+  </data>
+  <data name="Autopilot_StatusPausedWhileGaming" xml:space="preserve">
+    <value>შეჩერებულია, სანამ თამაშობთ</value>
+  </data>
+  <data name="Autopilot_StatusPausedByUser" xml:space="preserve">
+    <value>დაპაუზებულია</value>
+  </data>
+  <data name="Autopilot_StatusDailyLimitReached" xml:space="preserve">
+    <value>დღიური ლიმიტი ამოიწურა</value>
+  </data>
+  <data name="Autopilot_StatusCompleted" xml:space="preserve">
+    <value>დასრულდა</value>
+  </data>
+  <data name="Autopilot_StatusError" xml:space="preserve">
+    <value>შეცდომა</value>
+  </data>
+  <data name="Autopilot_Pause" xml:space="preserve">
+    <value>პაუზა</value>
+  </data>
+  <data name="Autopilot_Resume" xml:space="preserve">
+    <value>გაგრძელება</value>
+  </data>
+  <data name="Autopilot_ProgressAdded" xml:space="preserve">
+    <value>ავტოპილოტით დამატებულია {0} / {1}</value>
+  </data>
+  <data name="Autopilot_ProgressTotal" xml:space="preserve">
+    <value>თამაშის საერთო დრო: {0} / {1}</value>
+  </data>
+  <data name="Autopilot_ProgressNoTarget" xml:space="preserve">
+    <value>ნათამაშებია {0} · ავტოპილოტით {1} · დროის მიზნის გარეშე</value>
+  </data>
+  <data name="Autopilot_Counts" xml:space="preserve">
+    <value>{0} · {1}</value>
+  </data>
+  <data name="Autopilot_UnlockedByAutopilot_One" xml:space="preserve">
+    <value>ავტოპილოტით განბლოკილია {0}</value>
+  </data>
+  <data name="Autopilot_UnlockedByAutopilot_Other" xml:space="preserve">
+    <value>ავტოპილოტით განბლოკილია {0}</value>
+  </data>
+  <data name="Autopilot_Remaining_One" xml:space="preserve">
+    <value>დარჩა {0}</value>
+  </data>
+  <data name="Autopilot_Remaining_Other" xml:space="preserve">
+    <value>დარჩა {0}</value>
+  </data>
+  <data name="Autopilot_NextUnlock" xml:space="preserve">
+    <value>შემდეგი: {0}</value>
+  </data>
+  <data name="Autopilot_NextUnlockEta" xml:space="preserve">
+    <value>შემდეგი: {0}, {1}</value>
+  </data>
+  <data name="Autopilot_CardPreview.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ამ თამაშის გეგმის გადახედვა</value>
+  </data>
+  <data name="Autopilot_CardPreviewLabel.Text" xml:space="preserve">
+    <value>გადახედვა</value>
+  </data>
+  <data name="Autopilot_CardMore.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>სხვა მოქმედებები</value>
+  </data>
+  <data name="Autopilot_CardMore.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>სხვა მოქმედებები</value>
+  </data>
+  <data name="Autopilot_CardOverrides.Text" xml:space="preserve">
+    <value>ინდივიდუალური პარამეტრები…</value>
+  </data>
+  <data name="Autopilot_CardOpenGame.Text" xml:space="preserve">
+    <value>თამაშის გახსნა</value>
+  </data>
+  <data name="Autopilot_CardReset.Text" xml:space="preserve">
+    <value>პროგრესის განულება…</value>
+  </data>
+  <data name="Autopilot_CardRemove.Text" xml:space="preserve">
+    <value>ავტოპილოტიდან ამოღება</value>
+  </data>
+  <data name="Autopilot_ResetTitle" xml:space="preserve">
+    <value>განულდეს ავტოპილოტის პროგრესი?</value>
+  </data>
+  <data name="Autopilot_ResetMessage" xml:space="preserve">
+    <value>ავტოპილოტი დაივიწყებს დროსა და ტემპს, რომელსაც თამაშისთვის „{0}“ აღრიცხავდა. უკვე განბლოკილი მიღწევები განბლოკილი დარჩება.</value>
+  </data>
+  <data name="Autopilot_ResetConfirm" xml:space="preserve">
+    <value>განულება</value>
+  </data>
+  <data name="Autopilot_EmptyTitle.Text" xml:space="preserve">
+    <value>დასაწყებად დაამატეთ თამაშები</value>
+  </data>
+  <data name="Autopilot_EmptyBody.Text" xml:space="preserve">
+    <value>აირჩიეთ, რომელი თამაშები გაუშვას ავტოპილოტმა: თავად აარჩიეთ ან ქვემოთ, „თამაშებში“, გამოიყენეთ კოლექცია ან ჭკვიანი სია.</value>
+  </data>
+  <data name="Autopilot_EmptyAddGames.Content" xml:space="preserve">
+    <value>თამაშების დამატება…</value>
+  </data>
+  <data name="Autopilot_GamesTitle.Text" xml:space="preserve">
+    <value>თამაშები</value>
+  </data>
+  <data name="Autopilot_GamesSubtitle.Text" xml:space="preserve">
+    <value>რომელი თამაშები ეშვება, რა თანმიმდევრობით და რამდენი ერთდროულად</value>
+  </data>
+  <data name="Autopilot_Source.Header" xml:space="preserve">
+    <value>თამაშების წყარო</value>
+  </data>
+  <data name="Autopilot_SourceManual" xml:space="preserve">
+    <value>ჩემ მიერ არჩეული თამაშები</value>
+  </data>
+  <data name="Autopilot_SourceAllWithLocked" xml:space="preserve">
+    <value>ყველა თამაში დაბლოკილი მიღწევებით</value>
+  </data>
+  <data name="Autopilot_SourceCollection" xml:space="preserve">
+    <value>კოლექცია</value>
+  </data>
+  <data name="Autopilot_SourceSmartList" xml:space="preserve">
+    <value>ჭკვიანი სია</value>
+  </data>
+  <data name="Autopilot_SourceInstalled" xml:space="preserve">
+    <value>დაინსტალირებული თამაშები დაბლოკილი მიღწევებით</value>
+  </data>
+  <data name="Autopilot_Collection.Header" xml:space="preserve">
+    <value>კოლექცია</value>
+  </data>
+  <data name="Autopilot_Collection.PlaceholderText" xml:space="preserve">
+    <value>აირჩიეთ კოლექცია</value>
+  </data>
+  <data name="Autopilot_SmartList.Header" xml:space="preserve">
+    <value>ჭკვიანი სია</value>
+  </data>
+  <data name="Autopilot_SamCollection" xml:space="preserve">
+    <value>{0} (SAM)</value>
+  </data>
+  <data name="Autopilot_MissingCollection" xml:space="preserve">
+    <value>კოლექცია ვერ მოიძებნა</value>
+  </data>
+  <data name="Autopilot_SourceMatches_One" xml:space="preserve">
+    <value>ახლა შეესაბამება {0} თამაში</value>
+  </data>
+  <data name="Autopilot_SourceMatches_Other" xml:space="preserve">
+    <value>ახლა შეესაბამება {0} თამაში</value>
+  </data>
+  <data name="Autopilot_ManualTitle.Text" xml:space="preserve">
+    <value>გაშვების რიგი</value>
+  </data>
+  <data name="Autopilot_ManualHint.Text" xml:space="preserve">
+    <value>თანმიმდევრობის შესაცვლელად გადაათრიეთ ან გამოიყენეთ ისრები. სიაში ზემოთ მყოფი თამაშები პირველად ეშვება.</value>
+  </data>
+  <data name="Autopilot_AddGamesButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>სიაში თამაშების დამატება</value>
+  </data>
+  <data name="Autopilot_AddGamesLabel.Text" xml:space="preserve">
+    <value>თამაშების დამატება…</value>
+  </data>
+  <data name="Autopilot_ManualList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ავტოპილოტის თამაშები რიგის მიხედვით</value>
+  </data>
+  <data name="Autopilot_ManualEmpty.Text" xml:space="preserve">
+    <value>თამაშები ჯერ არ არის. დასაწყებად დაამატეთ.</value>
+  </data>
+  <data name="Autopilot_OverrideBadge.Text" xml:space="preserve">
+    <value>ინდივიდუალური</value>
+  </data>
+  <data name="Autopilot_ExcludedTitle.Text" xml:space="preserve">
+    <value>გამორიცხული თამაშები</value>
+  </data>
+  <data name="Autopilot_ExcludedHint.Text" xml:space="preserve">
+    <value>არასოდეს ეშვება, წყაროს მიუხედავად</value>
+  </data>
+  <data name="Autopilot_AddExcludedButton.Content" xml:space="preserve">
+    <value>გამორიცხვა…</value>
+  </data>
+  <data name="Autopilot_OverridesTitle.Text" xml:space="preserve">
+    <value>ინდივიდუალური პარამეტრები</value>
+  </data>
+  <data name="Autopilot_OverridesHint.Text" xml:space="preserve">
+    <value>განსხვავებული წესები ან მიღწევები კონკრეტული თამაშებისთვის</value>
+  </data>
+  <data name="Autopilot_AddOverrideButton.Content" xml:space="preserve">
+    <value>დამატება…</value>
+  </data>
+  <data name="Autopilot_NoneYet.Text" xml:space="preserve">
+    <value>არცერთი</value>
+  </data>
+  <data name="Autopilot_MaxConcurrent.Header" xml:space="preserve">
+    <value>ერთდროულად გაშვებული თამაშები</value>
+  </data>
+  <data name="Autopilot_MaxConcurrentHint.Text" xml:space="preserve">
+    <value>1–32. Steam ერთდროულად დაახლოებით 32 თამაშის გაშვებას იძლევა.</value>
+  </data>
+  <data name="Autopilot_AddGamesTitle" xml:space="preserve">
+    <value>თამაშების დამატება</value>
+  </data>
+  <data name="Autopilot_AddGamesPrimary" xml:space="preserve">
+    <value>დამატება</value>
+  </data>
+  <data name="Autopilot_ExcludeGamesTitle" xml:space="preserve">
+    <value>თამაშების გამორიცხვა</value>
+  </data>
+  <data name="Autopilot_ExcludeGamesPrimary" xml:space="preserve">
+    <value>გამორიცხვა</value>
+  </data>
+  <data name="Autopilot_OverrideGameTitle" xml:space="preserve">
+    <value>აირჩიეთ თამაში ინდივიდუალური პარამეტრებისთვის</value>
+  </data>
+  <data name="Autopilot_OverrideGamePrimary" xml:space="preserve">
+    <value>შემდეგი</value>
+  </data>
+  <data name="Autopilot_RemoveNamed" xml:space="preserve">
+    <value>{0} — ამოღება</value>
+  </data>
+  <data name="Autopilot_MoveUpNamed" xml:space="preserve">
+    <value>{0} — ზემოთ აწევა</value>
+  </data>
+  <data name="Autopilot_MoveDownNamed" xml:space="preserve">
+    <value>{0} — ქვემოთ ჩამოწევა</value>
+  </data>
+  <data name="Autopilot_OverridesNamed" xml:space="preserve">
+    <value>{0} — ინდივიდუალური პარამეტრები</value>
+  </data>
+  <data name="Autopilot_GameProgress" xml:space="preserve">
+    <value>{0} / {1} მიღწევა</value>
+  </data>
+  <data name="Autopilot_OverrideSummaryProfile" xml:space="preserve">
+    <value>პროფილი: {0}</value>
+  </data>
+  <data name="Autopilot_OverrideSummaryTarget" xml:space="preserve">
+    <value>საკუთარი დროის მიზანი</value>
+  </data>
+  <data name="Autopilot_OverrideSummaryRareOn" xml:space="preserve">
+    <value>იშვიათები ჩართულია</value>
+  </data>
+  <data name="Autopilot_OverrideSummaryRareOff" xml:space="preserve">
+    <value>იშვიათები გამოტოვებულია</value>
+  </data>
+  <data name="Autopilot_OverrideSummaryOnly_One" xml:space="preserve">
+    <value>მხოლოდ {0} მიღწევა</value>
+  </data>
+  <data name="Autopilot_OverrideSummaryOnly_Other" xml:space="preserve">
+    <value>მხოლოდ {0} მიღწევა</value>
+  </data>
+  <data name="Autopilot_OverrideSummaryExcluded_One" xml:space="preserve">
+    <value>{0} გამორიცხული</value>
+  </data>
+  <data name="Autopilot_OverrideSummaryExcluded_Other" xml:space="preserve">
+    <value>{0} გამორიცხული</value>
+  </data>
+  <data name="Autopilot_PickerSearch.PlaceholderText" xml:space="preserve">
+    <value>თამაშის ან App ID-ის ძიება</value>
+  </data>
+  <data name="Autopilot_PickerLockedOnly.Content" xml:space="preserve">
+    <value>მხოლოდ დაბლოკილი მიღწევებით</value>
+  </data>
+  <data name="Autopilot_PickerLoading.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თამაშები იტვირთება</value>
+  </data>
+  <data name="Autopilot_PickerList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თამაშები</value>
+  </data>
+  <data name="Autopilot_PickerEmpty.Text" xml:space="preserve">
+    <value>შესაბამისი თამაში ვერ მოიძებნა.</value>
+  </data>
+  <data name="Autopilot_PickerCount" xml:space="preserve">
+    <value>{0} · {1}</value>
+  </data>
+  <data name="Autopilot_PickerShown_One" xml:space="preserve">
+    <value>ნაჩვენებია {0} თამაში</value>
+  </data>
+  <data name="Autopilot_PickerShown_Other" xml:space="preserve">
+    <value>ნაჩვენებია {0} თამაში</value>
+  </data>
+  <data name="Autopilot_PickerSelected_One" xml:space="preserve">
+    <value>არჩეულია {0}</value>
+  </data>
+  <data name="Autopilot_PickerSelected_Other" xml:space="preserve">
+    <value>არჩეულია {0}</value>
+  </data>
+  <data name="Autopilot_RulesTitle.Text" xml:space="preserve">
+    <value>წესები</value>
+  </data>
+  <data name="Autopilot_RulesSubtitle.Text" xml:space="preserve">
+    <value>რა განიბლოკოს, რა სისწრაფით და რამდენ ხანს — ინახება პროფილებად</value>
+  </data>
+  <data name="Autopilot_Profile.Header" xml:space="preserve">
+    <value>პროფილი</value>
+  </data>
+  <data name="Autopilot_NewProfile.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ახალი პროფილი მიმდინარე წესებიდან</value>
+  </data>
+  <data name="Autopilot_NewProfileLabel.Text" xml:space="preserve">
+    <value>ახალი</value>
+  </data>
+  <data name="Autopilot_DuplicateProfile.Content" xml:space="preserve">
+    <value>დუბლირება</value>
+  </data>
+  <data name="Autopilot_RenameProfile.Content" xml:space="preserve">
+    <value>გადარქმევა</value>
+  </data>
+  <data name="Autopilot_DeleteProfile.Content" xml:space="preserve">
+    <value>წაშლა</value>
+  </data>
+  <data name="Autopilot_BuiltInBar.Title" xml:space="preserve">
+    <value>ჩაშენებული პროფილი</value>
+  </data>
+  <data name="Autopilot_BuiltInBar.Message" xml:space="preserve">
+    <value>ჩაშენებული პროფილების შეცვლა შეუძლებელია. საკუთარის შესაქმნელად შექმენით ასლი.</value>
+  </data>
+  <data name="Autopilot_DuplicateToEdit.Content" xml:space="preserve">
+    <value>ასლის შექმნა რედაქტირებისთვის</value>
+  </data>
+  <data name="Autopilot_BuiltInProfileName" xml:space="preserve">
+    <value>{0} (ჩაშენებული)</value>
+  </data>
+  <data name="Autopilot_NewProfileTitle" xml:space="preserve">
+    <value>ახალი პროფილი</value>
+  </data>
+  <data name="Autopilot_NewProfileName" xml:space="preserve">
+    <value>ჩემი პროფილი</value>
+  </data>
+  <data name="Autopilot_DuplicateProfileTitle" xml:space="preserve">
+    <value>პროფილის დუბლირება</value>
+  </data>
+  <data name="Autopilot_ProfileCopyName" xml:space="preserve">
+    <value>{0} — ასლი</value>
+  </data>
+  <data name="Autopilot_ProfileNumbered" xml:space="preserve">
+    <value>{0} {1}</value>
+  </data>
+  <data name="Autopilot_RenameProfileTitle" xml:space="preserve">
+    <value>პროფილის გადარქმევა</value>
+  </data>
+  <data name="Autopilot_ProfileNamePlaceholder" xml:space="preserve">
+    <value>პროფილის სახელი</value>
+  </data>
+  <data name="Autopilot_ProfileNameTaken" xml:space="preserve">
+    <value>ამ სახელით პროფილი უკვე არსებობს.</value>
+  </data>
+  <data name="Autopilot_DeleteProfileTitle" xml:space="preserve">
+    <value>წაიშალოს პროფილი?</value>
+  </data>
+  <data name="Autopilot_DeleteProfileMessage" xml:space="preserve">
+    <value>წაიშალოს „{0}“? ავტოპილოტი ჩაშენებულ პროფილზე გადავა.</value>
+  </data>
+  <data name="Autopilot_DeleteProfileMessageUsed_One" xml:space="preserve">
+    <value>წაიშალოს „{1}“? მას ინდივიდუალურ პარამეტრებში {0} თამაში იყენებს — ის აქტიურ პროფილზე გადავა.</value>
+  </data>
+  <data name="Autopilot_DeleteProfileMessageUsed_Other" xml:space="preserve">
+    <value>წაიშალოს „{1}“? მას ინდივიდუალურ პარამეტრებში {0} თამაში იყენებს — ისინი აქტიურ პროფილზე გადავა.</value>
+  </data>
+  <data name="Autopilot_WhatTitle.Text" xml:space="preserve">
+    <value>რა განიბლოკოს</value>
+  </data>
+  <data name="Autopilot_MinGlobalPercent.Header" xml:space="preserve">
+    <value>მოთამაშეთა მინიმალური წილი (%)</value>
+  </data>
+  <data name="Autopilot_MinGlobalPercentHint.Text" xml:space="preserve">
+    <value>მხოლოდ ის მიღწევები, რომლებიც მოთამაშეთა სულ მცირე ამ წილს აქვს. 0 = ზღვრის გარეშე.</value>
+  </data>
+  <data name="Autopilot_IncludeRare.Header" xml:space="preserve">
+    <value>იშვიათი მიღწევების ჩართვა</value>
+  </data>
+  <data name="Autopilot_RareThreshold.Header" xml:space="preserve">
+    <value>იშვიათია, თუ აქვს ნაკლებს, ვიდრე (%)</value>
+  </data>
+  <data name="Autopilot_RareBelowMinimum" xml:space="preserve">
+    <value>მინიმალური წილი იშვიათობის ზღვარს უდრის ან აღემატება, ამიტომ იშვიათი მიღწევა ვერ განიბლოკება.</value>
+  </data>
+  <data name="Autopilot_IncludeUnknown.Header" xml:space="preserve">
+    <value>იშვიათობის მონაცემების არმქონე მიღწევების ჩართვა</value>
+  </data>
+  <data name="Autopilot_UnknownAs.Header" xml:space="preserve">
+    <value>ჩაითვალოს, რომ აქვს (%)</value>
+  </data>
+  <data name="Autopilot_SkipHidden.Header" xml:space="preserve">
+    <value>დამალული მიღწევების გამოტოვება</value>
+  </data>
+  <data name="Autopilot_UpdateLinkedStats.Header" xml:space="preserve">
+    <value>ჯერ დაკავშირებული სტატისტიკის განახლება</value>
+  </data>
+  <data name="Autopilot_UpdateLinkedStatsHint.Text" xml:space="preserve">
+    <value>პროგრესის სტატისტიკის მქონე მიღწევის განბლოკვამდე სტატისტიკას სამიზნე მნიშვნელობამდე ზრდის, რომ ერთმანეთს შეესაბამებოდეს.</value>
+  </data>
+  <data name="Autopilot_PacingTitle.Text" xml:space="preserve">
+    <value>ტემპი</value>
+  </data>
+  <data name="Autopilot_Pacing.Header" xml:space="preserve">
+    <value>განბლოკვის წესი</value>
+  </data>
+  <data name="Autopilot_PacingPlaytime" xml:space="preserve">
+    <value>თამაშის დრო და იშვიათობა</value>
+  </data>
+  <data name="Autopilot_PacingInterval" xml:space="preserve">
+    <value>ფიქსირებული ინტერვალი</value>
+  </data>
+  <data name="Autopilot_CurveHint.Text" xml:space="preserve">
+    <value>თითო სტრიქონი: მიღწევები, რომლებიც მოთამაშეთა ამ წილს აქვს, განიბლოკება თამაშის ამდენი საერთო დროის შემდეგ. შუალედური მნიშვნელობები ხაზს მიჰყვება (ლოგარითმული სკალა), ამიტომ გავრცელებული მიღწევები პირველად განიბლოკება.</value>
+  </data>
+  <data name="Autopilot_CurvePercentHeader.Text" xml:space="preserve">
+    <value>აქვს მოთამაშეთა (%)</value>
+  </data>
+  <data name="Autopilot_CurveHoursHeader.Text" xml:space="preserve">
+    <value>განიბლოკება (საათის შემდეგ)</value>
+  </data>
+  <data name="Autopilot_CurvePercentBox.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>მოთამაშეთა წილი (%)</value>
+  </data>
+  <data name="Autopilot_CurveHoursBox.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თამაშის საათები</value>
+  </data>
+  <data name="Autopilot_CurveRemovePoint" xml:space="preserve">
+    <value>წერტილის წაშლა</value>
+  </data>
+  <data name="Autopilot_CurveAdd.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>უფრო იშვიათი წერტილის დამატება</value>
+  </data>
+  <data name="Autopilot_CurveAddLabel.Text" xml:space="preserve">
+    <value>წერტილის დამატება</value>
+  </data>
+  <data name="Autopilot_CurveSort.Content" xml:space="preserve">
+    <value>დალაგება</value>
+  </data>
+  <data name="Autopilot_CurveReset.Content" xml:space="preserve">
+    <value>საწყისზე დაბრუნება</value>
+  </data>
+  <data name="Autopilot_CurvePercentRange" xml:space="preserve">
+    <value>წილი უნდა იყოს 0-ზე მეტი და არაუმეტეს 100-ისა.</value>
+  </data>
+  <data name="Autopilot_CurveHoursRange" xml:space="preserve">
+    <value>საათები უარყოფითი ვერ იქნება.</value>
+  </data>
+  <data name="Autopilot_CurveEmpty" xml:space="preserve">
+    <value>თამაშის დროის მრუდს დაამატეთ ერთი წერტილი მაინც.</value>
+  </data>
+  <data name="Autopilot_CurveDuplicate" xml:space="preserve">
+    <value>მრუდის ორ წერტილს მოთამაშეთა ერთნაირი წილი აქვს.</value>
+  </data>
+  <data name="Autopilot_CurveNotIncreasing" xml:space="preserve">
+    <value>ამ მრუდის ზოგიერთ მონაკვეთზე უფრო იშვიათ მიღწევებს ნაკლები დრო სჭირდება. ეს დაშვებულია, მაგრამ უჩვეულოა.</value>
+  </data>
+  <data name="Autopilot_CurveChartTitle.Text" xml:space="preserve">
+    <value>საჭირო საათები მოთამაშეთა წილის მიხედვით (ლოგარითმული სკალა)</value>
+  </data>
+  <data name="Autopilot_CurveChart.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თამაშის დროის მრუდი</value>
+  </data>
+  <data name="Autopilot_CurvePointDescription" xml:space="preserve">
+    <value>მოთამაშეთა {0}: {1}-ის შემდეგ</value>
+  </data>
+  <data name="Autopilot_IntervalMinutes.Header" xml:space="preserve">
+    <value>ერთი განბლოკვა ყოველ (წუთში)</value>
+  </data>
+  <data name="Autopilot_JitterValue" xml:space="preserve">
+    <value>შემთხვევითი გადახრა: ±{0}%</value>
+  </data>
+  <data name="Autopilot_Jitter.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>შემთხვევითი გადახრა</value>
+  </data>
+  <data name="Autopilot_JitterHint.Text" xml:space="preserve">
+    <value>ცვლის ინტერვალებსა და მრუდის საათებს, რომ განბლოკვები რეგულარული რიტმით არ მოხდეს.</value>
+  </data>
+  <data name="Autopilot_Order.Header" xml:space="preserve">
+    <value>თანმიმდევრობა</value>
+  </data>
+  <data name="Autopilot_OrderMostCommonFirst" xml:space="preserve">
+    <value>ჯერ ყველაზე გავრცელებული</value>
+  </data>
+  <data name="Autopilot_OrderSchemaOrder" xml:space="preserve">
+    <value>თამაშის საკუთარი თანმიმდევრობა</value>
+  </data>
+  <data name="Autopilot_OrderRandom" xml:space="preserve">
+    <value>შემთხვევითი</value>
+  </data>
+  <data name="Autopilot_MinMinutesBetween.Header" xml:space="preserve">
+    <value>წუთები განბლოკვებს შორის</value>
+  </data>
+  <data name="Autopilot_MaxPerHour.Header" xml:space="preserve">
+    <value>მაქს. საათში</value>
+  </data>
+  <data name="Autopilot_MaxPerDay.Header" xml:space="preserve">
+    <value>მაქს. დღეში</value>
+  </data>
+  <data name="Autopilot_LimitsHint.Text" xml:space="preserve">
+    <value>თითო თამაშზე. 0 = ლიმიტის გარეშე.</value>
+  </data>
+  <data name="Autopilot_HowLongTitle.Text" xml:space="preserve">
+    <value>რამდენ ხანს ეშვებოდეს</value>
+  </data>
+  <data name="Autopilot_TargetMode.Header" xml:space="preserve">
+    <value>დროის მიზანი</value>
+  </data>
+  <data name="Autopilot_TargetAddHours" xml:space="preserve">
+    <value>ამდენი საათის თამაშის დამატება</value>
+  </data>
+  <data name="Autopilot_TargetUntilTotalHours" xml:space="preserve">
+    <value>სანამ საერთო თამაშის დრო მიაღწევს</value>
+  </data>
+  <data name="Autopilot_TargetUnlimited" xml:space="preserve">
+    <value>დროის მიზნის გარეშე</value>
+  </data>
+  <data name="Autopilot_TargetHours.Header" xml:space="preserve">
+    <value>საათები</value>
+  </data>
+  <data name="Autopilot_StopWhenAllUnlocked.Header" xml:space="preserve">
+    <value>გაჩერდეს, როცა ყველა დაშვებული მიღწევა განიბლოკება</value>
+  </data>
+  <data name="Autopilot_ScheduleTitle.Text" xml:space="preserve">
+    <value>განრიგი</value>
+  </data>
+  <data name="Autopilot_ScheduleSubtitle.Text" xml:space="preserve">
+    <value>როდის შეიძლება თამაშების გაშვება და როდის არაფერი განიბლოკება</value>
+  </data>
+  <data name="Autopilot_AllDay.Header" xml:space="preserve">
+    <value>მთელი დღე</value>
+  </data>
+  <data name="Autopilot_ActiveFrom.Header" xml:space="preserve">
+    <value>დასაწყისი</value>
+  </data>
+  <data name="Autopilot_ActiveTo.Header" xml:space="preserve">
+    <value>დასასრული</value>
+  </data>
+  <data name="Autopilot_WindowHint.Text" xml:space="preserve">
+    <value>ფანჯარა, რომელიც დაწყებაზე ადრე მთავრდება (მაგალითად 22:00–06:00), შუაღამეს გადადის.</value>
+  </data>
+  <data name="Autopilot_ErrorWindowSame" xml:space="preserve">
+    <value>აქტიური ფანჯარა ერთსა და იმავე დროს ვერ დაიწყება და დასრულდება.</value>
+  </data>
+  <data name="Autopilot_ErrorQuietSame" xml:space="preserve">
+    <value>მშვიდი საათები ერთსა და იმავე დროს ვერ დაიწყება და დასრულდება.</value>
+  </data>
+  <data name="Autopilot_ErrorNoDays" xml:space="preserve">
+    <value>აირჩიეთ ერთი დღე მაინც.</value>
+  </data>
+  <data name="Autopilot_ErrorNoCollection" xml:space="preserve">
+    <value>აირჩიეთ კოლექცია.</value>
+  </data>
+  <data name="Autopilot_DaysTitle.Text" xml:space="preserve">
+    <value>დღეები</value>
+  </data>
+  <data name="Autopilot_DaysList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>აქტიური დღეები</value>
+  </data>
+  <data name="Autopilot_QuietHours.Header" xml:space="preserve">
+    <value>მშვიდი საათები</value>
+  </data>
+  <data name="Autopilot_QuietFrom.Header" xml:space="preserve">
+    <value>დასაწყისი</value>
+  </data>
+  <data name="Autopilot_QuietTo.Header" xml:space="preserve">
+    <value>დასასრული</value>
+  </data>
+  <data name="Autopilot_QuietHint.Text" xml:space="preserve">
+    <value>თამაშები გრძელდება, მაგრამ არაფერი განიბლოკება.</value>
+  </data>
+  <data name="Autopilot_MaxHoursPerDay.Header" xml:space="preserve">
+    <value>მაქს. საათი თითო თამაშზე დღეში</value>
+  </data>
+  <data name="Autopilot_MaxHoursPerDayHint.Text" xml:space="preserve">
+    <value>0 = ლიმიტის გარეშე.</value>
+  </data>
+  <data name="Autopilot_PauseWhileGaming.Header" xml:space="preserve">
+    <value>პაუზა, როცა თავად ვთამაშობ</value>
+  </data>
+  <data name="Autopilot_PauseWhileGamingHint.Text" xml:space="preserve">
+    <value>ავტოპილოტის თამაშები პაუზდება, სანამ თავად თამაშობთ.</value>
+  </data>
+  <data name="Autopilot_ScheduleSummary" xml:space="preserve">
+    <value>დაახლოებით {0} მუშაობის დრო თითო თამაშზე დღეში.</value>
+  </data>
+  <data name="Autopilot_BehaviourTitle.Text" xml:space="preserve">
+    <value>ქცევა</value>
+  </data>
+  <data name="Autopilot_BehaviourSubtitle.Text" xml:space="preserve">
+    <value>შეტყობინებები, სარეზერვო ასლები და გაშვება</value>
+  </data>
+  <data name="Autopilot_Notify.Header" xml:space="preserve">
+    <value>შეტყობინებები</value>
+  </data>
+  <data name="Autopilot_NotifyNone" xml:space="preserve">
+    <value>არცერთი</value>
+  </data>
+  <data name="Autopilot_NotifyEachUnlock" xml:space="preserve">
+    <value>ყოველ განბლოკვაზე</value>
+  </data>
+  <data name="Autopilot_NotifyDailySummary" xml:space="preserve">
+    <value>დღიური შეჯამება</value>
+  </data>
+  <data name="Autopilot_BackupBeforeUnlock.Header" xml:space="preserve">
+    <value>მიღწევების სარეზერვო ასლი ყოველი განბლოკვის წინ</value>
+  </data>
+  <data name="Autopilot_StartWithWindows.Header" xml:space="preserve">
+    <value>Windows-თან ერთად გაშვება</value>
+  </data>
+  <data name="Autopilot_StartWithWindowsHint.Text" xml:space="preserve">
+    <value>Windows-ში შესვლისას SAM-ს სისტემურ უჯრაში უშვებს.</value>
+  </data>
+  <data name="Autopilot_ResumeOnStartup.Header" xml:space="preserve">
+    <value>გაგრძელება SAM-ის გაშვებისას, თუ მუშაობდა</value>
+  </data>
+  <data name="Autopilot_UnsavedTitle.Text" xml:space="preserve">
+    <value>შეუნახავი ცვლილებები</value>
+  </data>
+  <data name="Autopilot_UnsavedHint.Text" xml:space="preserve">
+    <value>შენახვამდე ავტოპილოტი შენახულ პარამეტრებს იყენებს. გადახედვა უკვე თქვენს ცვლილებებს იყენებს.</value>
+  </data>
+  <data name="Autopilot_SaveBarPreview.Content" xml:space="preserve">
+    <value>გადახედვა</value>
+  </data>
+  <data name="Autopilot_Discard.Content" xml:space="preserve">
+    <value>გაუქმება</value>
+  </data>
+  <data name="Autopilot_Save.Content" xml:space="preserve">
+    <value>შენახვა</value>
+  </data>
+  <data name="Autopilot_OverridesDialog.Title" xml:space="preserve">
+    <value>ინდივიდუალური პარამეტრები</value>
+  </data>
+  <data name="Autopilot_OverridesDialog.PrimaryButtonText" xml:space="preserve">
+    <value>გამოყენება</value>
+  </data>
+  <data name="Autopilot_OverridesDialog.CloseButtonText" xml:space="preserve">
+    <value>გაუქმება</value>
+  </data>
+  <data name="Autopilot_OverrideProfile.Header" xml:space="preserve">
+    <value>პროფილი</value>
+  </data>
+  <data name="Autopilot_OverrideUseActive" xml:space="preserve">
+    <value>აქტიური პროფილი ({0})</value>
+  </data>
+  <data name="Autopilot_OverrideTarget.Header" xml:space="preserve">
+    <value>დროის მიზანი</value>
+  </data>
+  <data name="Autopilot_OverrideUseProfile" xml:space="preserve">
+    <value>პროფილის პარამეტრი</value>
+  </data>
+  <data name="Autopilot_OverrideTargetHours.Header" xml:space="preserve">
+    <value>საათები</value>
+  </data>
+  <data name="Autopilot_OverrideRare.Header" xml:space="preserve">
+    <value>იშვიათი მიღწევები</value>
+  </data>
+  <data name="Autopilot_OverrideRareInclude" xml:space="preserve">
+    <value>ჩართვა</value>
+  </data>
+  <data name="Autopilot_OverrideRareSkip" xml:space="preserve">
+    <value>გამოტოვება</value>
+  </data>
+  <data name="Autopilot_OverrideMode.Header" xml:space="preserve">
+    <value>მიღწევები</value>
+  </data>
+  <data name="Autopilot_OverrideModeNone.Content" xml:space="preserve">
+    <value>წესების მიხედვით</value>
+  </data>
+  <data name="Autopilot_OverrideModeOnly.Content" xml:space="preserve">
+    <value>მხოლოდ ესენი</value>
+  </data>
+  <data name="Autopilot_OverrideModeExclude.Content" xml:space="preserve">
+    <value>ამათ გარდა</value>
+  </data>
+  <data name="Autopilot_OverrideModeNoneHint" xml:space="preserve">
+    <value>შეიძლება განიბლოკოს ყველა მიღწევა, რომელსაც წესები უშვებს.</value>
+  </data>
+  <data name="Autopilot_OverrideModeOnlyHint" xml:space="preserve">
+    <value>შეიძლება განიბლოკოს მხოლოდ მონიშნული მიღწევები (თუ არცერთი არ არის მონიშნული, წესები წყვეტს).</value>
+  </data>
+  <data name="Autopilot_OverrideModeExcludeHint" xml:space="preserve">
+    <value>მონიშნული მიღწევები არასოდეს განიბლოკება.</value>
+  </data>
+  <data name="Autopilot_OverrideSearch.PlaceholderText" xml:space="preserve">
+    <value>მიღწევების ძიება</value>
+  </data>
+  <data name="Autopilot_OverrideCheckAll.Content" xml:space="preserve">
+    <value>ყველას მონიშვნა</value>
+  </data>
+  <data name="Autopilot_OverrideCheckNone.Content" xml:space="preserve">
+    <value>მონიშვნის მოხსნა</value>
+  </data>
+  <data name="Autopilot_OverrideChecked" xml:space="preserve">
+    <value>მონიშნულია {0} / {1}</value>
+  </data>
+  <data name="Autopilot_ColumnAchievement.Text" xml:space="preserve">
+    <value>მიღწევა</value>
+  </data>
+  <data name="Autopilot_ColumnRarity.Text" xml:space="preserve">
+    <value>იშვიათობა</value>
+  </data>
+  <data name="Autopilot_ColumnStatus.Text" xml:space="preserve">
+    <value>სტატუსი</value>
+  </data>
+  <data name="Autopilot_ColumnGame.Text" xml:space="preserve">
+    <value>თამაში</value>
+  </data>
+  <data name="Autopilot_ColumnPlanned.Text" xml:space="preserve">
+    <value>დაგეგმილი</value>
+  </data>
+  <data name="Autopilot_ColumnEstimate.Text" xml:space="preserve">
+    <value>სავარაუდო დრო</value>
+  </data>
+  <data name="Autopilot_OverrideLoading.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>მიღწევები იტვირთება</value>
+  </data>
+  <data name="Autopilot_OverrideList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>მიღწევები</value>
+  </data>
+  <data name="Autopilot_OverrideNoSchema" xml:space="preserve">
+    <value>ამ კომპიუტერზე ამ თამაშის მიღწევების მონაცემები ჯერ არ არის. ერთხელ გახსენით SAM-ში ან Steam-ში და სცადეთ თავიდან.</value>
+  </data>
+  <data name="Autopilot_AchievementUnlocked" xml:space="preserve">
+    <value>განბლოკილი</value>
+  </data>
+  <data name="Autopilot_AchievementLocked" xml:space="preserve">
+    <value>დაბლოკილი</value>
+  </data>
+  <data name="Autopilot_AchievementProtected" xml:space="preserve">
+    <value>დაცული</value>
+  </data>
+  <data name="Autopilot_AchievementHidden" xml:space="preserve">
+    <value>დამალული, დაბლოკილი</value>
+  </data>
+  <data name="Autopilot_PreviewDialog.Title" xml:space="preserve">
+    <value>გადახედვა</value>
+  </data>
+  <data name="Autopilot_PreviewIntro.Text" xml:space="preserve">
+    <value>რას გააკეთებდა ავტოპილოტი მიმდინარე პარამეტრებით, შეუნახავი ცვლილებების ჩათვლით. არაფერი იცვლება.</value>
+  </data>
+  <data name="Autopilot_PreviewGame.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>თამაში</value>
+  </data>
+  <data name="Autopilot_PreviewAllGames_One" xml:space="preserve">
+    <value>ყველა თამაში ({0})</value>
+  </data>
+  <data name="Autopilot_PreviewAllGames_Other" xml:space="preserve">
+    <value>ყველა თამაში ({0})</value>
+  </data>
+  <data name="Autopilot_PreviewTruncated" xml:space="preserve">
+    <value>გადახედვა მხოლოდ პირველი {0} თამაშისთვისაა.</value>
+  </data>
+  <data name="Autopilot_PreviewLoading.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>იგეგმება</value>
+  </data>
+  <data name="Autopilot_PreviewProgress" xml:space="preserve">
+    <value>იგეგმება თამაში {0} / {1}…</value>
+  </data>
+  <data name="Autopilot_PreviewNoGames.Text" xml:space="preserve">
+    <value>გადასახედი თამაშები არ არის. დაამატეთ თამაშები ან აირჩიეთ სხვა წყარო.</value>
+  </data>
+  <data name="Autopilot_PreviewTable.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>დაგეგმილი განბლოკვები</value>
+  </data>
+  <data name="Autopilot_PreviewAtPlaytime" xml:space="preserve">
+    <value>თამაშის {0}-ზე</value>
+  </data>
+  <data name="Autopilot_PreviewSomeFailed_One" xml:space="preserve">
+    <value>{0} თამაშის დაგეგმვა ვერ მოხერხდა: {1}</value>
+  </data>
+  <data name="Autopilot_PreviewSomeFailed_Other" xml:space="preserve">
+    <value>{0} თამაშის დაგეგმვა ვერ მოხერხდა: {1}</value>
+  </data>
+  <data name="Autopilot_PreviewNothingPlanned" xml:space="preserve">
+    <value>არაფერი განიბლოკება</value>
+  </data>
+  <data name="Autopilot_PreviewWillUnlockDays_One" xml:space="preserve">
+    <value>{0} განიბლოკება ~{1} განმავლობაში</value>
+  </data>
+  <data name="Autopilot_PreviewWillUnlockDays_Other" xml:space="preserve">
+    <value>{0} განიბლოკება ~{1} განმავლობაში</value>
+  </data>
+  <data name="Autopilot_PreviewWillUnlockHours_One" xml:space="preserve">
+    <value>{0} განიბლოკება თამაშის ~{1}-ში</value>
+  </data>
+  <data name="Autopilot_PreviewWillUnlockHours_Other" xml:space="preserve">
+    <value>{0} განიბლოკება თამაშის ~{1}-ში</value>
+  </data>
+  <data name="Autopilot_Days_One" xml:space="preserve">
+    <value>{0} დღის</value>
+  </data>
+  <data name="Autopilot_Days_Other" xml:space="preserve">
+    <value>{0} დღის</value>
+  </data>
+  <data name="Autopilot_PreviewSkipped_One" xml:space="preserve">
+    <value>{0} გამოტოვებული</value>
+  </data>
+  <data name="Autopilot_PreviewSkipped_Other" xml:space="preserve">
+    <value>{0} გამოტოვებული</value>
+  </data>
+  <data name="Autopilot_PreviewReasonCount" xml:space="preserve">
+    <value>{0} {1}</value>
+  </data>
+  <data name="Autopilot_PreviewTotals" xml:space="preserve">
+    <value>{0}; {1}: {2}</value>
+  </data>
+  <data name="Autopilot_ReasonNone" xml:space="preserve">
+    <value>განიბლოკება</value>
+  </data>
+  <data name="Autopilot_ReasonAlreadyUnlocked" xml:space="preserve">
+    <value>უკვე განბლოკილია</value>
+  </data>
+  <data name="Autopilot_ReasonProtected" xml:space="preserve">
+    <value>დაცულია, შეცვლა შეუძლებელია</value>
+  </data>
+  <data name="Autopilot_ReasonHidden" xml:space="preserve">
+    <value>დამალულია (წესებით გამოტოვებულია)</value>
+  </data>
+  <data name="Autopilot_ReasonBelowMinimumPercent" xml:space="preserve">
+    <value>მოთამაშეთა მინიმალურ წილზე ნაკლები</value>
+  </data>
+  <data name="Autopilot_ReasonRare" xml:space="preserve">
+    <value>იშვიათია (წესებით გამოტოვებულია)</value>
+  </data>
+  <data name="Autopilot_ReasonUnknownRarity" xml:space="preserve">
+    <value>იშვიათობის მონაცემი არ არის</value>
+  </data>
+  <data name="Autopilot_ReasonExcluded" xml:space="preserve">
+    <value>ამ თამაშისთვის გამორიცხულია</value>
+  </data>
+  <data name="Autopilot_ReasonNotInOnlyList" xml:space="preserve">
+    <value>არ არის ამ თამაშის სიაში „მხოლოდ ესენი“</value>
+  </data>
+  <data name="Autopilot_ReasonShortNone" xml:space="preserve">
+    <value>დაგეგმილი</value>
+  </data>
+  <data name="Autopilot_ReasonShortAlreadyUnlocked" xml:space="preserve">
+    <value>უკვე განბლოკილი</value>
+  </data>
+  <data name="Autopilot_ReasonShortProtected" xml:space="preserve">
+    <value>დაცული</value>
+  </data>
+  <data name="Autopilot_ReasonShortHidden" xml:space="preserve">
+    <value>დამალული</value>
+  </data>
+  <data name="Autopilot_ReasonShortBelowMinimumPercent" xml:space="preserve">
+    <value>მინიმუმზე ნაკლები</value>
+  </data>
+  <data name="Autopilot_ReasonShortRare" xml:space="preserve">
+    <value>იშვიათი</value>
+  </data>
+  <data name="Autopilot_ReasonShortUnknownRarity" xml:space="preserve">
+    <value>იშვიათობის მონაცემის გარეშე</value>
+  </data>
+  <data name="Autopilot_ReasonShortExcluded" xml:space="preserve">
+    <value>გამორიცხული</value>
+  </data>
+  <data name="Autopilot_ReasonShortNotInOnlyList" xml:space="preserve">
+    <value>სიაში არ არის</value>
+  </data>
 </root>

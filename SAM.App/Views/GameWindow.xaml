@@ -176,6 +176,11 @@
                     </InfoBar.ActionButton>
                 </InfoBar>
                 <InfoBar
+                    x:Uid="Autopilot_GameWarning"
+                    Severity="Warning"
+                    IsClosable="True"
+                    IsOpen="{x:Bind ViewModel.IsAutopilotWarningOpen, Mode=TwoWay}" />
+                <InfoBar
                     Title="{x:Bind ViewModel.StatusTitle, Mode=OneWay}"
                     Message="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
                     Severity="{x:Bind ViewModel.StatusSeverity, Mode=OneWay}"

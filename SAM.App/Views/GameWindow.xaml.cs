@@ -61,6 +61,16 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
         this.ViewModel.LoadCompleted += this.OnLoadCompleted;
         this.AchievementList.AddHandler(UIElement.KeyDownEvent, new KeyEventHandler(this.OnAchievementListKeyDown), true);
 
+        // Warn (without blocking anything) while Autopilot runs this game; re-check on activation.
+        this.ViewModel.CheckAutopilot();
+        this.Activated += (_, e) =>
+        {
+            if (e.WindowActivationState != WindowActivationState.Deactivated)
+            {
+                this.ViewModel.CheckAutopilot();
+            }
+        };
+
         this.Root.Loaded += async (_, _) =>
         {
             if (this._loadStarted == false)
