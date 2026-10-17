@@ -823,7 +823,13 @@ public sealed partial class LibraryViewModel : ObservableObject
 
     partial void OnBackupBeforeCommitChanged(bool value) => this.SaveSettings();
 
-    partial void OnMinimizeToTrayChanged(bool value) => this.SaveSettings();
+    partial void OnMinimizeToTrayChanged(bool value)
+    {
+        this.SaveSettings();
+
+        // Show or remove the tray icon now rather than at the next close.
+        App.UpdateTray();
+    }
 
     partial void OnShowNotificationsChanged(bool value) => this.SaveSettings();
 
