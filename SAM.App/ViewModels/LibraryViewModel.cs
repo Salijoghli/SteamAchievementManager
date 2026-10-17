@@ -111,9 +111,13 @@ public sealed partial class LibraryViewModel : ObservableObject
         this._startupLanguage = settings.Language;
         this.LanguageIndex = LanguageIndexOf(settings.Language);
         this.KeepOtherAccountsCache = settings.KeepOtherAccountsCache;
-        this.InstalledOnly = settings.InstalledOnly;
         this.ShowHidden = settings.ShowHidden;
         this.CollectionFilter = string.IsNullOrEmpty(settings.CollectionFilter) ? null : settings.CollectionFilter;
+        if (settings.InstalledOnly && this.CollectionFilter == null)
+        {
+            // "Installed only" used to be a filter switch; it's now an entry in the collection picker.
+            this.CollectionFilter = InstalledCollectionKey;
+        }
         this.SmartList = SmartLists.Any(l => l.Key == settings.SmartList) ? settings.SmartList : null;
         this.IsListView = string.Equals(settings.LibraryViewMode, "List", StringComparison.OrdinalIgnoreCase);
         this.SpoilerProtection = settings.SpoilerProtection;
@@ -272,15 +276,18 @@ public sealed partial class LibraryViewModel : ObservableObject
     [ObservableProperty]
     private bool _keepOtherAccountsCache;
 
-    [ObservableProperty]
-    private bool _installedOnly;
+    /// <summary>The collection picker's built-in "Installed games" entry (a CollectionFilter value).</summary>
+    public const string InstalledCollectionKey = "installed";
+
+    /// <summary>True when the collection picker shows only installed games.</summary>
+    public bool InstalledOnly => this.CollectionFilter == InstalledCollectionKey;
 
     [ObservableProperty]
     private bool _showHidden;
 
     /// <summary>The selected collection's <see cref="GameCollection.FilterKey"/>, or null for all games.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CollectionFilterName), nameof(IsCollectionFilterActive))]
+    [NotifyPropertyChangedFor(nameof(CollectionFilterName), nameof(IsCollectionFilterActive), nameof(InstalledOnly))]
     private string? _collectionFilter;
 
     /// <summary>The selected smart list's key, or null for none.</summary>
@@ -369,7 +376,9 @@ public sealed partial class LibraryViewModel : ObservableObject
     public string CollectionFilterName =>
         this.CollectionFilter == null
             ? Strings.Get("Library_CollectionsAllGames")
-            : this.FindCollection(this.CollectionFilter)?.Name ?? Strings.Get("Library_CollectionsAllGames");
+            : this.InstalledOnly
+                ? Strings.Get("Library_CollectionsInstalled")
+                : this.FindCollection(this.CollectionFilter)?.Name ?? Strings.Get("Library_CollectionsAllGames");
 
     /// <summary>Steam collections with explicit app lists (read-only).</summary>
     public IReadOnlyList<GameCollection> SteamCollections { get; private set; } = [];
@@ -820,7 +829,6 @@ public sealed partial class LibraryViewModel : ObservableObject
 
     partial void OnCustomToChanged(DateTimeOffset? value) => this.OnViewSettingChanged();
 
-    partial void OnInstalledOnlyChanged(bool value) => this.OnViewSettingChanged();
 
     partial void OnShowHiddenChanged(bool value) => this.OnViewSettingChanged();
 
@@ -920,7 +928,7 @@ public sealed partial class LibraryViewModel : ObservableObject
             _ => "System",
         };
         settings.KeepOtherAccountsCache = this.KeepOtherAccountsCache;
-        settings.InstalledOnly = this.InstalledOnly;
+        settings.InstalledOnly = false; // Migrated into CollectionFilter.
         settings.ShowHidden = this.ShowHidden;
         settings.CollectionFilter = this.CollectionFilter;
         settings.SmartList = this.SmartList;
@@ -964,11 +972,6 @@ public sealed partial class LibraryViewModel : ObservableObject
             count++;
         }
 
-        if (this.InstalledOnly)
-        {
-            count++;
-        }
-
         if (this.ShowHidden)
         {
             count++;
@@ -991,7 +994,6 @@ public sealed partial class LibraryViewModel : ObservableObject
         this.LastPlayedFilterIndex = 0;
         this.CustomFrom = null;
         this.CustomTo = null;
-        this.InstalledOnly = false;
         this.ShowHidden = false;
         this._initializing = initializing;
         this.OnViewSettingChanged();

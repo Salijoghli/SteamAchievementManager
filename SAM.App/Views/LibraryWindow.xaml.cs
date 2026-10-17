@@ -301,7 +301,7 @@ public sealed partial class LibraryWindow : Window
         }
     }
 
-    /// <summary>Rebuilds the collection picker: All games, Steam collections, SAM collections, Manage.</summary>
+    /// <summary>Rebuilds the collection picker: All games, Installed games, Steam collections, SAM collections, Manage.</summary>
     private void OnCollectionMenuOpening(object? sender, object e)
     {
         var items = this.CollectionMenu.Items;
@@ -310,7 +310,11 @@ public sealed partial class LibraryWindow : Window
         var current = this.ViewModel.CollectionFilter;
         var all = this.CollectionItem(Strings.Get("Library_CollectionsAllGames"), null);
         items.Add(all);
-        var anyChecked = false;
+        var installed = this.CollectionItem(Strings.Get("Library_CollectionsInstalled"), LibraryViewModel.InstalledCollectionKey);
+        installed.Icon = new FontIcon { Glyph = "" };
+        installed.IsChecked = current == LibraryViewModel.InstalledCollectionKey;
+        items.Add(installed);
+        var anyChecked = installed.IsChecked;
 
         void AddGroup(string title, IReadOnlyList<GameCollection> collections)
         {

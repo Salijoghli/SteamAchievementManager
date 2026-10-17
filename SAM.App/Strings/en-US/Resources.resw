@@ -384,9 +384,6 @@ If you have this game through Family Sharing, it may be locked while the owner i
   <data name="Library_FilterFavoritesOnly.Header" xml:space="preserve">
     <value>Favorites only</value>
   </data>
-  <data name="Library_FilterInstalledOnly.Header" xml:space="preserve">
-    <value>Installed only</value>
-  </data>
   <data name="Library_FilterShowHidden.Header" xml:space="preserve">
     <value>Show hidden games</value>
   </data>
@@ -530,6 +527,9 @@ If you have this game through Family Sharing, it may be locked while the owner i
   </data>
   <data name="Library_CollectionsAllGames" xml:space="preserve">
     <value>All games</value>
+  </data>
+  <data name="Library_CollectionsInstalled" xml:space="preserve">
+    <value>Installed games</value>
   </data>
   <data name="Library_CollectionsSteamGroup" xml:space="preserve">
     <value>Steam collections</value>

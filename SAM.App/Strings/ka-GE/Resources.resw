@@ -380,9 +380,6 @@
   <data name="Library_FilterFavoritesOnly.Header" xml:space="preserve">
     <value>მხოლოდ რჩეულები</value>
   </data>
-  <data name="Library_FilterInstalledOnly.Header" xml:space="preserve">
-    <value>მხოლოდ დაინსტალირებული</value>
-  </data>
   <data name="Library_FilterShowHidden.Header" xml:space="preserve">
     <value>დამალული თამაშების ჩვენება</value>
   </data>
@@ -526,6 +523,9 @@
   </data>
   <data name="Library_CollectionsAllGames" xml:space="preserve">
     <value>ყველა თამაში</value>
+  </data>
+  <data name="Library_CollectionsInstalled" xml:space="preserve">
+    <value>დაინსტალირებული თამაშები</value>
   </data>
   <data name="Library_CollectionsSteamGroup" xml:space="preserve">
     <value>Steam-ის კოლექციები</value>

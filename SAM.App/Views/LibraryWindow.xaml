@@ -373,7 +373,6 @@
                                     </StackPanel>
                                     <StackPanel>
                                         <ToggleSwitch x:Uid="Library_FilterFavoritesOnly" IsOn="{x:Bind ViewModel.FavoritesOnly, Mode=TwoWay}" />
-                                        <ToggleSwitch x:Uid="Library_FilterInstalledOnly" IsOn="{x:Bind ViewModel.InstalledOnly, Mode=TwoWay}" />
                                         <ToggleSwitch x:Uid="Library_FilterShowHidden" IsOn="{x:Bind ViewModel.ShowHidden, Mode=TwoWay}" />
                                     </StackPanel>
                                     <StackPanel Spacing="4">
