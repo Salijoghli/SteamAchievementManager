@@ -34,7 +34,18 @@ public sealed class AppServices
         this.Timeline = new TimelineService(steam, this.Schemas);
         this.Updates = new UpdateService(http, settings);
         this.Notifications = new NotificationService(settings);
+        this.AutopilotStore = new Autopilot.AutopilotStore(this.Cache);
     }
+
+    private Autopilot.AutopilotEngine? _autopilot;
+
+    public Autopilot.AutopilotStore AutopilotStore { get; }
+
+    /// <summary>
+    /// The Autopilot engine, created on first use. Only the library process should use it (create
+    /// it on the UI thread); game windows and workers use AutopilotEngine's static helpers instead.
+    /// </summary>
+    public Autopilot.AutopilotEngine Autopilot => this._autopilot ??= new Autopilot.AutopilotEngine(this);
 
     public BackupService Backups { get; }
 

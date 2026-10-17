@@ -239,6 +239,9 @@
   <data name="Library_PageHistory.Text" xml:space="preserve">
     <value>ისტორია</value>
   </data>
+  <data name="Library_PageAutopilot.Text" xml:space="preserve">
+    <value>ავტოპილოტი</value>
+  </data>
   <data name="Library_SearchBox.PlaceholderText" xml:space="preserve">
     <value>თამაშის ან App ID-ის ძიება</value>
   </data>

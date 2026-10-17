@@ -1,0 +1,7 @@
+<UserControl
+    x:Class="SAM.App.Views.Pages.AutopilotPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- TODO(autopilot-ui): placeholder. -->
+    <TextBlock Text="Autopilot" Margin="24" />
+</UserControl>

@@ -473,6 +473,7 @@ public sealed partial class LibraryWindow : Window
             {
                 "stats" => new Pages.StatsPage(this._services, this.ViewModel),
                 "activity" => new Pages.ActivityPage(this._services, this.ViewModel),
+                "autopilot" => new Pages.AutopilotPage(this._services, this.ViewModel),
                 _ => new Pages.HistoryPage(this._services, this.ViewModel),
             };
             this._pages[tag] = page;

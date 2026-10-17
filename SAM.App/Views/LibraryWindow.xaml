@@ -118,6 +118,11 @@
                     <FontIcon Glyph="&#xE81C;" />
                 </SelectorBarItem.Icon>
             </SelectorBarItem>
+            <SelectorBarItem x:Uid="Library_PageAutopilot" Tag="autopilot">
+                <SelectorBarItem.Icon>
+                    <FontIcon Glyph="&#xE945;" />
+                </SelectorBarItem.Icon>
+            </SelectorBarItem>
         </SelectorBar>
 
         <!-- Non-library pages (Stats, Activity, History) replace the library rows below. -->

@@ -242,6 +242,9 @@ If you have this game through Family Sharing, it may be locked while the owner i
   <data name="Library_PageHistory.Text" xml:space="preserve">
     <value>History</value>
   </data>
+  <data name="Library_PageAutopilot.Text" xml:space="preserve">
+    <value>Autopilot</value>
+  </data>
   <data name="Library_SearchBox.PlaceholderText" xml:space="preserve">
     <value>Search games or App ID</value>
   </data>
