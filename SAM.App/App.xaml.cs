@@ -4,6 +4,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using SAM.App.Infrastructure;
 using SAM.App.Services;
+using SAM.App.Services.Autopilot;
 using SAM.App.Views;
 
 namespace SAM.App;
@@ -14,6 +15,8 @@ namespace SAM.App;
 /// <c>SAM.exe 21690 --unlock-all</c> (or <c>--lock-all</c>) opens it with every achievement pre-set.
 /// <c>SAM.exe 21690 --unlock ID --commit</c> changes achievements without a window, and
 /// <c>SAM.exe --help</c> prints the full usage (see <see cref="CommandLine"/>).
+/// <c>SAM.exe --autopilot</c> starts the library hidden in the tray with Autopilot running, and
+/// <c>SAM.exe &lt;appid&gt; --autopilot-worker &lt;pid&gt;</c> is a headless Autopilot worker (see <see cref="AutopilotWorker"/>).
 /// Each game runs in its own process because Steam binds a client connection to
 /// one App ID for the lifetime of the process.
 /// </summary>
@@ -31,7 +34,11 @@ public partial class App : Application
     private bool _exiting;
 
     private bool _trayHintShown;
+    private bool _autopilotHintShown;
     private string? _trayStatus;
+
+    /// <summary>The library's Autopilot engine (null in game windows, workers and command-line runs).</summary>
+    private AutopilotEngine? _autopilot;
 
     public App()
     {
@@ -120,6 +127,10 @@ public partial class App : Application
             case LaunchMode.Commit:
                 this.RunCommandLine(command);
                 return;
+
+            case LaunchMode.AutopilotWorker:
+                this.RunAutopilotWorker(command);
+                return;
         }
 
         var appId = command.AppId;
@@ -158,7 +169,10 @@ public partial class App : Application
         {
             var library = new LibraryWindow(Services);
             this.SetUpTray(library);
-            this.Show(library);
+            this.SetUpAutopilot(command.StartAutopilot);
+
+            // "--autopilot" (Start with Windows): stay in the tray; the window opens from the icon.
+            this.Show(library, activate: command.StartAutopilot == false || this.HideToTrayAtStart() == false);
         }
         else
         {
@@ -262,6 +276,22 @@ public partial class App : Application
         }
     }
 
+    /// <summary>Runs a headless Autopilot worker until it stops, then exits with its exit code.</summary>
+    private async void RunAutopilotWorker(CommandLine command)
+    {
+        var code = AutopilotProtocol.ExitSteamFailed;
+        try
+        {
+            code = await AutopilotWorker.RunAsync(command.AppId, command.ParentProcessId, this._settings);
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log($"Autopilot worker for {command.AppId} failed", e);
+        }
+
+        this.ExitWith(code);
+    }
+
     /// <summary>Runs a headless "--commit" command line, then exits with its exit code.</summary>
     private async void RunCommandLine(CommandLine command)
     {
@@ -286,7 +316,9 @@ public partial class App : Application
         this.Exit();
     }
 
-    private void Show(Window window)
+    /// <param name="window">The window.</param>
+    /// <param name="activate">False to create the window without showing it (started hidden in the tray).</param>
+    private void Show(Window window, bool activate = true)
     {
         this._window = window;
         this._instance?.BringToFrontOnRequest(window, arguments =>
@@ -297,16 +329,26 @@ public partial class App : Application
             }
 
             ApplyForwardedLaunch(window, arguments);
+            if (this._autopilot is { IsRunning: false } engine && arguments.Contains(CommandLine.AutopilotOption, StringComparer.OrdinalIgnoreCase))
+            {
+                this.StartAutopilot(engine);
+            }
         });
         window.Closed += (_, _) =>
         {
+            // Stops the workers (Autopilot resumes next time if "Resume on startup" is on).
+            this._autopilot?.Dispose();
+            this._autopilot = null;
             Tray?.Dispose();
             Tray = null;
             NotificationService.Unregister();
             this._instance?.Dispose();
             Services?.Steam.Dispose();
         };
-        window.Activate();
+        if (activate)
+        {
+            window.Activate();
+        }
     }
 
     #region Tray and notifications
@@ -338,7 +380,10 @@ public partial class App : Application
 
     private void OnLibraryClosing(AppWindow sender, AppWindowClosingEventArgs args)
     {
-        if (this._exiting || Tray == null || this._settings.MinimizeToTray == false)
+        // While Autopilot runs, closing the window hides it even without "Minimize to tray":
+        // closing would stop the games. "Exit" in the tray menu really quits.
+        var autopilotRunning = this._autopilot?.IsRunning == true;
+        if (this._exiting || Tray == null || (this._settings.MinimizeToTray == false && autopilotRunning == false))
         {
             return;
         }
@@ -354,11 +399,122 @@ public partial class App : Application
         sender.Hide();
         this._hiddenToTray = true;
 
-        if (this._trayHintShown == false)
+        if (autopilotRunning && this._autopilotHintShown == false)
+        {
+            this._autopilotHintShown = true;
+            this._trayHintShown = true;
+            Services?.Notifications.Show(Strings.Get("AutopilotEngine_TrayHintTitle"), Strings.Get("AutopilotEngine_TrayHintMessage"));
+        }
+        else if (this._trayHintShown == false)
         {
             this._trayHintShown = true;
             Services?.Notifications.Show(Strings.Get("App_TrayHintTitle"), Strings.Get("App_TrayHintMessage"));
         }
+    }
+
+    /// <summary>For "--autopilot": shows only the tray icon. False if the shell refused it (then the window must show).</summary>
+    private bool HideToTrayAtStart()
+    {
+        if (Tray == null)
+        {
+            return false;
+        }
+
+        Tray.IsVisible = true;
+        if (Tray.IsVisible == false)
+        {
+            return false;
+        }
+
+        this._hiddenToTray = true;
+        this.RefreshTray();
+        return true;
+    }
+
+    /// <summary>
+    /// Creates the library's Autopilot engine, mirrors its status in the tray (tooltip and the
+    /// Pause/Resume menu item) and starts it for "--autopilot" or when it was running last time
+    /// and "Resume on startup" is on.
+    /// </summary>
+    private void SetUpAutopilot(bool start)
+    {
+        if (Services == null)
+        {
+            return;
+        }
+
+        AutopilotEngine engine;
+        try
+        {
+            engine = Services.Autopilot;
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log("Couldn't create the Autopilot engine", e);
+            return;
+        }
+
+        this._autopilot = engine;
+        engine.Changed += (_, _) => this.OnAutopilotChanged(engine);
+        if (Tray != null)
+        {
+            Tray.AutopilotCommandRequested += async (_, _) =>
+            {
+                try
+                {
+                    if (engine.IsRunning)
+                    {
+                        await engine.StopAsync();
+                    }
+                    else
+                    {
+                        await engine.StartAsync();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Diagnostics.Log("Couldn't pause or resume Autopilot from the tray", e);
+                }
+            };
+        }
+
+        try
+        {
+            start = start || (engine.Config.ResumeOnStartup && engine.Config.WasRunning);
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log("Couldn't read the Autopilot configuration", e);
+            start = false;
+        }
+
+        this.OnAutopilotChanged(engine);
+        if (start)
+        {
+            this.StartAutopilot(engine);
+        }
+    }
+
+    private async void StartAutopilot(AutopilotEngine engine)
+    {
+        try
+        {
+            await engine.StartAsync();
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log("Couldn't start Autopilot", e);
+        }
+    }
+
+    private void OnAutopilotChanged(AutopilotEngine engine)
+    {
+        if (Tray != null)
+        {
+            Tray.AutopilotCommandText = Strings.Get(engine.IsRunning ? "AutopilotEngine_TrayPause" : "AutopilotEngine_TrayResume");
+        }
+
+        SetTrayStatus(engine.IsRunning ? engine.TrayStatus ?? Strings.Get("AutopilotEngine_TrayIdle") : null);
     }
 
     /// <summary>The icon is shown while the window is hidden, the setting is on, or a status is set.</summary>

@@ -19,13 +19,20 @@ public enum LaunchMode
 
     /// <summary>The arguments are invalid; see <see cref="CommandLine.Error"/>.</summary>
     Invalid,
+
+    /// <summary>
+    /// Internal: a headless Autopilot worker for <see cref="CommandLine.AppId"/>, started by the
+    /// library (<c>&lt;appid&gt; --autopilot-worker &lt;parent pid&gt;</c>).
+    /// </summary>
+    AutopilotWorker,
 }
 
 /// <summary>
 /// Parses SAM's command line:
 /// <c>SAM.exe [&lt;appid&gt; [--unlock-all | --lock-all]]</c> for the windows, and
 /// <c>SAM.exe &lt;appid&gt; [--unlock ID[,ID…]] [--lock ID[,ID…]] [--unlock-all-cli] --commit [--quiet] [--no-backup]</c>
-/// to change achievements without a window. Pure and side-effect free, so it can be unit tested.
+/// to change achievements without a window, and <c>SAM.exe --autopilot</c> to start the library in
+/// the tray with Autopilot running. Pure and side-effect free, so it can be unit tested.
 /// </summary>
 public sealed class CommandLine
 {
@@ -44,6 +51,12 @@ public sealed class CommandLine
     /// <summary>Internal option used to restart the library: <c>--restart-after=&lt;pid&gt;</c>.</summary>
     public const string RestartAfterOption = "--restart-after=";
 
+    /// <summary>Starts the library hidden in the tray with Autopilot running (used by "Start with Windows").</summary>
+    public const string AutopilotOption = "--autopilot";
+
+    /// <summary>Internal option the Autopilot engine starts its workers with: <c>&lt;appid&gt; --autopilot-worker &lt;parent pid&gt;</c>.</summary>
+    public const string AutopilotWorkerOption = "--autopilot-worker";
+
     /// <summary>Usage text printed by <c>--help</c>.</summary>
     public const string Usage =
         """
@@ -54,6 +67,7 @@ public sealed class CommandLine
           SAM.exe <appid>                  Open the achievement manager for a game.
           SAM.exe <appid> --unlock-all     ...with every achievement set to unlocked (confirm in the window).
           SAM.exe <appid> --lock-all       ...with every achievement set to locked (confirm in the window).
+          SAM.exe --autopilot              Start the library in the tray and start Autopilot.
 
           SAM.exe <appid> [--unlock ID[,ID...]] [--lock ID[,ID...]] [--unlock-all-cli] --commit [options]
                                            Change achievements without opening a window.
@@ -114,6 +128,12 @@ public sealed class CommandLine
     /// </summary>
     public int RestartAfterProcessId { get; private init; }
 
+    /// <summary><c>--autopilot</c>: start the library hidden in the tray and start Autopilot.</summary>
+    public bool StartAutopilot { get; private init; }
+
+    /// <summary>Autopilot worker: the library process to watch (the worker exits when it does).</summary>
+    public int ParentProcessId { get; private init; }
+
     /// <summary>Why the arguments are invalid (when <see cref="Mode"/> is <see cref="LaunchMode.Invalid"/>).</summary>
     public string? Error { get; private init; }
 
@@ -139,6 +159,11 @@ public sealed class CommandLine
             {
                 return new CommandLine { Mode = LaunchMode.Library, RestartAfterProcessId = restartAfter };
             }
+        }
+
+        if (args.Count == 1 && string.Equals(args[0], AutopilotOption, StringComparison.OrdinalIgnoreCase))
+        {
+            return new CommandLine { Mode = LaunchMode.Library, StartAutopilot = true, RestartAfterProcessId = restartAfter };
         }
 
         if (args.Any(IsHelp))
@@ -168,6 +193,7 @@ public sealed class CommandLine
         var unlock = new List<string>();
         var @lock = new List<string>();
         bool unlockAllPreset = false, lockAllPreset = false, unlockAll = false, commit = false, quiet = false, noBackup = false;
+        var workerParent = 0;
 
         for (var i = 1; i < args.Count; i++)
         {
@@ -232,9 +258,34 @@ public sealed class CommandLine
                 case "--no-backup" when value == null:
                     noBackup = true;
                     break;
+                case AutopilotWorkerOption:
+                {
+                    if (value == null && i + 1 < args.Count && args[i + 1].StartsWith("-", StringComparison.Ordinal) == false)
+                    {
+                        value = args[++i];
+                    }
+
+                    if (int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out workerParent) == false || workerParent <= 0)
+                    {
+                        return Invalid($"{AutopilotWorkerOption} needs the parent process ID.", appId);
+                    }
+
+                    break;
+                }
+
                 default:
                     return Invalid($"Unknown option \"{arg}\".", appId);
             }
+        }
+
+        if (workerParent != 0)
+        {
+            if (unlock.Count > 0 || @lock.Count > 0 || unlockAllPreset || lockAllPreset || unlockAll || commit || quiet || noBackup)
+            {
+                return Invalid($"{AutopilotWorkerOption} can't be combined with other options.", appId);
+            }
+
+            return new CommandLine { Mode = LaunchMode.AutopilotWorker, AppId = appId, ParentProcessId = workerParent };
         }
 
         var both = unlock.Intersect(@lock, StringComparer.Ordinal).ToList();

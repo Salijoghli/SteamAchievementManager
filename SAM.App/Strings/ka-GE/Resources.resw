@@ -242,6 +242,111 @@
   <data name="Library_PageAutopilot.Text" xml:space="preserve">
     <value>ავტოპილოტი</value>
   </data>
+  <data name="AutopilotEngine_WindowOpen" xml:space="preserve">
+    <value>ამ თამაშის SAM-ის ფანჯარა ღიაა. დახურეთ, რომ ავტოპილოტმა თამაში გაუშვას.</value>
+  </data>
+  <data name="AutopilotEngine_AlreadyRunning" xml:space="preserve">
+    <value>ამ თამაშს უკვე უშვებს ავტოპილოტის სხვა პროცესი.</value>
+  </data>
+  <data name="AutopilotEngine_NoSchema" xml:space="preserve">
+    <value>ამ თამაშს ამ კომპიუტერზე მიღწევების სქემა არ აქვს. ერთხელ გახსენით SAM-ში, რომ Steam-მა ჩამოტვირთოს.</value>
+  </data>
+  <data name="AutopilotEngine_UnknownRequest" xml:space="preserve">
+    <value>ავტოპილოტის უცნობი მოთხოვნა.</value>
+  </data>
+  <data name="AutopilotEngine_UnknownAchievement" xml:space="preserve">
+    <value>თამაშს არ აქვს მიღწევა {0}. არაფერი შეცვლილა.</value>
+  </data>
+  <data name="AutopilotEngine_ProtectedAchievement" xml:space="preserve">
+    <value>„{0}“ დაცულია და მისი შეცვლა შეუძლებელია. არაფერი შეცვლილა.</value>
+  </data>
+  <data name="AutopilotEngine_NoAchievementState" xml:space="preserve">
+    <value>Steam-მა „{0}“-ის მდგომარეობა არ დააბრუნა. არაფერი შეცვლილა.</value>
+  </data>
+  <data name="AutopilotEngine_NothingToUnlock" xml:space="preserve">
+    <value>განსაბლოკი არაფერია: მიღწევები უკვე განბლოკილია.</value>
+  </data>
+  <data name="AutopilotEngine_BackupFailed" xml:space="preserve">
+    <value>განბლოკვამდე თამაშის სარეზერვო ასლის შექმნა ვერ მოხერხდა ({0}). არაფერი შეცვლილა.</value>
+  </data>
+  <data name="AutopilotEngine_StatRefused" xml:space="preserve">
+    <value>Steam-მა სტატისტიკის „{0}“ ({1}) დაყენებაზე უარი თქვა.</value>
+  </data>
+  <data name="AutopilotEngine_AchievementRefused" xml:space="preserve">
+    <value>Steam-მა „{0}“-ის ({1}) განბლოკვაზე უარი თქვა.</value>
+  </data>
+  <data name="AutopilotEngine_NothingStored" xml:space="preserve">
+    <value>არაფერი შენახულა. {0}</value>
+  </data>
+  <data name="AutopilotEngine_NotUndone" xml:space="preserve">
+    <value>SAM-მა ვერ გააუქმა {0}-ზე უკვე შეტანილი ცვლილება; Steam-მა შეიძლება ის ატვირთოს, როცა ამ თამაშის სტატისტიკა შემდეგ ჯერზე შეინახება.</value>
+  </data>
+  <data name="AutopilotEngine_UnlockedMessage_One" xml:space="preserve">
+    <value>განბლოკილია {0} მიღწევა: {1}</value>
+  </data>
+  <data name="AutopilotEngine_UnlockedMessage_Other" xml:space="preserve">
+    <value>განბლოკილია {0} მიღწევა: {1}</value>
+  </data>
+  <data name="AutopilotEngine_DryRunSuffix" xml:space="preserve">
+    <value> (საცდელი გაშვება: Steam-ზე არაფერი შეცვლილა)</value>
+  </data>
+  <data name="AutopilotEngine_DryRunTag" xml:space="preserve">
+    <value>(საცდელი გაშვება)</value>
+  </data>
+  <data name="AutopilotEngine_WorkerStartFailed" xml:space="preserve">
+    <value>თამაშის ავტოპილოტის პროცესის გაშვება ვერ მოხერხდა: {0}</value>
+  </data>
+  <data name="AutopilotEngine_WorkerNoAnswer" xml:space="preserve">
+    <value>თამაშის ავტოპილოტის პროცესმა არ უპასუხა. ავტოპილოტი ხელახლა სცდის.</value>
+  </data>
+  <data name="AutopilotEngine_WorkerExited" xml:space="preserve">
+    <value>თამაშის ავტოპილოტის პროცესი მოულოდნელად გაჩერდა (გასვლის კოდი {0}). ავტოპილოტი ხელახლა სცდის.</value>
+  </data>
+  <data name="AutopilotEngine_WorkerStopped" xml:space="preserve">
+    <value>თამაშის ავტოპილოტის პროცესი გაჩერდა. ავტოპილოტი ხელახლა სცდის.</value>
+  </data>
+  <data name="AutopilotEngine_TrayIdle" xml:space="preserve">
+    <value>ავტოპილოტი: ელოდება, თამაშები არ არის გაშვებული</value>
+  </data>
+  <data name="AutopilotEngine_TrayRunning_One" xml:space="preserve">
+    <value>ავტოპილოტი: გაშვებულია {0} თამაში</value>
+  </data>
+  <data name="AutopilotEngine_TrayRunning_Other" xml:space="preserve">
+    <value>ავტოპილოტი: გაშვებულია {0} თამაში</value>
+  </data>
+  <data name="AutopilotEngine_TrayRunningNext_One" xml:space="preserve">
+    <value>ავტოპილოტი: გაშვებულია {0} თამაში · შემდეგი განბლოკვა {1}</value>
+  </data>
+  <data name="AutopilotEngine_TrayRunningNext_Other" xml:space="preserve">
+    <value>ავტოპილოტი: გაშვებულია {0} თამაში · შემდეგი განბლოკვა {1}</value>
+  </data>
+  <data name="AutopilotEngine_TrayPause" xml:space="preserve">
+    <value>ავტოპილოტის დაპაუზება</value>
+  </data>
+  <data name="AutopilotEngine_TrayResume" xml:space="preserve">
+    <value>ავტოპილოტის გაგრძელება</value>
+  </data>
+  <data name="AutopilotEngine_TrayHintTitle" xml:space="preserve">
+    <value>ავტოპილოტი კვლავ მუშაობს</value>
+  </data>
+  <data name="AutopilotEngine_TrayHintMessage" xml:space="preserve">
+    <value>SAM ავტოპილოტის თამაშებს სისტემური არედან აგრძელებს. ავტოპილოტის დასაპაუზებლად ან გასასვლელად დააწკაპუნეთ ხატულაზე მარჯვენა ღილაკით.</value>
+  </data>
+  <data name="AutopilotEngine_NotifyTitle" xml:space="preserve">
+    <value>ავტოპილოტი: {0}</value>
+  </data>
+  <data name="AutopilotEngine_NotifyFailedTitle" xml:space="preserve">
+    <value>ავტოპილოტმა {0}-ში მიღწევები ვერ განბლოკა</value>
+  </data>
+  <data name="AutopilotEngine_SummaryTitle" xml:space="preserve">
+    <value>ავტოპილოტის შეჯამება</value>
+  </data>
+  <data name="AutopilotEngine_SummaryMessage_One" xml:space="preserve">
+    <value>განბლოკილია {0} მიღწევა: {1}.</value>
+  </data>
+  <data name="AutopilotEngine_SummaryMessage_Other" xml:space="preserve">
+    <value>განბლოკილია {0} მიღწევა: {1}.</value>
+  </data>
   <data name="Library_SearchBox.PlaceholderText" xml:space="preserve">
     <value>თამაშის ან App ID-ის ძიება</value>
   </data>
