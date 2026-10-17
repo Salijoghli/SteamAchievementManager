@@ -5,7 +5,7 @@ using SAM.App.ViewModels;
 
 namespace SAM.App.Views.Library;
 
-/// <summary>Library settings: theme, cache options and the logged-in account.</summary>
+/// <summary>Settings: appearance, library and cache, game window, app behavior and updates, and the logged-in account.</summary>
 public sealed partial class LibrarySettingsDialog : ContentDialog
 {
     public LibrarySettingsDialog(LibraryViewModel viewModel)
@@ -17,6 +17,7 @@ public sealed partial class LibrarySettingsDialog : ContentDialog
         viewModel.PropertyChanged += this.OnViewModelPropertyChanged;
         this.Closed += (_, _) => viewModel.PropertyChanged -= this.OnViewModelPropertyChanged;
         this.Opened += async (_, _) => await this.UpdateCacheSizeAsync();
+        this.VersionText.Text = $"Version {LibraryViewModel.CurrentVersionText}";
     }
 
     public LibraryViewModel ViewModel { get; }
@@ -41,6 +42,24 @@ public sealed partial class LibrarySettingsDialog : ContentDialog
         this.CacheSizeText.Text = LibraryFormat.Bytes(size);
         this.CacheSizeSkeleton.Visibility = Visibility.Collapsed;
         this.CacheSizeText.Visibility = Visibility.Visible;
+    }
+
+    private async void OnCheckNowClick(object sender, RoutedEventArgs e)
+    {
+        this.CheckNowButton.IsEnabled = false;
+        this.UpdateProgress.IsActive = true;
+        this.UpdateProgress.Visibility = Visibility.Visible;
+        try
+        {
+            this.UpdateStatusText.Text = await this.ViewModel.CheckForUpdatesNowAsync();
+            this.UpdateStatusText.Visibility = Visibility.Visible;
+        }
+        finally
+        {
+            this.UpdateProgress.IsActive = false;
+            this.UpdateProgress.Visibility = Visibility.Collapsed;
+            this.CheckNowButton.IsEnabled = true;
+        }
     }
 
     private void OnConfirmClearCache(object sender, RoutedEventArgs e)

@@ -33,9 +33,31 @@ public sealed partial class GameCardViewModel : ObservableObject
 
     public string AppIdText { get; }
 
+    /// <summary>The library this card belongs to (used by context menus for collection actions).</summary>
+    internal LibraryViewModel Owner => this._owner;
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ToolTipText))]
     private string _name;
+
+    /// <summary>Install info from Steam's app manifests, or null if the game isn't installed.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsInstalled), nameof(InstalledText), nameof(PlayLabel), nameof(PlayGlyph), nameof(ToolTipText))]
+    private InstalledGame? _installed;
+
+    /// <summary>True when the user has hidden this game; hidden cards are shown dimmed.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HiddenLabel), nameof(HiddenGlyph), nameof(CardOpacity))]
+    private bool _isHidden;
+
+    /// <summary>Extra label for the active smart list, e.g. "3 left" or "Rarest 0.4%". Null when none.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasSmartBadge))]
+    private string? _smartBadge;
+
+    /// <summary>True while the smart list's per-game data (e.g. rarity) is still loading.</summary>
+    [ObservableProperty]
+    private bool _isSmartBadgeLoading;
 
     /// <summary>"normal", "demo", "mod" or "junk".</summary>
     [ObservableProperty]
@@ -47,7 +69,7 @@ public sealed partial class GameCardViewModel : ObservableObject
 
     /// <summary>Null when unknown (no schema).</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ProgressText), nameof(ProgressPercent), nameof(HasAchievements), nameof(IsPerfect), nameof(CompletionSortKey))]
+    [NotifyPropertyChangedFor(nameof(ProgressText), nameof(ProgressPercent), nameof(HasAchievements), nameof(IsPerfect), nameof(CompletionSortKey), nameof(ProgressCountText), nameof(PercentText))]
     private GameProgress? _progress;
 
     /// <summary>False until progress has been computed at least once (shows a skeleton).</summary>
@@ -55,7 +77,7 @@ public sealed partial class GameCardViewModel : ObservableObject
     private bool _isProgressLoaded;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(PlaytimeText), nameof(LastPlayed))]
+    [NotifyPropertyChangedFor(nameof(PlaytimeText), nameof(LastPlayed), nameof(PlaytimeShortText), nameof(LastPlayedText))]
     private PlaytimeInfo? _playtime;
 
     /// <summary>False until the playtime map has been read at least once (shows a skeleton).</summary>
@@ -64,10 +86,12 @@ public sealed partial class GameCardViewModel : ObservableObject
 
     /// <summary>Local path of the cached card image, once downloaded.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsImagePending))]
     private string? _imagePath;
 
     /// <summary>True when no image could be loaded; the card shows a fallback.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsImagePending))]
     private bool _imageFailed;
 
     internal CancellationTokenSource? ImageLoad { get; set; }
@@ -96,11 +120,47 @@ public sealed partial class GameCardViewModel : ObservableObject
 
     public string PlaytimeText => LibraryFormat.PlaytimeSummary(this.Playtime);
 
+    /// <summary>"12/30" for the list view, or "–" without achievements.</summary>
+    public string ProgressCountText => this.Progress is { Total: > 0 } p
+        ? $"{LibraryFormat.Count(p.Unlocked)}/{LibraryFormat.Count(p.Total)}"
+        : "–";
+
+    /// <summary>"40%" for the list view, or "–" without achievements.</summary>
+    public string PercentText => this.Progress is { Total: > 0 } p
+        ? $"{Math.Floor(p.Fraction * 100).ToString(CultureInfo.CurrentCulture)}%"
+        : "–";
+
+    public string PlaytimeShortText => this.PlaytimeSpan > TimeSpan.Zero ? LibraryFormat.Playtime(this.PlaytimeSpan) : "–";
+
+    public string LastPlayedText => LibraryFormat.RelativeDate(this.LastPlayed);
+
+    public bool IsInstalled => this.Installed != null;
+
+    public string InstalledText => this.Installed is { } i ? LibraryFormat.Bytes(i.SizeOnDisk) : "";
+
+    /// <summary>"Play" for installed games, "Install" otherwise.</summary>
+    public string PlayLabel => this.IsInstalled ? "Play" : "Install";
+
+    public string PlayGlyph => this.IsInstalled ? "" : "";
+
+    public string HiddenLabel => this.IsHidden ? "Unhide game" : "Hide game";
+
+    public string HiddenGlyph => this.IsHidden ? "" : "";
+
+    public double CardOpacity => this.IsHidden ? 0.5 : 1;
+
+    public bool HasSmartBadge => this.SmartBadge != null;
+
+    /// <summary>True until the image has loaded or failed (the list view shows a skeleton).</summary>
+    public bool IsImagePending => this.ImagePath == null && this.ImageFailed == false;
+
     public string FavoriteGlyph => this.IsFavorite ? "" : "";
 
     public string FavoriteLabel => this.IsFavorite ? "Remove from favorites" : "Add to favorites";
 
-    public string ToolTipText => $"{this.Name} (App ID {this.AppIdText})";
+    public string ToolTipText => this.Installed is { } installed
+        ? $"{this.Name} (App ID {this.AppIdText})\nInstalled ·{LibraryFormat.Bytes(installed.SizeOnDisk)}"
+        : $"{this.Name} (App ID {this.AppIdText})";
 
     internal void Update(GameEntry entry)
     {
@@ -138,6 +198,12 @@ public sealed partial class GameCardViewModel : ObservableObject
 
     [RelayCommand]
     private void LockAll() => this._owner.LaunchGame(this, "--lock-all");
+
+    [RelayCommand]
+    private void Play() => this._owner.PlayOrInstall(this);
+
+    [RelayCommand]
+    private void ToggleHidden() => this._owner.SetHidden(this, !this.IsHidden);
 
     [RelayCommand]
     private void ToggleFavorite() => this.IsFavorite = !this.IsFavorite;

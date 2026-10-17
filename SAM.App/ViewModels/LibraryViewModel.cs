@@ -36,6 +36,9 @@ public enum LibraryLastPlayedFilter
     Custom,
 }
 
+/// <summary>A smart list: a built-in filter with its own order.</summary>
+public sealed record LibrarySmartList(string Key, string Name, string Description);
+
 /// <summary>An entry in the search box's suggestion list.</summary>
 public sealed record LibrarySuggestion(string Text, uint AppId, GameCardViewModel? Card)
 {
@@ -60,6 +63,22 @@ public sealed partial class LibraryViewModel : ObservableObject
     private CancellationTokenSource? _refreshCts;
     private CancellationTokenSource? _enrichCts;
     private bool _isShutDown;
+    private readonly CancellationTokenSource _lifetime = new();
+
+    /// <summary>Smart list keys stored in <see cref="AppSettings.SmartList"/>.</summary>
+    public const string AlmostPerfectList = "almost-perfect";
+
+    public const string NeverStartedList = "never-started";
+
+    public const string RarestOwnedList = "rarest-owned";
+
+    // Column keys for the list view's sortable headers.
+    public const string NameColumn = "name";
+    public const string ProgressColumn = "progress";
+    public const string PlaytimeColumn = "playtime";
+    public const string LastPlayedColumn = "lastplayed";
+    public const string InstalledColumn = "installed";
+    public const string FavoriteColumn = "favorite";
 
     public LibraryViewModel(AppServices services)
     {
@@ -87,6 +106,16 @@ public sealed partial class LibraryViewModel : ObservableObject
             _ => 0,
         };
         this.KeepOtherAccountsCache = settings.KeepOtherAccountsCache;
+        this.InstalledOnly = settings.InstalledOnly;
+        this.ShowHidden = settings.ShowHidden;
+        this.CollectionFilter = string.IsNullOrEmpty(settings.CollectionFilter) ? null : settings.CollectionFilter;
+        this.SmartList = SmartLists.Any(l => l.Key == settings.SmartList) ? settings.SmartList : null;
+        this.IsListView = string.Equals(settings.LibraryViewMode, "List", StringComparison.OrdinalIgnoreCase);
+        this.SpoilerProtection = settings.SpoilerProtection;
+        this.BackupBeforeCommit = settings.BackupBeforeCommit;
+        this.MinimizeToTray = settings.MinimizeToTray;
+        this.ShowNotifications = settings.ShowNotifications;
+        this.CheckForUpdates = settings.CheckForUpdates;
         this._initializing = false;
         this.UpdateActiveFilterCount();
 
@@ -99,7 +128,19 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
 
         services.Favorites.Changed += this.OnFavoritesStoreChanged;
+        services.Collections.Changed += this.OnCollectionsStoreChanged;
     }
+
+    /// <summary>The smart lists offered in the header, in menu order.</summary>
+    public static IReadOnlyList<LibrarySmartList> SmartLists { get; } =
+    [
+        new(AlmostPerfectList, "Almost perfect", "80% or more unlocked, fewest remaining first"),
+        new(NeverStartedList, "Never started", "Has achievements but none unlocked, most played first"),
+        new(RarestOwnedList, "Rarest owned", "Ordered by the rarest achievement you've unlocked"),
+    ];
+
+    /// <summary>Every owned game (unfiltered), for pages that summarize the whole library.</summary>
+    public IReadOnlyCollection<GameCardViewModel> AllGames => this._master.Values;
 
     #region Observable state
     [ObservableProperty]
@@ -107,7 +148,7 @@ public sealed partial class LibraryViewModel : ObservableObject
 
     /// <summary>True while there is nothing to show yet (skeleton grid).</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsLibraryEmpty), nameof(IsNoMatches), nameof(IsGridVisible))]
+    [NotifyPropertyChangedFor(nameof(IsLibraryEmpty), nameof(IsNoMatches), nameof(IsGridVisible), nameof(IsGridViewShown), nameof(IsListViewShown), nameof(IsGridSkeletonShown), nameof(IsListSkeletonShown))]
     private bool _isLoading = true;
 
     /// <summary>True while the game list is being refreshed in the background.</summary>
@@ -116,7 +157,7 @@ public sealed partial class LibraryViewModel : ObservableObject
 
     /// <summary>Set when the list couldn't be loaded and there's nothing cached.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsLoadErrorOpen), nameof(IsLibraryEmpty), nameof(IsNoMatches), nameof(IsGridVisible))]
+    [NotifyPropertyChangedFor(nameof(IsLoadErrorOpen), nameof(IsLibraryEmpty), nameof(IsNoMatches), nameof(IsGridVisible), nameof(IsGridViewShown), nameof(IsListViewShown))]
     private string? _loadError;
 
     [ObservableProperty]
@@ -220,6 +261,67 @@ public sealed partial class LibraryViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _keepOtherAccountsCache;
+
+    [ObservableProperty]
+    private bool _installedOnly;
+
+    [ObservableProperty]
+    private bool _showHidden;
+
+    /// <summary>The selected collection's <see cref="GameCollection.FilterKey"/>, or null for all games.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CollectionFilterName), nameof(IsCollectionFilterActive))]
+    private string? _collectionFilter;
+
+    /// <summary>The selected smart list's key, or null for none.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSmartListActive), nameof(SmartListName), nameof(IsSortEnabled), nameof(ActiveSortColumn))]
+    private string? _smartList;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsGridViewShown), nameof(IsListViewShown), nameof(IsGridSkeletonShown), nameof(IsListSkeletonShown))]
+    private bool _isListView;
+
+    [ObservableProperty]
+    private bool _spoilerProtection;
+
+    [ObservableProperty]
+    private bool _backupBeforeCommit;
+
+    [ObservableProperty]
+    private bool _minimizeToTray;
+
+    [ObservableProperty]
+    private bool _showNotifications;
+
+    [ObservableProperty]
+    private bool _checkForUpdates;
+
+    /// <summary>True while a CSV export runs (progress InfoBar).</summary>
+    [ObservableProperty]
+    private bool _isExporting;
+
+    [ObservableProperty]
+    private string _exportProgressText = "";
+
+    [ObservableProperty]
+    private bool _isExportDoneOpen;
+
+    [ObservableProperty]
+    private string _exportDoneMessage = "";
+
+    /// <summary>Path of the last exported file.</summary>
+    [ObservableProperty]
+    private string? _exportedPath;
+
+    [ObservableProperty]
+    private bool _isUpdateOpen;
+
+    [ObservableProperty]
+    private string _updateTitle = "";
+
+    [ObservableProperty]
+    private string _updateMessage = "";
     #endregion
 
     public bool IsLoadErrorOpen
@@ -235,6 +337,45 @@ public sealed partial class LibraryViewModel : ObservableObject
     }
 
     public bool IsGridVisible => this.IsLoading == false && this.LoadError == null;
+
+    public bool IsGridViewShown => this.IsGridVisible && this.IsListView == false;
+
+    public bool IsListViewShown => this.IsGridVisible && this.IsListView;
+
+    public bool IsGridSkeletonShown => this.IsLoading && this.IsListView == false;
+
+    public bool IsListSkeletonShown => this.IsLoading && this.IsListView;
+
+    public bool IsSmartListActive => this.SmartList != null;
+
+    public string SmartListName => SmartLists.FirstOrDefault(l => l.Key == this.SmartList)?.Name ?? "Smart lists";
+
+    /// <summary>Smart lists have their own order, so the sort controls are disabled while one is active.</summary>
+    public bool IsSortEnabled => this.IsSmartListActive == false;
+
+    public bool IsCollectionFilterActive => this.CollectionFilter != null;
+
+    /// <summary>Name shown on the collection picker.</summary>
+    public string CollectionFilterName =>
+        this.CollectionFilter == null ? "All games" : this.FindCollection(this.CollectionFilter)?.Name ?? "All games";
+
+    /// <summary>Steam collections with explicit app lists (read-only).</summary>
+    public IReadOnlyList<GameCollection> SteamCollections { get; private set; } = [];
+
+    /// <summary>Collections made in SAM.</summary>
+    public IReadOnlyList<GameCollection> CustomCollections { get; private set; } = [];
+
+    /// <summary>The list view column the games are sorted by ("" when none matches, e.g. App ID or a smart list).</summary>
+    public string ActiveSortColumn => this.IsSmartListActive
+        ? ""
+        : this._columnSort ?? (LibrarySort)this.SortIndex switch
+        {
+            LibrarySort.Name => NameColumn,
+            LibrarySort.RecentlyPlayed => LastPlayedColumn,
+            LibrarySort.Playtime => PlaytimeColumn,
+            LibrarySort.Progress => ProgressColumn,
+            _ => "",
+        };
 
     public bool IsLibraryEmpty => this.IsLoading == false && this.LoadError == null && this.TotalCount == 0;
 
@@ -273,11 +414,13 @@ public sealed partial class LibraryViewModel : ObservableObject
             this.LogOnce("LoadCached", e);
         }
 
+        this.ReloadCustomCollections();
         if (cached is { Count: > 0 })
         {
             this.SetGames(cached);
         }
 
+        this.CheckForUpdatesOnStartup();
         await this.RefreshAsync();
     }
 
@@ -293,6 +436,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         var cts = this._refreshCts = new CancellationTokenSource();
 
         this.IsRefreshing = true;
+        this.ReloadSteamCollections();
         this.LoadError = null;
         this.IsRefreshWarningOpen = false;
         if (this._master.Count == 0)
@@ -363,7 +507,7 @@ public sealed partial class LibraryViewModel : ObservableObject
             }
             else
             {
-                this._master[entry.AppId] = new GameCardViewModel(this, entry, this.IsFavorite(entry.AppId));
+                this._master[entry.AppId] = this.CreateCard(entry);
             }
         }
 
@@ -405,6 +549,38 @@ public sealed partial class LibraryViewModel : ObservableObject
         var cts = this._enrichCts = new CancellationTokenSource();
         var token = cts.Token;
         var cards = this._master.Values.ToArray();
+
+        // Installed games: one pass over Steam's app manifests.
+        var installed = await Task.Run(() =>
+        {
+            try
+            {
+                return this._services.Installed.Load();
+            }
+            catch (Exception e)
+            {
+                this.LogOnce("Installed", e);
+                return null;
+            }
+        });
+        if (token.IsCancellationRequested)
+        {
+            return;
+        }
+
+        if (installed != null)
+        {
+            this._installed = installed;
+            foreach (var card in cards)
+            {
+                card.Installed = installed.TryGetValue(card.AppId, out var game) ? game : null;
+            }
+
+            if (this.InstalledOnly || this._columnSort == InstalledColumn)
+            {
+                this.ApplyFilter();
+            }
+        }
 
         // Playtime: one file read per refresh.
         var playtime = await Task.Run(() =>
@@ -480,7 +656,12 @@ public sealed partial class LibraryViewModel : ObservableObject
 
         this.FlushProgress(results, token, final: true);
         this.UpdateSummary();
-        if (this.CompletionFilterIndex != 0 || this.SortIndex == (int)LibrarySort.Progress)
+        if (this.SmartList == RarestOwnedList)
+        {
+            this.StartRarestLoad();
+        }
+
+        if (this.CompletionFilterIndex != 0 || this.SortIndex == (int)LibrarySort.Progress || this.IsSmartListActive)
         {
             this.ApplyFilter();
         }
@@ -502,7 +683,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
 
         // Grow a completion-filtered view as results arrive; a final pass re-sorts.
-        if (any && final == false && this.CompletionFilterIndex != 0)
+        if (any && final == false && (this.CompletionFilterIndex != 0 || this.IsSmartListActive))
         {
             this.ApplyFilter();
         }
@@ -510,7 +691,7 @@ public sealed partial class LibraryViewModel : ObservableObject
 
     private bool NeedsResortForPlaytime() =>
         this.SortIndex is (int)LibrarySort.RecentlyPlayed or (int)LibrarySort.Playtime ||
-        this.LastPlayedFilterIndex != 0;
+        this.LastPlayedFilterIndex != 0 || this.SmartList == NeverStartedList;
 
     private void UpdateSummary()
     {
@@ -591,7 +772,12 @@ public sealed partial class LibraryViewModel : ObservableObject
     #region Filtering and sorting
     partial void OnSearchTextChanged(string value) => this.ApplyFilter();
 
-    partial void OnSortIndexChanged(int value) => this.OnViewSettingChanged();
+    partial void OnSortIndexChanged(int value)
+    {
+        this._columnSort = null;
+        this.OnPropertyChanged(nameof(this.ActiveSortColumn));
+        this.OnViewSettingChanged();
+    }
 
     partial void OnSortDescendingChanged(bool value) => this.OnViewSettingChanged();
 
@@ -614,6 +800,34 @@ public sealed partial class LibraryViewModel : ObservableObject
     partial void OnCustomFromChanged(DateTimeOffset? value) => this.OnViewSettingChanged();
 
     partial void OnCustomToChanged(DateTimeOffset? value) => this.OnViewSettingChanged();
+
+    partial void OnInstalledOnlyChanged(bool value) => this.OnViewSettingChanged();
+
+    partial void OnShowHiddenChanged(bool value) => this.OnViewSettingChanged();
+
+    partial void OnCollectionFilterChanged(string? value) => this.OnViewSettingChanged();
+
+    partial void OnSmartListChanged(string? value)
+    {
+        if (value == RarestOwnedList && this._initializing == false)
+        {
+            this.StartRarestLoad();
+        }
+
+        this.OnViewSettingChanged();
+    }
+
+    partial void OnIsListViewChanged(bool value) => this.SaveSettings();
+
+    partial void OnSpoilerProtectionChanged(bool value) => this.SaveSettings();
+
+    partial void OnBackupBeforeCommitChanged(bool value) => this.SaveSettings();
+
+    partial void OnMinimizeToTrayChanged(bool value) => this.SaveSettings();
+
+    partial void OnShowNotificationsChanged(bool value) => this.SaveSettings();
+
+    partial void OnCheckForUpdatesChanged(bool value) => this.SaveSettings();
 
     partial void OnThemeIndexChanged(int value) => this.SaveSettings();
 
@@ -658,6 +872,16 @@ public sealed partial class LibraryViewModel : ObservableObject
             _ => "System",
         };
         settings.KeepOtherAccountsCache = this.KeepOtherAccountsCache;
+        settings.InstalledOnly = this.InstalledOnly;
+        settings.ShowHidden = this.ShowHidden;
+        settings.CollectionFilter = this.CollectionFilter;
+        settings.SmartList = this.SmartList;
+        settings.LibraryViewMode = this.IsListView ? "List" : "Grid";
+        settings.SpoilerProtection = this.SpoilerProtection;
+        settings.BackupBeforeCommit = this.BackupBeforeCommit;
+        settings.MinimizeToTray = this.MinimizeToTray;
+        settings.ShowNotifications = this.ShowNotifications;
+        settings.CheckForUpdates = this.CheckForUpdates;
         try
         {
             settings.Save();
@@ -681,12 +905,23 @@ public sealed partial class LibraryViewModel : ObservableObject
             count++;
         }
 
-        if (this.CompletionFilterIndex != 0)
+        // A smart list replaces the completion filter, so it doesn't count while one is active.
+        if (this.CompletionFilterIndex != 0 && this.IsSmartListActive == false)
         {
             count++;
         }
 
         if (this.LastPlayedFilterIndex != 0)
+        {
+            count++;
+        }
+
+        if (this.InstalledOnly)
+        {
+            count++;
+        }
+
+        if (this.ShowHidden)
         {
             count++;
         }
@@ -708,6 +943,8 @@ public sealed partial class LibraryViewModel : ObservableObject
         this.LastPlayedFilterIndex = 0;
         this.CustomFrom = null;
         this.CustomTo = null;
+        this.InstalledOnly = false;
+        this.ShowHidden = false;
         this._initializing = initializing;
         this.OnViewSettingChanged();
     }
@@ -717,6 +954,10 @@ public sealed partial class LibraryViewModel : ObservableObject
     {
         this._suspendFilter = true;
         this.SearchText = "";
+        this._initializing = true;
+        this.CollectionFilter = null;
+        this.SmartList = null;
+        this._initializing = false;
         this._suspendFilter = false;
         this.ResetFilters();
     }
@@ -735,13 +976,24 @@ public sealed partial class LibraryViewModel : ObservableObject
         var digits = search.Length > 0 && search.All(char.IsAsciiDigit);
         var range = this.GetLastPlayedRange();
         var neverPlayed = this.LastPlayedFilterIndex == (int)LibraryLastPlayedFilter.Never;
-        var completion = (LibraryCompletionFilter)this.CompletionFilterIndex;
+        var smartList = this.SmartList;
+
+        // A smart list defines its own completion criteria, so the completion filter is ignored.
+        var completion = smartList == null ? (LibraryCompletionFilter)this.CompletionFilterIndex : LibraryCompletionFilter.All;
+        var collection = this.CollectionFilter is { } key ? this.FindCollection(key) : null;
 
         var list = new List<GameCardViewModel>(this._master.Count);
         foreach (var card in this._master.Values)
         {
+            card.SmartBadge = this.GetSmartBadge(card, smartList);
+            card.IsSmartBadgeLoading = smartList == RarestOwnedList && this.IsRarestPending(card);
+
             if (this.IsTypeShown(card.Type) == false ||
-                (this.FavoritesOnly && card.IsFavorite == false))
+                (this.FavoritesOnly && card.IsFavorite == false) ||
+                (this.InstalledOnly && card.IsInstalled == false) ||
+                (this.ShowHidden == false && card.IsHidden) ||
+                (collection != null && collection.AppIds.Contains(card.AppId) == false) ||
+                MatchesSmartList(card, smartList) == false)
             {
                 continue;
             }
@@ -785,7 +1037,7 @@ public sealed partial class LibraryViewModel : ObservableObject
             list.Add(card);
         }
 
-        list.Sort(this.Compare);
+        list.Sort(smartList == null ? this.Compare : this.CompareForSmartList);
         this.Sync(list);
 
         this.ShownCount = list.Count;
@@ -826,13 +1078,18 @@ public sealed partial class LibraryViewModel : ObservableObject
             return a.IsFavorite ? -1 : 1;
         }
 
-        var result = (LibrarySort)this.SortIndex switch
+        var result = this._columnSort switch
         {
-            LibrarySort.AppId => a.AppId.CompareTo(b.AppId),
-            LibrarySort.RecentlyPlayed => Nullable.Compare(a.LastPlayed, b.LastPlayed),
-            LibrarySort.Playtime => a.PlaytimeSpan.CompareTo(b.PlaytimeSpan),
-            LibrarySort.Progress => a.CompletionSortKey.CompareTo(b.CompletionSortKey),
-            _ => 0,
+            InstalledColumn => a.IsInstalled.CompareTo(b.IsInstalled),
+            FavoriteColumn => a.IsFavorite.CompareTo(b.IsFavorite),
+            _ => (LibrarySort)this.SortIndex switch
+            {
+                LibrarySort.AppId => a.AppId.CompareTo(b.AppId),
+                LibrarySort.RecentlyPlayed => Nullable.Compare(a.LastPlayed, b.LastPlayed),
+                LibrarySort.Playtime => a.PlaytimeSpan.CompareTo(b.PlaytimeSpan),
+                LibrarySort.Progress => a.CompletionSortKey.CompareTo(b.CompletionSortKey),
+                _ => 0,
+            },
         };
 
         if (result == 0)
@@ -967,7 +1224,7 @@ public sealed partial class LibraryViewModel : ObservableObject
 
         if (this._master.TryGetValue(entry.AppId, out var card) == false)
         {
-            card = new GameCardViewModel(this, entry, this.IsFavorite(entry.AppId));
+            card = this.CreateCard(entry);
             this._master[entry.AppId] = card;
             this.TotalCount = this._master.Count;
             this.ApplyFilter();
@@ -1070,19 +1327,40 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
     }
 
-    internal async void OpenUrl(string url)
+    internal void OpenUrl(string url) => this.LaunchUri(url, "Couldn't open the browser");
+
+    /// <summary>Starts the game through Steam if it's installed, or opens Steam's install dialog.</summary>
+    internal void PlayOrInstall(GameCardViewModel card) => this.LaunchUri(
+        card.IsInstalled ? $"steam://rungameid/{card.AppIdText}" : $"steam://install/{card.AppIdText}",
+        card.IsInstalled ? $"Couldn't start {card.Name}" : $"Couldn't install {card.Name}");
+
+    private async void LaunchUri(string url, string failureTitle)
     {
         try
         {
             if (await Windows.System.Launcher.LaunchUriAsync(new Uri(url)) == false)
             {
-                this.ShowNotice("Couldn't open the browser", url, InfoBarSeverity.Error);
+                this.ShowNotice(failureTitle, url, InfoBarSeverity.Error);
             }
         }
         catch (Exception e)
         {
             Diagnostics.Log($"Couldn't open {url}", e);
-            this.ShowNotice("Couldn't open the browser", e.Message, InfoBarSeverity.Error);
+            this.ShowNotice(failureTitle, e.Message, InfoBarSeverity.Error);
+        }
+    }
+
+    /// <summary>Opens a file or folder with its default handler (Explorer for folders).</summary>
+    public void OpenPath(string path)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(path) { UseShellExecute = true })?.Dispose();
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log($"Couldn't open {path}", e);
+            this.ShowNotice("Couldn't open the file", e.Message, InfoBarSeverity.Error);
         }
     }
 
@@ -1143,6 +1421,8 @@ public sealed partial class LibraryViewModel : ObservableObject
     public void Shutdown()
     {
         this._isShutDown = true;
+        this._lifetime.Cancel();
+        this._services.Collections.Changed -= this.OnCollectionsStoreChanged;
         this._refreshCts?.Cancel();
         this._enrichCts?.Cancel();
         foreach (var card in this._master.Values)

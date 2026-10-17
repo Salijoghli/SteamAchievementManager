@@ -6,9 +6,11 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using SAM.App.Models;
 using SAM.App.Services;
 using SAM.App.ViewModels;
 using SAM.App.Views.Library;
+using Windows.Storage.Pickers;
 using VirtualKey = Windows.System.VirtualKey;
 
 namespace SAM.App.Views;
@@ -20,7 +22,7 @@ namespace SAM.App.Views;
 public sealed partial class LibraryWindow : Window
 {
     private readonly DispatcherQueueTimer _searchDebounce;
-    private bool _isSettingsOpen;
+    private bool _isDialogOpen;
 
     private readonly AppServices _services;
 
@@ -70,6 +72,7 @@ public sealed partial class LibraryWindow : Window
     private async void OnRootLoaded(object sender, RoutedEventArgs e)
     {
         this.Root.Loaded -= this.OnRootLoaded;
+        this.SyncViewModeButtons();
         try
         {
             await this.ViewModel.InitializeAsync();
@@ -269,6 +272,173 @@ public sealed partial class LibraryWindow : Window
     }
     #endregion
 
+    #region View mode, collections and smart lists
+    private void OnGridModeClick(object sender, RoutedEventArgs e)
+    {
+        this.ViewModel.IsListView = false;
+        this.SyncViewModeButtons();
+    }
+
+    private void OnListModeClick(object sender, RoutedEventArgs e)
+    {
+        this.ViewModel.IsListView = true;
+        this.SyncViewModeButtons();
+    }
+
+    /// <summary>The two view buttons act as a segmented control: exactly one is checked.</summary>
+    private void SyncViewModeButtons()
+    {
+        this.GridModeButton.IsChecked = this.ViewModel.IsListView == false;
+        this.ListModeButton.IsChecked = this.ViewModel.IsListView;
+    }
+
+    private void OnColumnHeaderClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: string column })
+        {
+            this.ViewModel.SortByColumn(column);
+        }
+    }
+
+    /// <summary>Rebuilds the collection picker: All games, Steam collections, SAM collections, Manage.</summary>
+    private void OnCollectionMenuOpening(object? sender, object e)
+    {
+        var items = this.CollectionMenu.Items;
+        items.Clear();
+
+        var current = this.ViewModel.CollectionFilter;
+        var all = this.CollectionItem("All games", null);
+        items.Add(all);
+        var anyChecked = false;
+
+        void AddGroup(string title, IReadOnlyList<GameCollection> collections)
+        {
+            if (collections.Count == 0)
+            {
+                return;
+            }
+
+            items.Add(new MenuFlyoutSeparator());
+            items.Add(new MenuFlyoutItem { Text = title, IsEnabled = false });
+            foreach (var collection in collections)
+            {
+                var item = this.CollectionItem(collection.Name, collection.FilterKey);
+                item.IsChecked = collection.FilterKey == current;
+                anyChecked |= item.IsChecked;
+                items.Add(item);
+            }
+        }
+
+        AddGroup("Steam collections", this.ViewModel.SteamCollections);
+        AddGroup("SAM collections", this.ViewModel.CustomCollections);
+        all.IsChecked = anyChecked == false;
+
+        items.Add(new MenuFlyoutSeparator());
+        var manage = new MenuFlyoutItem { Text = "Manage collections…", Icon = new FontIcon { Glyph = "" } };
+        manage.Click += this.OnManageCollectionsClick;
+        items.Add(manage);
+    }
+
+    private RadioMenuFlyoutItem CollectionItem(string text, string? filterKey)
+    {
+        var item = new RadioMenuFlyoutItem { Text = text, GroupName = "LibraryCollection" };
+        item.Click += (_, _) => this.ViewModel.CollectionFilter = filterKey;
+        return item;
+    }
+
+    private void OnSmartListMenuOpening(object? sender, object e)
+    {
+        var items = this.SmartListMenu.Items;
+        items.Clear();
+
+        var none = new RadioMenuFlyoutItem { Text = "None", GroupName = "LibrarySmartList", IsChecked = this.ViewModel.SmartList == null };
+        none.Click += (_, _) => this.ViewModel.SmartList = null;
+        items.Add(none);
+        items.Add(new MenuFlyoutSeparator());
+
+        foreach (var list in LibraryViewModel.SmartLists)
+        {
+            var key = list.Key;
+            var item = new RadioMenuFlyoutItem
+            {
+                Text = list.Name,
+                GroupName = "LibrarySmartList",
+                IsChecked = this.ViewModel.SmartList == key,
+            };
+            ToolTipService.SetToolTip(item, list.Description);
+            item.Click += (_, _) => this.ViewModel.SmartList = key;
+            items.Add(item);
+        }
+    }
+
+    private async void OnManageCollectionsClick(object sender, RoutedEventArgs e)
+    {
+        if (this._isDialogOpen)
+        {
+            return;
+        }
+
+        this._isDialogOpen = true;
+        try
+        {
+            await CollectionDialogs.ShowManageAsync(this.Root.XamlRoot, this.ViewModel);
+        }
+        catch (Exception ex)
+        {
+            Diagnostics.Log("Manage collections dialog failed", ex);
+        }
+        finally
+        {
+            this._isDialogOpen = false;
+        }
+    }
+    #endregion
+
+    #region Export
+    private async void OnExportLibraryClick(object sender, RoutedEventArgs e)
+    {
+        var path = await this.PickCsvPathAsync($"SAM library {DateTime.Now:yyyy-MM-dd}");
+        if (path != null)
+        {
+            await this.ViewModel.ExportLibraryAsync(path);
+        }
+    }
+
+    private async void OnExportAchievementsClick(object sender, RoutedEventArgs e)
+    {
+        var path = await this.PickCsvPathAsync($"SAM achievements {DateTime.Now:yyyy-MM-dd}");
+        if (path != null)
+        {
+            await this.ViewModel.ExportAchievementsAsync(path);
+        }
+    }
+
+    /// <summary>Asks where to save a CSV file. Returns null if cancelled.</summary>
+    private async Task<string?> PickCsvPathAsync(string suggestedName)
+    {
+        try
+        {
+            var picker = new FileSavePicker
+            {
+                SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
+                SuggestedFileName = suggestedName,
+            };
+            picker.FileTypeChoices.Add("CSV (comma separated)", new List<string> { ".csv" });
+
+            // Unpackaged apps must tell the picker which window owns it.
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, WinRT.Interop.WindowNative.GetWindowHandle(this));
+            var file = await picker.PickSaveFileAsync();
+            return file?.Path;
+        }
+        catch (Exception ex)
+        {
+            Diagnostics.Log("Save picker failed", ex);
+            this.ViewModel.ShowNotice("Couldn't choose a file", ex.Message, InfoBarSeverity.Error);
+            return null;
+        }
+    }
+    #endregion
+
     #region Pages
     private readonly Dictionary<string, UIElement> _pages = [];
 
@@ -313,12 +483,12 @@ public sealed partial class LibraryWindow : Window
 
     private async void OnSettingsClick(object sender, RoutedEventArgs e)
     {
-        if (this._isSettingsOpen)
+        if (this._isDialogOpen)
         {
             return;
         }
 
-        this._isSettingsOpen = true;
+        this._isDialogOpen = true;
         try
         {
             var dialog = new LibrarySettingsDialog(this.ViewModel) { XamlRoot = this.Root.XamlRoot };
@@ -334,7 +504,7 @@ public sealed partial class LibraryWindow : Window
         }
         finally
         {
-            this._isSettingsOpen = false;
+            this._isDialogOpen = false;
         }
     }
 }

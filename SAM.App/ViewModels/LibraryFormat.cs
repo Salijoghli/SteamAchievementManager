@@ -1,5 +1,7 @@
 using System.Globalization;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using SAM.App.Models;
 
 namespace SAM.App.ViewModels;
@@ -89,4 +91,17 @@ public static class LibraryFormat
     public static Visibility VisibleIfNotNull(object? value) => value != null ? Visibility.Visible : Visibility.Collapsed;
 
     public static double OpacityIf(bool value) => value ? 1 : 0;
+
+    /// <summary>Sort arrow for a list view column header: shown only on the active column.</summary>
+    public static string SortGlyph(string activeColumn, bool descending, string column) =>
+        activeColumn != column ? "" : descending ? "" : "";
+
+    /// <summary>The list view's Favorite header: a star, or the sort arrow while sorted by it.</summary>
+    public static string FavoriteHeaderGlyph(string activeColumn, bool descending) =>
+        activeColumn == LibraryViewModel.FavoriteColumn ? SortGlyph(activeColumn, descending, activeColumn) : "";
+
+    /// <summary>A small decoded thumbnail of a cached card image for the list view, or null.</summary>
+    public static ImageSource? Thumbnail(string? path) => path == null
+        ? null
+        : new BitmapImage { DecodePixelWidth = 96, DecodePixelType = DecodePixelType.Logical, UriSource = new Uri(path) };
 }

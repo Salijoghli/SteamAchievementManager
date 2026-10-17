@@ -33,6 +33,8 @@ public sealed partial class GameCard : UserControl
         this.HeaderImage.OpacityTransition = this._fade;
         this.CardRoot.TranslationTransition = new Vector3Transition { Duration = TimeSpan.FromMilliseconds(150) };
         this.HoverBorder.OpacityTransition = new ScalarTransition { Duration = TimeSpan.FromMilliseconds(150) };
+        this.PlayButton.OpacityTransition = new ScalarTransition { Duration = TimeSpan.FromMilliseconds(150) };
+        this.ContextFlyout = GameContextMenu.Create(this, () => this.Card);
         this.Loaded += (_, _) => this.Subscribe(this.Card);
         this.Unloaded += (_, _) => this.Subscribe(null);
     }
@@ -156,5 +158,7 @@ public sealed partial class GameCard : UserControl
     {
         this.CardRoot.Translation = hover ? new Vector3(0, -3, 0) : Vector3.Zero;
         this.HoverBorder.Opacity = hover ? 1 : 0;
+        this.PlayButton.Opacity = hover ? 1 : 0;
+        this.PlayButton.IsHitTestVisible = hover;
     }
 }
