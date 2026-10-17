@@ -36,6 +36,9 @@ public sealed partial class UnlockItemViewModel : ObservableObject
 
     public string Name => this.Event.AchievementName;
 
+    /// <summary>Screen readers announce list rows by their item's ToString.</summary>
+    public override string ToString() => $"{this.Name}, {this.Event.GameName}";
+
     public string Description => this.Event.Description;
 
     public bool HasDescription => string.IsNullOrWhiteSpace(this.Event.Description) == false;

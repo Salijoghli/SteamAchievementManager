@@ -58,6 +58,9 @@ public sealed partial class AchievementViewModel : ObservableObject
 
     public string Name => string.IsNullOrWhiteSpace(this.Definition.Name) ? this.Definition.Id : this.Definition.Name;
 
+    /// <summary>Screen readers announce list rows by their item's ToString.</summary>
+    public override string ToString() => $"{this.Name}, {(this.IsChecked ? "unlocked" : "locked")}";
+
     public string Description => this.Definition.Description;
 
     public bool IsHidden => this.Definition.IsHidden;

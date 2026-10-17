@@ -41,6 +41,9 @@ public sealed partial class StatViewModel : ObservableObject
     public string Id => this.Definition.Id;
 
     /// <summary>The display name, humanized when the schema only repeats the ID.</summary>
+    /// <summary>Screen readers announce list rows by their item's ToString.</summary>
+    public override string ToString() => this.DisplayName;
+
     public string DisplayName =>
         string.IsNullOrWhiteSpace(this.Definition.DisplayName) || this.Definition.DisplayName == this.Definition.Id
             ? Humanize(this.Definition.Id)
