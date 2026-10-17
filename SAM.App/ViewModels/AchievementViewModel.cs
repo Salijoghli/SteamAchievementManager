@@ -110,18 +110,62 @@ public sealed partial class AchievementViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DisplayDescription))]
     [NotifyPropertyChangedFor(nameof(IsDescriptionConcealed))]
+    [NotifyPropertyChangedFor(nameof(IsSpoilerMasked))]
     private bool _isRevealed;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DisplayDescription))]
     [NotifyPropertyChangedFor(nameof(IsDescriptionConcealed))]
+    [NotifyPropertyChangedFor(nameof(IsSpoilerMasked))]
     private bool _isHovered;
 
-    public bool IsDescriptionConcealed => this.IsHidden && this.IsRevealed == false && this.IsHovered == false;
+    /// <summary>
+    /// Spoiler protection (from the settings): hidden descriptions are masked until clicked
+    /// and hovering no longer reveals them.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DisplayDescription))]
+    [NotifyPropertyChangedFor(nameof(IsDescriptionConcealed))]
+    [NotifyPropertyChangedFor(nameof(IsSpoilerMasked))]
+    private bool _isSpoilerProtectionOn;
+
+    public bool IsDescriptionConcealed =>
+        this.IsHidden && this.IsRevealed == false && (this.IsSpoilerProtectionOn || this.IsHovered == false);
+
+    /// <summary>True when the description is replaced by the spoiler mask (instead of plain placeholder text).</summary>
+    public bool IsSpoilerMasked => this.IsDescriptionConcealed && this.IsSpoilerProtectionOn;
 
     public string DisplayDescription => this.IsDescriptionConcealed
-        ? "Hidden achievement — hover or click to reveal"
+        ? (this.IsSpoilerProtectionOn
+            ? "Hidden achievement — click to reveal"
+            : "Hidden achievement — hover or click to reveal")
         : string.IsNullOrEmpty(this.Description) ? (this.IsHidden ? "Hidden achievement" : "") : this.Description;
+    #endregion
+
+    #region Row actions and note
+    /// <summary>True while the pointer is over the row; reveals the row's action buttons.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ActionOpacity))]
+    private bool _isRowHovered;
+
+    /// <summary>The user's personal note, or null if none.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasNote))]
+    [NotifyPropertyChangedFor(nameof(HasNoNote))]
+    [NotifyPropertyChangedFor(nameof(NotePreview))]
+    private string? _note;
+
+    public bool HasNote => string.IsNullOrWhiteSpace(this.Note) == false;
+
+    public bool HasNoNote => this.HasNote == false;
+
+    /// <summary>The note's first non-empty line, for the one-line preview under the description.</summary>
+    public string NotePreview => this.HasNote
+        ? this.Note!.Split('\n').Select(line => line.Trim()).First(line => line.Length > 0)
+        : "";
+
+    /// <summary>Hover-revealed buttons (guides, and the note button while there's no note).</summary>
+    public double ActionOpacity => this.IsRowHovered ? 1.0 : 0.0;
     #endregion
 
     #region Rarity
@@ -216,6 +260,7 @@ public sealed partial class AchievementViewModel : ObservableObject
     public bool Matches(string query) =>
         this.Name.Contains(query, StringComparison.CurrentCultureIgnoreCase) ||
         this.Id.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+        (this.Note?.Contains(query, StringComparison.CurrentCultureIgnoreCase) ?? false) ||
         ((this.IsHidden == false || this.IsRevealed) &&
          this.Description.Contains(query, StringComparison.CurrentCultureIgnoreCase));
 }
