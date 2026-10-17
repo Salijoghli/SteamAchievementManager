@@ -187,6 +187,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <SelectorBar x:Name="Tabs" SelectionChanged="OnTabChanged" VerticalAlignment="Center">
                     <SelectorBarItem x:Name="AchievementsTab" x:Uid="Game_AchievementsTab" IsSelected="True">
@@ -231,6 +232,7 @@
                     </AppBarElementContainer>
                     <AppBarButton
                         x:Uid="Game_InvertButton"
+                        DynamicOverflowOrder="1"
                         Command="{x:Bind ViewModel.InvertCommand}">
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xE8AB;" />
@@ -239,28 +241,18 @@
                     <AppBarButton
                         Icon="Refresh"
                         x:Uid="Game_ReloadButton"
+                        DynamicOverflowOrder="2"
                         Click="OnReloadClick"
                         IsEnabled="{x:Bind game:GameFormat.Not(ViewModel.IsBusy), Mode=OneWay}" />
                     <AppBarButton
                         x:Uid="Game_BackupsButton"
+                        DynamicOverflowOrder="3"
                         Click="OnBackupsClick"
                         IsEnabled="{x:Bind game:GameFormat.IsIdle(ViewModel.IsLoaded, ViewModel.IsBusy), Mode=OneWay}">
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xE78C;" />
                         </AppBarButton.Icon>
                     </AppBarButton>
-                    <AppBarSeparator />
-                    <AppBarElementContainer VerticalAlignment="Center">
-                        <Button
-                            Style="{StaticResource AccentButtonStyle}"
-                            x:Uid="Game_CommitButton"
-                            Command="{x:Bind ViewModel.CommitCommand}">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <FontIcon Glyph="&#xE74E;" FontSize="16" />
-                                <TextBlock Text="{x:Bind ViewModel.CommitLabel, Mode=OneWay}" />
-                            </StackPanel>
-                        </Button>
-                    </AppBarElementContainer>
                     <CommandBar.SecondaryCommands>
                         <AppBarToggleButton
                             x:Uid="Game_SpoilerToggle"
@@ -288,6 +280,19 @@
                         </AppBarButton>
                     </CommandBar.SecondaryCommands>
                 </CommandBar>
+
+                <!-- Outside the CommandBar so it can never be moved into the overflow menu. -->
+                <Button
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    Style="{StaticResource AccentButtonStyle}"
+                    x:Uid="Game_CommitButton"
+                    Command="{x:Bind ViewModel.CommitCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <FontIcon Glyph="&#xE74E;" FontSize="16" />
+                        <TextBlock Text="{x:Bind ViewModel.CommitLabel, Mode=OneWay}" />
+                    </StackPanel>
+                </Button>
             </Grid>
 
             <!-- Body. -->
