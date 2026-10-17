@@ -16,7 +16,7 @@ public sealed class AppServices
         this.Favorites = new FavoritesStore(this.Cache);
 
         var http = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
-        http.DefaultRequestHeaders.UserAgent.ParseAdd("SteamAchievementManager/8.0");
+        http.DefaultRequestHeaders.UserAgent.ParseAdd($"SteamAchievementManager/{UpdateService.CurrentVersion.ToString(3)}");
 
         this.Schemas = new SchemaService(steam);
         this.Progress = new ProgressService(steam);
