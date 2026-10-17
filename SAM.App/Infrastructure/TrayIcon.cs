@@ -6,7 +6,8 @@ namespace SAM.App.Infrastructure;
 
 /// <summary>
 /// The app's notification-area ("system tray") icon, via Shell_NotifyIcon. Left-click raises
-/// <see cref="OpenRequested"/>; right-click shows a menu with "Open library" and "Exit".
+/// <see cref="OpenRequested"/>; right-click shows a menu with "Open library", an optional extra
+/// command (<see cref="AutopilotCommandText"/>, e.g. "Pause Autopilot") and "Exit".
 /// </summary>
 /// <remarks>
 /// Create and use it on the UI thread: it owns a hidden window whose messages are pumped by that
@@ -21,6 +22,7 @@ public sealed class TrayIcon : IDisposable
     private const uint CallbackMessage = WmApp + 1;
     private const int OpenCommand = 1;
     private const int ExitCommand = 2;
+    private const int AutopilotCommand = 3;
 
     private static readonly WndProc WindowProcedure = StaticWindowProc;
     private static readonly Dictionary<IntPtr, TrayIcon> Instances = [];
@@ -59,6 +61,12 @@ public sealed class TrayIcon : IDisposable
 
     /// <summary>"Exit" in the icon's menu. Raised on the UI thread.</summary>
     public event EventHandler? ExitRequested;
+
+    /// <summary>The <see cref="AutopilotCommandText"/> menu item was chosen. Raised on the UI thread.</summary>
+    public event EventHandler? AutopilotCommandRequested;
+
+    /// <summary>Text of an extra menu item above "Exit" (e.g. "Pause Autopilot"); null hides it.</summary>
+    public string? AutopilotCommandText { get; set; }
 
     /// <summary>
     /// Whether the icon is shown in the notification area. Stays false after setting it to true
@@ -169,6 +177,11 @@ public sealed class TrayIcon : IDisposable
         try
         {
             AppendMenu(menu, MfString, OpenCommand, Strings.Get("Tray_OpenLibrary"));
+            if (string.IsNullOrEmpty(this.AutopilotCommandText) == false)
+            {
+                AppendMenu(menu, MfString, AutopilotCommand, this.AutopilotCommandText);
+            }
+
             AppendMenu(menu, MfSeparator, 0, null);
             AppendMenu(menu, MfString, ExitCommand, Strings.Get("Tray_Exit"));
             SetMenuDefaultItem(menu, OpenCommand, 0);
@@ -187,6 +200,9 @@ public sealed class TrayIcon : IDisposable
                     break;
                 case ExitCommand:
                     this.ExitRequested?.Invoke(this, EventArgs.Empty);
+                    break;
+                case AutopilotCommand:
+                    this.AutopilotCommandRequested?.Invoke(this, EventArgs.Empty);
                     break;
             }
         }

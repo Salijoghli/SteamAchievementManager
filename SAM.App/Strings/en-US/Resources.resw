@@ -245,6 +245,111 @@ If you have this game through Family Sharing, it may be locked while the owner i
   <data name="Library_PageAutopilot.Text" xml:space="preserve">
     <value>Autopilot</value>
   </data>
+  <data name="AutopilotEngine_WindowOpen" xml:space="preserve">
+    <value>SAM's window for this game is open. Close it so Autopilot can run the game.</value>
+  </data>
+  <data name="AutopilotEngine_AlreadyRunning" xml:space="preserve">
+    <value>Another Autopilot process is already running this game.</value>
+  </data>
+  <data name="AutopilotEngine_NoSchema" xml:space="preserve">
+    <value>This game has no achievement schema on this PC. Open it in SAM once so Steam downloads it.</value>
+  </data>
+  <data name="AutopilotEngine_UnknownRequest" xml:space="preserve">
+    <value>Unknown Autopilot request.</value>
+  </data>
+  <data name="AutopilotEngine_UnknownAchievement" xml:space="preserve">
+    <value>The game has no achievement {0}. Nothing was changed.</value>
+  </data>
+  <data name="AutopilotEngine_ProtectedAchievement" xml:space="preserve">
+    <value>"{0}" is protected and can't be changed. Nothing was changed.</value>
+  </data>
+  <data name="AutopilotEngine_NoAchievementState" xml:space="preserve">
+    <value>Steam didn't return the state of "{0}". Nothing was changed.</value>
+  </data>
+  <data name="AutopilotEngine_NothingToUnlock" xml:space="preserve">
+    <value>Nothing to unlock: the achievements are already unlocked.</value>
+  </data>
+  <data name="AutopilotEngine_BackupFailed" xml:space="preserve">
+    <value>Couldn't back up the game before unlocking ({0}). Nothing was changed.</value>
+  </data>
+  <data name="AutopilotEngine_StatRefused" xml:space="preserve">
+    <value>Steam refused to set the stat "{0}" ({1}).</value>
+  </data>
+  <data name="AutopilotEngine_AchievementRefused" xml:space="preserve">
+    <value>Steam refused to unlock "{0}" ({1}).</value>
+  </data>
+  <data name="AutopilotEngine_NothingStored" xml:space="preserve">
+    <value>Nothing was stored. {0}</value>
+  </data>
+  <data name="AutopilotEngine_NotUndone" xml:space="preserve">
+    <value>SAM couldn't undo the change already made to {0}; Steam may upload it the next time this game's stats are stored.</value>
+  </data>
+  <data name="AutopilotEngine_UnlockedMessage_One" xml:space="preserve">
+    <value>{0} achievement unlocked: {1}</value>
+  </data>
+  <data name="AutopilotEngine_UnlockedMessage_Other" xml:space="preserve">
+    <value>{0} achievements unlocked: {1}</value>
+  </data>
+  <data name="AutopilotEngine_DryRunSuffix" xml:space="preserve">
+    <value> (dry run: nothing was changed on Steam)</value>
+  </data>
+  <data name="AutopilotEngine_DryRunTag" xml:space="preserve">
+    <value>(dry run)</value>
+  </data>
+  <data name="AutopilotEngine_WorkerStartFailed" xml:space="preserve">
+    <value>Couldn't start the game's Autopilot process: {0}</value>
+  </data>
+  <data name="AutopilotEngine_WorkerNoAnswer" xml:space="preserve">
+    <value>The game's Autopilot process didn't answer. Autopilot will try again.</value>
+  </data>
+  <data name="AutopilotEngine_WorkerExited" xml:space="preserve">
+    <value>The game's Autopilot process stopped unexpectedly (exit code {0}). Autopilot will try again.</value>
+  </data>
+  <data name="AutopilotEngine_WorkerStopped" xml:space="preserve">
+    <value>The game's Autopilot process stopped. Autopilot will try again.</value>
+  </data>
+  <data name="AutopilotEngine_TrayIdle" xml:space="preserve">
+    <value>Autopilot: waiting, no games running</value>
+  </data>
+  <data name="AutopilotEngine_TrayRunning_One" xml:space="preserve">
+    <value>Autopilot: {0} game running</value>
+  </data>
+  <data name="AutopilotEngine_TrayRunning_Other" xml:space="preserve">
+    <value>Autopilot: {0} games running</value>
+  </data>
+  <data name="AutopilotEngine_TrayRunningNext_One" xml:space="preserve">
+    <value>Autopilot: {0} game running · next unlock {1}</value>
+  </data>
+  <data name="AutopilotEngine_TrayRunningNext_Other" xml:space="preserve">
+    <value>Autopilot: {0} games running · next unlock {1}</value>
+  </data>
+  <data name="AutopilotEngine_TrayPause" xml:space="preserve">
+    <value>Pause Autopilot</value>
+  </data>
+  <data name="AutopilotEngine_TrayResume" xml:space="preserve">
+    <value>Resume Autopilot</value>
+  </data>
+  <data name="AutopilotEngine_TrayHintTitle" xml:space="preserve">
+    <value>Autopilot is still running</value>
+  </data>
+  <data name="AutopilotEngine_TrayHintMessage" xml:space="preserve">
+    <value>SAM keeps running your Autopilot games from the tray. Right-click the tray icon to pause Autopilot or exit.</value>
+  </data>
+  <data name="AutopilotEngine_NotifyTitle" xml:space="preserve">
+    <value>Autopilot: {0}</value>
+  </data>
+  <data name="AutopilotEngine_NotifyFailedTitle" xml:space="preserve">
+    <value>Autopilot couldn't unlock achievements in {0}</value>
+  </data>
+  <data name="AutopilotEngine_SummaryTitle" xml:space="preserve">
+    <value>Autopilot summary</value>
+  </data>
+  <data name="AutopilotEngine_SummaryMessage_One" xml:space="preserve">
+    <value>{0} achievement unlocked in {1}.</value>
+  </data>
+  <data name="AutopilotEngine_SummaryMessage_Other" xml:space="preserve">
+    <value>{0} achievements unlocked in {1}.</value>
+  </data>
   <data name="Library_SearchBox.PlaceholderText" xml:space="preserve">
     <value>Search games or App ID</value>
   </data>
