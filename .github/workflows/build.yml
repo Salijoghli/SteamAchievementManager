@@ -22,11 +22,14 @@ jobs:
         if: hashFiles('SAM.App.Tests/SAM.App.Tests.csproj') != ''
         run: dotnet test SAM.App.Tests -c Release -p:Platform=x64 --no-build -v:minimal -nologo
 
-      - name: Upload build
+      - name: Package single-file SAM.exe
+        shell: pwsh
+        run: ./build.ps1
+
+      - name: Upload SAM.exe
         uses: actions/upload-artifact@v4
         with:
           name: SteamAchievementManager
           path: |
+            upload/SAM.exe
             LICENSE.txt
-            upload/
-            !upload/**/*.pdb

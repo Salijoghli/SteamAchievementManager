@@ -198,7 +198,7 @@ public sealed class NotificationService(AppSettings settings)
             using (var key = Registry.CurrentUser.CreateSubKey($@"Software\Classes\AppUserModelId\{AppUserModelId}"))
             {
                 key.SetValue("DisplayName", DisplayName);
-                key.SetValue("IconUri", Path.Combine(AppContext.BaseDirectory, "Assets", "SAM.ico"));
+                key.SetValue("IconUri", AppIcon.Path);
             }
 
             // (ToastNotifier.Setting throws "element not found" for unpackaged apps, so it isn't checked.)

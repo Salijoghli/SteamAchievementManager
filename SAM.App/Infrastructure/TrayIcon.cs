@@ -48,7 +48,7 @@ public sealed class TrayIcon : IDisposable
 
         Instances[this._hwnd] = this;
 
-        var iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "SAM.ico");
+        var iconPath = AppIcon.Path;
         this._icon = LoadImage(IntPtr.Zero, iconPath, ImageIcon, GetSystemMetrics(SmCxSmIcon), GetSystemMetrics(SmCySmIcon), LrLoadFromFile);
         if (this._icon == IntPtr.Zero)
         {

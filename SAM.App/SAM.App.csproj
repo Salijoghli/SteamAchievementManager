@@ -21,16 +21,13 @@
     <UseWinUI>true</UseWinUI>
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <!-- Bundle .NET too, so SAM.exe runs on any Windows 10/11 PC without installing anything. -->
+    <SelfContained>true</SelfContained>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\SAM.ico</ApplicationIcon>
     <Nullable>enable</Nullable>
     <LangVersion>12.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <OutputPath>..\upload\</OutputPath>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Assets\**" CopyToOutputDirectory="PreserveNewest" />
@@ -38,6 +35,8 @@
   <ItemGroup>
     <!-- English UI text, also embedded so Strings works where the resource system isn't available (e.g. tests). -->
     <EmbeddedResource Include="Strings\en-US\Resources.resw" LogicalName="SAM.App.Strings.en-US.Resources.resw" />
+    <!-- The app icon, written out at run time when there's no Assets folder (single-file SAM.exe). -->
+    <EmbeddedResource Include="Assets\SAM.ico" LogicalName="SAM.App.Assets.SAM.ico" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK.WinUI" Version="2.3.9" />

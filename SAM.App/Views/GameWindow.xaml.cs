@@ -49,7 +49,7 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
 
         this.Title = this.ViewModel.GameName;
         this.SystemBackdrop = new MicaBackdrop();
-        this.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "SAM.ico"));
+        this.AppWindow.SetIcon(AppIcon.Path);
         this.ExtendsContentIntoTitleBar = true;
         this.SetTitleBar(this.AppTitleBar);
         this.ApplyTheme(services.Settings.Theme);

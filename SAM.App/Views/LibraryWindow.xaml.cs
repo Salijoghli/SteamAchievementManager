@@ -37,7 +37,7 @@ public sealed partial class LibraryWindow : Window
         this.SystemBackdrop = new MicaBackdrop();
         this.ExtendsContentIntoTitleBar = true;
         this.SetTitleBar(this.AppTitleBar);
-        this.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "SAM.ico"));
+        this.AppWindow.SetIcon(AppIcon.Path);
         this.AppWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
         this.SizeAndCenter(1440, 900);
         this.UpdateTitleBarTheme();

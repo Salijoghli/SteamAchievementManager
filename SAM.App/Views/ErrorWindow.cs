@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml;
+using SAM.App.Services;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 
@@ -12,7 +13,7 @@ public sealed class ErrorWindow : Window
         this.Title = Strings.Get("Common_AppName");
         this.SystemBackdrop = new MicaBackdrop();
         this.AppWindow.Resize(new Windows.Graphics.SizeInt32(560, 320));
-        this.AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "SAM.ico"));
+        this.AppWindow.SetIcon(AppIcon.Path);
 
         var close = new Button
         {
