@@ -91,11 +91,14 @@
         </Grid>
 
         <!-- Page switcher: the library and the pages next to it. -->
+        <!-- Tabs, with app-wide Settings at the right so it's reachable from every tab. -->
+        <Grid Grid.Row="1" Margin="16,0,24,4" MaxWidth="{StaticResource ContentMaxWidth}" ColumnSpacing="8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
         <SelectorBar
             x:Name="PageSelector"
-            Grid.Row="1"
-            Margin="16,0,16,4"
-            MaxWidth="{StaticResource ContentMaxWidth}"
             HorizontalAlignment="Stretch"
             SelectionChanged="OnPageSelectionChanged">
             <SelectorBarItem x:Name="LibraryPageItem" x:Uid="Library_PageLibrary" Tag="library" IsSelected="True">
@@ -124,6 +127,15 @@
                 </SelectorBarItem.Icon>
             </SelectorBarItem>
         </SelectorBar>
+            <Button
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                Style="{StaticResource IconButtonStyle}"
+                x:Uid="Library_SettingsButton"
+                Click="OnSettingsClick">
+                <FontIcon Glyph="&#xE713;" FontSize="16" />
+            </Button>
+        </Grid>
 
         <!-- Non-library pages (Stats, Activity, History) replace the library rows below. -->
         <ContentControl
@@ -258,13 +270,6 @@
                             </MenuFlyoutItem>
                         </MenuFlyout>
                     </Button.Flyout>
-                </Button>
-                <Button
-                    Grid.Column="6"
-                    Style="{StaticResource IconButtonStyle}"
-                    x:Uid="Library_SettingsButton"
-                    Click="OnSettingsClick">
-                    <FontIcon Glyph="&#xE713;" FontSize="16" />
                 </Button>
             </Grid>
 
