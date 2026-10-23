@@ -449,6 +449,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
 
         this.CheckForUpdatesOnStartup();
+        this.StartWatchingStats();
         await this.RefreshAsync();
     }
 
@@ -640,7 +641,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
 
         // Progress: schemas load from disk, so run a few at a time and flush results in batches.
-        var results = new ConcurrentQueue<(GameCardViewModel Card, GameProgress? Progress)>();
+        var results = new ConcurrentQueue<(GameCardViewModel Card, GameProgress? Progress, StoreAchievementCount? Store)>();
         var flushTimer = this._dispatcher.CreateTimer();
         flushTimer.Interval = TimeSpan.FromMilliseconds(120);
         flushTimer.Tick += (_, _) => this.FlushProgress(results, token, final: false);
@@ -656,17 +657,24 @@ public sealed partial class LibraryViewModel : ObservableObject
             await Task.Run(() => Parallel.ForEach(cards, options, card =>
             {
                 GameProgress? progress = null;
+                StoreAchievementCount? store = null;
                 try
                 {
                     var schema = this._services.Schemas.Load(card.AppId);
                     progress = this._services.Progress.GetCachedProgress(card.AppId, schema);
+
+                    // No schema: whether the game has achievements at all comes from the store.
+                    if (progress == null)
+                    {
+                        store = this._services.AchievementCounts.TryGetCached(card.AppId);
+                    }
                 }
                 catch (Exception e)
                 {
                     this.LogOnce("Progress", e);
                 }
 
-                results.Enqueue((card, progress));
+                results.Enqueue((card, progress, store));
             }), token);
         }
         catch (OperationCanceledException)
@@ -683,6 +691,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
 
         this.FlushProgress(results, token, final: true);
+        this.StartStoreLookups(cards.Where(c => c.Progress == null && c.StoreCount is null or { Status: StoreAchievementStatus.Failed }));
         this.UpdateSummary();
         if (this.SmartList == RarestOwnedList)
         {
@@ -695,7 +704,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
     }
 
-    private void FlushProgress(ConcurrentQueue<(GameCardViewModel Card, GameProgress? Progress)> results, CancellationToken token, bool final)
+    private void FlushProgress(ConcurrentQueue<(GameCardViewModel Card, GameProgress? Progress, StoreAchievementCount? Store)> results, CancellationToken token, bool final)
     {
         if (token.IsCancellationRequested)
         {
@@ -706,6 +715,11 @@ public sealed partial class LibraryViewModel : ObservableObject
         while (results.TryDequeue(out var result))
         {
             result.Card.Progress = result.Progress;
+            if (result.Store != null)
+            {
+                result.Card.StoreCount = result.Store;
+            }
+
             result.Card.IsProgressLoaded = true;
             any = true;
         }
@@ -745,6 +759,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         this.CompletionDetail = Strings.Plural("Library_CompletionDetail", total, LibraryFormat.Count(unlocked));
         this.PerfectText = Strings.Plural("Library_PerfectSummaryText", perfect);
         this.TotalPlaytimeText = Strings.Format("Library_PlaytimeSummaryText", LibraryFormat.Playtime(playtime));
+        this.UpdateMissingAchievementDataText();
         this.IsSummaryReady = true;
     }
     #endregion
@@ -1106,7 +1121,8 @@ public sealed partial class LibraryViewModel : ObservableObject
                 var p = card.Progress;
                 var match = completion switch
                 {
-                    LibraryCompletionFilter.HasAchievements => p is { Total: > 0 },
+                    // Not loaded: the store says it has achievements, but progress is unknown.
+                    LibraryCompletionFilter.HasAchievements => p is { Total: > 0 } || card.AchievementState == AchievementState.NotLoaded,
                     LibraryCompletionFilter.NotStarted => p is { Total: > 0, Unlocked: 0 },
                     LibraryCompletionFilter.InProgress => p is { Total: > 0 } q && q.Unlocked > 0 && q.Unlocked < q.Total,
                     LibraryCompletionFilter.Perfect => p is { IsPerfect: true },
@@ -1533,6 +1549,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         }
 
         this._services.Favorites.Changed -= this.OnFavoritesStoreChanged;
+        this.ShutDownAchievementData();
     }
     #endregion
 

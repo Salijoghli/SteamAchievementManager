@@ -400,6 +400,57 @@ public sealed partial class LibraryWindow : Window
     }
     #endregion
 
+    #region Achievement data
+    /// <summary>"Load missing achievement data…": explains what happens, then loads every missing game one at a time.</summary>
+    private async void OnLoadMissingClick(object sender, RoutedEventArgs e)
+    {
+        if (this._isDialogOpen || this.ViewModel.IsFetchingAll)
+        {
+            return;
+        }
+
+        var games = this.ViewModel.GetGamesMissingAchievementData();
+        if (games.Count == 0)
+        {
+            this.ViewModel.ShowNotice(Strings.Get("Library_LoadMissingNoneTitle"), Strings.Get("Library_LoadMissingNone"), InfoBarSeverity.Informational);
+            return;
+        }
+
+        this._isDialogOpen = true;
+        try
+        {
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.Root.XamlRoot,
+                RequestedTheme = this.Root.ActualTheme,
+                Style = (Style)Application.Current.Resources["DefaultContentDialogStyle"],
+                Title = Strings.Get("Library_LoadMissingTitle"),
+                Content = new TextBlock
+                {
+                    Text = Strings.Plural("Library_LoadMissingMessage", games.Count),
+                    TextWrapping = TextWrapping.Wrap,
+                    MaxWidth = 440,
+                },
+                PrimaryButtonText = Strings.Get("Library_LoadMissingConfirm"),
+                CloseButtonText = Strings.Get("Common_Cancel"),
+                DefaultButton = ContentDialogButton.Primary,
+            };
+            if (await dialog.ShowAsync() == ContentDialogResult.Primary)
+            {
+                this.ViewModel.FetchAllAchievementData(games);
+            }
+        }
+        catch (Exception ex)
+        {
+            Diagnostics.Log("Load missing achievement data dialog failed", ex);
+        }
+        finally
+        {
+            this._isDialogOpen = false;
+        }
+    }
+    #endregion
+
     #region Export
     private async void OnExportLibraryClick(object sender, RoutedEventArgs e)
     {

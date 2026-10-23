@@ -162,7 +162,28 @@
                                     Text="{x:Bind Card.ProgressText, Mode=OneWay}"
                                     Style="{StaticResource CaptionTextBlockStyle}"
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    VerticalAlignment="Center"
                                     TextTrimming="CharacterEllipsis" />
+                                <!-- "Load achievements" when Steam hasn't downloaded the game's achievement data. -->
+                                <Button
+                                    Width="24"
+                                    Height="24"
+                                    Padding="0"
+                                    VerticalAlignment="Center"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Command="{x:Bind Card.LoadAchievementsCommand, Mode=OneWay}"
+                                    AutomationProperties.Name="{x:Bind Card.LoadAchievementsLabel}"
+                                    ToolTipService.ToolTip="{x:Bind Card.LoadAchievementsLabel}"
+                                    Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.CanLoadAchievements), Mode=OneWay}">
+                                    <FontIcon Glyph="&#xE896;" FontSize="12" />
+                                </Button>
+                                <ProgressRing
+                                    Width="14"
+                                    Height="14"
+                                    VerticalAlignment="Center"
+                                    IsActive="{x:Bind Card.IsFetchingAchievements, Mode=OneWay}"
+                                    Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.IsFetchingAchievements), Mode=OneWay}" />
                             </StackPanel>
                             <!-- Smart list badge, e.g. "3 left" or "Rarest 0.4%". -->
                             <Grid Grid.Column="1" Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.HasSmartBadge), Mode=OneWay}">

@@ -1,7 +1,7 @@
 namespace SAM.App.Services;
 
 // Data layer entry point. Each service lives in its own file in this folder:
-// SchemaService, ProgressService, PlaytimeService, GlobalPercentService, ImageCache, GameArt
+// SchemaService, ProgressService, PlaytimeService, GlobalPercentService, AchievementCountService, ImageCache, GameArt
 // and GameListService. UI code depends only on their public signatures.
 
 /// <summary>Creates and holds the services for the process.</summary>
@@ -22,6 +22,7 @@ public sealed class AppServices
         this.Progress = new ProgressService(steam);
         this.Playtime = new PlaytimeService(steam);
         this.GlobalPercents = new GlobalPercentService(this.Cache, http);
+        this.AchievementCounts = new AchievementCountService(this.Cache, http);
         this.Images = new ImageCache(this.Cache, http);
         this.Art = new GameArt(steam);
         this.Games = new GameListService(this.Cache, steam, http);
@@ -81,6 +82,9 @@ public sealed class AppServices
     public PlaytimeService Playtime { get; }
 
     public GlobalPercentService GlobalPercents { get; }
+
+    /// <summary>Whether games have achievements, from the store, for games whose schema Steam hasn't downloaded.</summary>
+    public AchievementCountService AchievementCounts { get; }
 
     public ImageCache Images { get; }
 

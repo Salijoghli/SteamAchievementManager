@@ -630,8 +630,10 @@ public sealed partial class GameViewModel : ObservableObject
         {
             await this._services.Steam.RequestUserStatsAsync();
 
-            var schema = await Task.Run(() => this._services.Schemas.Load(this.AppId));
-            if (schema == null || (schema.Achievements.Count == 0 && schema.Stats.Count == 0))
+            // Steam writes the schema file right after it sends the stats; on a game it has never
+            // fetched before, give it a few seconds before saying the schema isn't cached.
+            var schema = await this._services.Schemas.WaitForAsync(this.AppId, TimeSpan.FromSeconds(10));
+            if (schema == null ||(schema.Achievements.Count == 0 && schema.Stats.Count == 0))
             {
                 throw new SteamUnavailableException(MissingSchemaMessage);
             }

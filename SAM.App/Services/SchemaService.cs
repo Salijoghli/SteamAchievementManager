@@ -53,6 +53,43 @@ public sealed class SchemaService(SteamSession steam)
         }
     }
 
+    /// <summary>Forgets the memoized schema for <paramref name="appId"/>, so the next <see cref="Load"/> re-reads the file.</summary>
+    public void Invalidate(uint appId) => this._cache.TryRemove(appId, out _);
+
+    /// <summary>True when Steam has written the schema file for <paramref name="appId"/>.</summary>
+    public bool SchemaFileExists(uint appId)
+    {
+        try
+        {
+            return File.Exists(GetSchemaPath(steam.SteamInstallPath, appId));
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// <see cref="Load"/>, polling (off the calling thread) until the schema is there or
+    /// <paramref name="timeout"/> has passed. Steam writes the file right after it sends the stats,
+    /// so right after RequestUserStats it may briefly be missing. Null if it never appears, or if
+    /// the file is there but still has no stats on a second look (a game without achievements).
+    /// </summary>
+    public async Task<GameSchema?> WaitForAsync(uint appId, TimeSpan timeout, CancellationToken cancellationToken = default)
+    {
+        var deadline = DateTime.UtcNow + timeout;
+        for (var attempt = 0; ; attempt++)
+        {
+            var schema = await Task.Run(() => this.Load(appId), cancellationToken).ConfigureAwait(true);
+            if (schema != null || DateTime.UtcNow >= deadline || (attempt > 0 && this.SchemaFileExists(appId)))
+            {
+                return schema;
+            }
+
+            await Task.Delay(TimeSpan.FromMilliseconds(500), cancellationToken).ConfigureAwait(true);
+        }
+    }
+
     internal static string GetSchemaPath(string steamInstallPath, uint appId) =>
         Path.Combine(steamInstallPath, "appcache", "stats", $"UserGameStatsSchema_{appId}.bin");
 

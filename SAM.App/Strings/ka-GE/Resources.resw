@@ -3301,4 +3301,76 @@
   <data name="Autopilot_ReasonShortNotInOnlyList" xml:space="preserve">
     <value>სიაში არ არის</value>
   </data>
+  <data name="Card_NotLoaded_One" xml:space="preserve">
+    <value>ჩატვირთული არ არის · {0} მიღწევა</value>
+  </data>
+  <data name="Card_NotLoaded_Other" xml:space="preserve">
+    <value>ჩატვირთული არ არის · {0} მიღწევა</value>
+  </data>
+  <data name="Card_AchievementsUnknown" xml:space="preserve">
+    <value>მიღწევები უცნობია</value>
+  </data>
+  <data name="Card_AchievementsChecking" xml:space="preserve">
+    <value>მიღწევების შემოწმება…</value>
+  </data>
+  <data name="Card_AchievementsLoading" xml:space="preserve">
+    <value>მიღწევები იტვირთება…</value>
+  </data>
+  <data name="Card_LoadAchievements" xml:space="preserve">
+    <value>მიღწევების ჩატვირთვა</value>
+  </data>
+  <data name="Library_NotLoadedSummary_One" xml:space="preserve">
+    <value>· {0} ჩატვირთული არ არის</value>
+  </data>
+  <data name="Library_NotLoadedSummary_Other" xml:space="preserve">
+    <value>· {0} ჩატვირთული არ არის</value>
+  </data>
+  <data name="Library_NotLoadedHint.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>თამაშები, რომელთა მიღწევების მონაცემები Steam-ს ჯერ არ ჩამოუტვირთავს. ჩასატვირთად … მენიუში აირჩიეთ „მიღწევების მონაცემების ჩატვირთვა“.</value>
+  </data>
+  <data name="Library_LoadMissingItem.Text" xml:space="preserve">
+    <value>მიღწევების მონაცემების ჩატვირთვა…</value>
+  </data>
+  <data name="Library_LoadMissingTitle" xml:space="preserve">
+    <value>ჩავტვირთოთ მიღწევების მონაცემები?</value>
+  </data>
+  <data name="Library_LoadMissingMessage_One" xml:space="preserve">
+    <value>SAM Steam-ს {0} თამაშის მიღწევების მონაცემებს მოსთხოვს. Steam რამდენიმე წამით გაჩვენებთ, როგორც ამ თამაშის მოთამაშეს, და შეიძლება განაახლოს „ბოლოს ნათამაშები“ თარიღი. არაფერი განიბლოკება და არაფერი შეიცვლება.</value>
+  </data>
+  <data name="Library_LoadMissingMessage_Other" xml:space="preserve">
+    <value>SAM Steam-ს {0} თამაშის მიღწევების მონაცემებს მოსთხოვს, თითო-თითოდ. თითოეული თამაშისთვის Steam რამდენიმე წამით გაჩვენებთ, როგორც მის მოთამაშეს, და შეიძლება განაახლოს „ბოლოს ნათამაშები“ თარიღი. არაფერი განიბლოკება და არაფერი შეიცვლება.</value>
+  </data>
+  <data name="Library_LoadMissingConfirm" xml:space="preserve">
+    <value>ჩატვირთვა</value>
+  </data>
+  <data name="Library_LoadMissingNoneTitle" xml:space="preserve">
+    <value>ჩასატვირთი არაფერია</value>
+  </data>
+  <data name="Library_LoadMissingNone" xml:space="preserve">
+    <value>ყველა თამაშის მიღწევების მონაცემები უკვე ჩატვირთულია.</value>
+  </data>
+  <data name="Library_LoadMissingBar.Title" xml:space="preserve">
+    <value>მიღწევების მონაცემები იტვირთება</value>
+  </data>
+  <data name="Library_LoadMissingCancel.Content" xml:space="preserve">
+    <value>გაუქმება</value>
+  </data>
+  <data name="Library_LoadMissingProgress" xml:space="preserve">
+    <value>მიღწევები იტვირთება: {0} / {1} — {2}</value>
+  </data>
+  <data name="Library_LoadMissingDoneTitle" xml:space="preserve">
+    <value>მიღწევების მონაცემები</value>
+  </data>
+  <data name="Library_LoadMissingDone_One" xml:space="preserve">
+    <value>მიღწევების მონაცემები ჩაიტვირთა {0}-დან {1} თამაშისთვის.</value>
+  </data>
+  <data name="Library_LoadMissingDone_Other" xml:space="preserve">
+    <value>მიღწევების მონაცემები ჩაიტვირთა {0}-დან {1} თამაშისთვის.</value>
+  </data>
+  <data name="Library_LoadAchievementsFailedTitle" xml:space="preserve">
+    <value>{0} — მიღწევები ვერ ჩაიტვირთა</value>
+  </data>
+  <data name="Library_LoadAchievementsFailed" xml:space="preserve">
+    <value>Steam-მა თამაშის მიღწევების მონაცემები არ გამოგზავნა. დარწმუნდით, რომ Steam გაშვებულია და ონლაინ რეჟიმშია, შემდეგ კვლავ სცადეთ.</value>
+  </data>
 </root>

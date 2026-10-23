@@ -25,6 +25,12 @@ public enum LaunchMode
     /// library (<c>&lt;appid&gt; --autopilot-worker &lt;parent pid&gt;</c>).
     /// </summary>
     AutopilotWorker,
+
+    /// <summary>
+    /// Ask Steam for <see cref="CommandLine.AppId"/>'s stats so it downloads the achievement schema,
+    /// then exit, without a window (<c>&lt;appid&gt; --fetch-achievements</c>).
+    /// </summary>
+    FetchAchievements,
 }
 
 /// <summary>
@@ -32,7 +38,8 @@ public enum LaunchMode
 /// <c>SAM.exe [&lt;appid&gt; [--unlock-all | --lock-all]]</c> for the windows, and
 /// <c>SAM.exe &lt;appid&gt; [--unlock ID[,ID…]] [--lock ID[,ID…]] [--unlock-all-cli] --commit [--quiet] [--no-backup]</c>
 /// to change achievements without a window, and <c>SAM.exe --autopilot</c> to start the library in
-/// the tray with Autopilot running. Pure and side-effect free, so it can be unit tested.
+/// the tray with Autopilot running, and <c>SAM.exe &lt;appid&gt; --fetch-achievements</c> to have Steam
+/// download a game's achievement data. Pure and side-effect free, so it can be unit tested.
 /// </summary>
 public sealed class CommandLine
 {
@@ -60,6 +67,9 @@ public sealed class CommandLine
     /// <summary>Internal option the engine adds in Autopilot dry-run mode: the worker only logs what it would change.</summary>
     public const string AutopilotDryRunOption = "--autopilot-dry-run";
 
+    /// <summary>Downloads a game's achievement data without a window: <c>&lt;appid&gt; --fetch-achievements</c>.</summary>
+    public const string FetchAchievementsOption = "--fetch-achievements";
+
     /// <summary>Usage text printed by <c>--help</c>.</summary>
     public const string Usage =
         """
@@ -71,6 +81,9 @@ public sealed class CommandLine
           SAM.exe <appid> --unlock-all     ...with every achievement set to unlocked (confirm in the window).
           SAM.exe <appid> --lock-all       ...with every achievement set to locked (confirm in the window).
           SAM.exe --autopilot              Start the library in the tray and start Autopilot.
+          SAM.exe <appid> --fetch-achievements
+                                           Ask Steam to download the game's achievement data
+                                           (read-only; Steam briefly shows the game as playing).
 
           SAM.exe <appid> [--unlock ID[,ID...]] [--lock ID[,ID...]] [--unlock-all-cli] --commit [options]
                                            Change achievements without opening a window.
@@ -201,6 +214,7 @@ public sealed class CommandLine
         bool unlockAllPreset = false, lockAllPreset = false, unlockAll = false, commit = false, quiet = false, noBackup = false;
         var workerParent = 0;
         var workerDryRun = false;
+        var fetch = false;
 
         for (var i = 1; i < args.Count; i++)
         {
@@ -265,6 +279,9 @@ public sealed class CommandLine
                 case "--no-backup" when value == null:
                     noBackup = true;
                     break;
+                case FetchAchievementsOption when value == null:
+                    fetch = true;
+                    break;
                 case AutopilotDryRunOption when value == null:
                     workerDryRun = true;
                     break;
@@ -286,6 +303,16 @@ public sealed class CommandLine
                 default:
                     return Invalid($"Unknown option \"{arg}\".", appId);
             }
+        }
+
+        if (fetch)
+        {
+            if (args.Count != 2)
+            {
+                return Invalid($"{FetchAchievementsOption} can't be combined with other options.", appId);
+            }
+
+            return new CommandLine { Mode = LaunchMode.FetchAchievements, AppId = appId };
         }
 
         if (workerParent != 0)

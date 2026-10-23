@@ -27,6 +27,11 @@ internal static class GameContextMenu
 
         items.Add(Item(Strings.Get("Card_MenuOpen"), "", () => card?.OpenCommand.Execute(null)));
         items.Add(Item(card?.PlayLabel ?? Strings.Get("Card_Play"), card?.PlayGlyph ?? "", () => card?.PlayCommand.Execute(null)));
+        if (card is { CanLoadAchievements: true })
+        {
+            items.Add(Item(Strings.Get("Card_LoadAchievements"), "", () => card.LoadAchievementsCommand.Execute(null)));
+        }
+
         items.Add(new MenuFlyoutSeparator());
         items.Add(Item(Strings.Get("Card_MenuUnlockAll"), "", () => card?.UnlockAllCommand.Execute(null)));
         items.Add(Item(Strings.Get("Card_MenuLockAll"), "", () => card?.LockAllCommand.Execute(null)));

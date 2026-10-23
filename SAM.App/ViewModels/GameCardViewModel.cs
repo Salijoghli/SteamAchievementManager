@@ -5,6 +5,7 @@ using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SAM.App.Models;
+using SAM.App.Services;
 
 namespace SAM.App.ViewModels;
 
@@ -70,7 +71,22 @@ public sealed partial class GameCardViewModel : ObservableObject
     /// <summary>Null when unknown (no schema).</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ProgressText), nameof(ProgressPercent), nameof(HasAchievements), nameof(IsPerfect), nameof(CompletionSortKey), nameof(ProgressCountText), nameof(PercentText))]
+    [NotifyPropertyChangedFor(nameof(AchievementState), nameof(IsAchievementDataMissing), nameof(CanLoadAchievements))]
     private GameProgress? _progress;
+
+    /// <summary>
+    /// What the store says about the game's achievements, for games without a schema on this PC;
+    /// null until the store answered (see <see cref="AchievementState"/>).
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ProgressText), nameof(CompletionSortKey), nameof(ProgressCountText))]
+    [NotifyPropertyChangedFor(nameof(AchievementState), nameof(IsAchievementDataMissing), nameof(CanLoadAchievements))]
+    private StoreAchievementCount? _storeCount;
+
+    /// <summary>True while SAM asks Steam for this game's achievement data ("Load achievements").</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ProgressText), nameof(CanLoadAchievements))]
+    private bool _isFetchingAchievements;
 
     /// <summary>False until progress has been computed at least once (shows a skeleton).</summary>
     [ObservableProperty]
@@ -100,34 +116,56 @@ public sealed partial class GameCardViewModel : ObservableObject
 
     public bool HasAchievements => this.Progress is { Total: > 0 };
 
+    /// <summary>Loaded, not loaded, none, unknown or checking (see <see cref="Models.AchievementState"/>).</summary>
+    public AchievementState AchievementState => AchievementStates.Classify(this.Progress, this.StoreCount);
+
+    /// <summary>True when Steam hasn't downloaded the game's achievement data (not loaded, or unknown).</summary>
+    public bool IsAchievementDataMissing => AchievementStates.IsMissing(this.AchievementState);
+
+    /// <summary>Shows the "Load achievements" button.</summary>
+    public bool CanLoadAchievements => this.IsFetchingAchievements == false && this.IsAchievementDataMissing;
+
+    public string LoadAchievementsLabel => Strings.Get("Card_LoadAchievements");
+
     public bool IsPerfect => this.Progress is { IsPerfect: true };
 
     public double ProgressPercent => this.Progress is { Total: > 0 } p ? p.Fraction * 100 : 0;
 
-    /// <summary>For sorting: fraction, or -1 for games without achievements.</summary>
-    public double CompletionSortKey => this.Progress is { Total: > 0 } p ? p.Fraction : -1;
+    /// <summary>For sorting: fraction, -1 for games without achievements, -0.5 when progress isn't known.</summary>
+    public double CompletionSortKey => AchievementStates.CompletionSortKey(this.AchievementState, this.Progress);
 
     public DateTimeOffset? LastPlayed => this.Playtime?.LastPlayed;
 
     public TimeSpan PlaytimeSpan => this.Playtime?.Playtime ?? TimeSpan.Zero;
 
-    public string ProgressText => this.Progress switch
+    public string ProgressText => this.AchievementState switch
     {
-        null or { Total: 0 } => Strings.Get("Card_NoAchievements"),
-        { Unlocked: 0 } p => Strings.Format("Card_ProgressNotStarted", LibraryFormat.Count(p.Total)),
-        { } p => Strings.Format(
-            "Card_Progress",
-            LibraryFormat.Count(p.Unlocked),
-            LibraryFormat.Count(p.Total),
-            Math.Floor(p.Fraction * 100).ToString(CultureInfo.CurrentCulture)),
+        _ when this.IsFetchingAchievements && this.Progress == null => Strings.Get("Card_AchievementsLoading"),
+        AchievementState.NotLoaded => Strings.Plural("Card_NotLoaded", this.StoreCount?.Total ?? 0),
+        AchievementState.Unknown => Strings.Get("Card_AchievementsUnknown"),
+        AchievementState.Checking => Strings.Get("Card_AchievementsChecking"),
+        _ => this.Progress switch
+        {
+            null or { Total: 0 } => Strings.Get("Card_NoAchievements"),
+            { Unlocked: 0 } p => Strings.Format("Card_ProgressNotStarted", LibraryFormat.Count(p.Total)),
+            { } p => Strings.Format(
+                "Card_Progress",
+                LibraryFormat.Count(p.Unlocked),
+                LibraryFormat.Count(p.Total),
+                Math.Floor(p.Fraction * 100).ToString(CultureInfo.CurrentCulture)),
+        },
     };
 
     public string PlaytimeText => LibraryFormat.PlaytimeSummary(this.Playtime);
 
-    /// <summary>"12/30" for the list view, or "–" without achievements.</summary>
-    public string ProgressCountText => this.Progress is { Total: > 0 } p
-        ? $"{LibraryFormat.Count(p.Unlocked)}/{LibraryFormat.Count(p.Total)}"
-        : "–";
+    /// <summary>"12/30" for the list view, "?/30" when not loaded, "?" when unknown, or "–" without achievements.</summary>
+    public string ProgressCountText => this.AchievementState switch
+    {
+        AchievementState.Loaded when this.Progress is { } p => $"{LibraryFormat.Count(p.Unlocked)}/{LibraryFormat.Count(p.Total)}",
+        AchievementState.NotLoaded => $"?/{LibraryFormat.Count(this.StoreCount?.Total ?? 0)}",
+        AchievementState.Unknown => "?",
+        _ => "–",
+    };
 
     /// <summary>"40%" for the list view, or "–" without achievements.</summary>
     public string PercentText => this.Progress is { Total: > 0 } p
@@ -202,6 +240,10 @@ public sealed partial class GameCardViewModel : ObservableObject
 
     [RelayCommand]
     private void LockAll() => this._owner.LaunchGame(this, "--lock-all");
+
+    /// <summary>Asks Steam for the game's achievement data (a short headless SAM run).</summary>
+    [RelayCommand]
+    private void LoadAchievements() => this._owner.LoadAchievements(this);
 
     [RelayCommand]
     private void Play() => this._owner.PlayOrInstall(this);

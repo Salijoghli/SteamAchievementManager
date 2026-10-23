@@ -263,6 +263,11 @@
                                 </MenuFlyoutItem.Icon>
                             </MenuFlyoutItem>
                             <MenuFlyoutSeparator />
+                            <MenuFlyoutItem x:Uid="Library_LoadMissingItem" Click="OnLoadMissingClick" IsEnabled="{x:Bind vm:LibraryFormat.Not(ViewModel.IsFetchingAll), Mode=OneWay}">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE896;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
                             <MenuFlyoutItem x:Uid="Library_ManageCollectionsItem" Click="OnManageCollectionsClick">
                                 <MenuFlyoutItem.Icon>
                                     <FontIcon Glyph="&#xE8F4;" />
@@ -307,6 +312,12 @@
                         <StackPanel Orientation="Horizontal" Spacing="6" ToolTipService.ToolTip="{x:Bind ViewModel.CompletionDetail, Mode=OneWay}">
                             <FontIcon Glyph="&#xE9D5;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             <TextBlock Text="{x:Bind ViewModel.CompletionText, Mode=OneWay}" Style="{StaticResource SummaryTextStyle}" />
+                            <!-- "· 5 not loaded": games whose achievement data Steam hasn't downloaded. -->
+                            <TextBlock
+                                x:Uid="Library_NotLoadedHint"
+                                Text="{x:Bind ViewModel.MissingAchievementDataText, Mode=OneWay}"
+                                Style="{StaticResource SummaryTextStyle}"
+                                Visibility="{x:Bind ViewModel.HasMissingAchievementData, Mode=OneWay}" />
                         </StackPanel>
                         <StackPanel x:Uid="Library_PerfectSummary" Orientation="Horizontal" Spacing="6">
                             <FontIcon Glyph="&#xE7C1;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -493,6 +504,20 @@
                 Visibility="{x:Bind ViewModel.IsExporting, Mode=OneWay}">
                 <InfoBar.Content>
                     <ProgressBar IsIndeterminate="{x:Bind ViewModel.IsExporting, Mode=OneWay}" Margin="0,0,0,12" />
+                </InfoBar.Content>
+            </InfoBar>
+            <InfoBar
+                x:Uid="Library_LoadMissingBar"
+                Message="{x:Bind ViewModel.FetchAllProgressText, Mode=OneWay}"
+                Severity="Informational"
+                IsClosable="False"
+                IsOpen="{x:Bind ViewModel.IsFetchingAll, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.IsFetchingAll, Mode=OneWay}">
+                <InfoBar.ActionButton>
+                    <Button x:Uid="Library_LoadMissingCancel" Command="{x:Bind ViewModel.CancelFetchAllCommand}" />
+                </InfoBar.ActionButton>
+                <InfoBar.Content>
+                    <ProgressBar IsIndeterminate="{x:Bind ViewModel.IsFetchingAll, Mode=OneWay}" Margin="0,0,0,12" />
                 </InfoBar.Content>
             </InfoBar>
             <InfoBar

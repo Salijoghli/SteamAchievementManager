@@ -16,7 +16,8 @@ namespace SAM.App;
 /// <c>SAM.exe 21690 --unlock ID --commit</c> changes achievements without a window, and
 /// <c>SAM.exe --help</c> prints the full usage (see <see cref="CommandLine"/>).
 /// <c>SAM.exe --autopilot</c> starts the library hidden in the tray with Autopilot running, and
-/// <c>SAM.exe &lt;appid&gt; --autopilot-worker &lt;pid&gt;</c> is a headless Autopilot worker (see <see cref="AutopilotWorker"/>).
+/// <c>SAM.exe &lt;appid&gt; --autopilot-worker &lt;pid&gt;</c> is a headless Autopilot worker (see <see cref="AutopilotWorker"/>), and
+/// <c>SAM.exe &lt;appid&gt; --fetch-achievements</c> has Steam download a game's achievement data (see <see cref="AchievementFetcher"/>).
 /// Each game runs in its own process because Steam binds a client connection to
 /// one App ID for the lifetime of the process.
 /// </summary>
@@ -90,7 +91,7 @@ public partial class App : Application
         var command = CommandLine.Parse(arguments);
 
         // Command-line output stays English whatever the UI language, so scripts see stable text.
-        if (command.Mode is LaunchMode.Help or LaunchMode.Invalid or LaunchMode.Commit)
+        if (command.Mode is LaunchMode.Help or LaunchMode.Invalid or LaunchMode.Commit or LaunchMode.FetchAchievements)
         {
             ApplyLanguage("en-US");
         }
@@ -130,6 +131,10 @@ public partial class App : Application
 
             case LaunchMode.AutopilotWorker:
                 this.RunAutopilotWorker(command);
+                return;
+
+            case LaunchMode.FetchAchievements:
+                this.RunFetchAchievements(command);
                 return;
         }
 
@@ -335,6 +340,22 @@ public partial class App : Application
         catch (Exception e)
         {
             Diagnostics.Log($"Autopilot worker for {command.AppId} failed", e);
+        }
+
+        this.ExitWith(code);
+    }
+
+    /// <summary>Runs a headless "--fetch-achievements", then exits with its exit code.</summary>
+    private async void RunFetchAchievements(CommandLine command)
+    {
+        var code = CommandLine.ExitFailed;
+        try
+        {
+            code = await AchievementFetcher.RunAsync(command.AppId);
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log($"Fetching achievements for {command.AppId} failed", e);
         }
 
         this.ExitWith(code);

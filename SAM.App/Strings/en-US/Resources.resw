@@ -3347,4 +3347,76 @@ Installed · {2}</value>
   <data name="Autopilot_ReasonShortNotInOnlyList" xml:space="preserve">
     <value>not in the list</value>
   </data>
+  <data name="Card_NotLoaded_One" xml:space="preserve">
+    <value>Not loaded · {0} achievement</value>
+  </data>
+  <data name="Card_NotLoaded_Other" xml:space="preserve">
+    <value>Not loaded · {0} achievements</value>
+  </data>
+  <data name="Card_AchievementsUnknown" xml:space="preserve">
+    <value>Achievements unknown</value>
+  </data>
+  <data name="Card_AchievementsChecking" xml:space="preserve">
+    <value>Checking achievements…</value>
+  </data>
+  <data name="Card_AchievementsLoading" xml:space="preserve">
+    <value>Loading achievements…</value>
+  </data>
+  <data name="Card_LoadAchievements" xml:space="preserve">
+    <value>Load achievements</value>
+  </data>
+  <data name="Library_NotLoadedSummary_One" xml:space="preserve">
+    <value>· {0} not loaded</value>
+  </data>
+  <data name="Library_NotLoadedSummary_Other" xml:space="preserve">
+    <value>· {0} not loaded</value>
+  </data>
+  <data name="Library_NotLoadedHint.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Games whose achievement data Steam hasn't downloaded yet. To load it, use Load missing achievement data in the … menu.</value>
+  </data>
+  <data name="Library_LoadMissingItem.Text" xml:space="preserve">
+    <value>Load missing achievement data…</value>
+  </data>
+  <data name="Library_LoadMissingTitle" xml:space="preserve">
+    <value>Load missing achievement data?</value>
+  </data>
+  <data name="Library_LoadMissingMessage_One" xml:space="preserve">
+    <value>SAM will ask Steam for the achievement data of {0} game. Steam briefly shows you as playing it for a few seconds and may update its "last played" date. Nothing is unlocked or changed.</value>
+  </data>
+  <data name="Library_LoadMissingMessage_Other" xml:space="preserve">
+    <value>SAM will ask Steam for the achievement data of {0} games, one at a time. For each game Steam briefly shows you as playing it for a few seconds and may update its "last played" date. Nothing is unlocked or changed.</value>
+  </data>
+  <data name="Library_LoadMissingConfirm" xml:space="preserve">
+    <value>Load</value>
+  </data>
+  <data name="Library_LoadMissingNoneTitle" xml:space="preserve">
+    <value>Nothing to load</value>
+  </data>
+  <data name="Library_LoadMissingNone" xml:space="preserve">
+    <value>Every game's achievement data is already loaded.</value>
+  </data>
+  <data name="Library_LoadMissingBar.Title" xml:space="preserve">
+    <value>Loading achievement data</value>
+  </data>
+  <data name="Library_LoadMissingCancel.Content" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Library_LoadMissingProgress" xml:space="preserve">
+    <value>Loading achievements {0} of {1} — {2}</value>
+  </data>
+  <data name="Library_LoadMissingDoneTitle" xml:space="preserve">
+    <value>Achievement data</value>
+  </data>
+  <data name="Library_LoadMissingDone_One" xml:space="preserve">
+    <value>Loaded achievement data for {1} of {0} game.</value>
+  </data>
+  <data name="Library_LoadMissingDone_Other" xml:space="preserve">
+    <value>Loaded achievement data for {1} of {0} games.</value>
+  </data>
+  <data name="Library_LoadAchievementsFailedTitle" xml:space="preserve">
+    <value>Couldn't load achievements for {0}</value>
+  </data>
+  <data name="Library_LoadAchievementsFailed" xml:space="preserve">
+    <value>Steam didn't send the game's achievement data. Make sure Steam is running and online, then try again.</value>
+  </data>
 </root>

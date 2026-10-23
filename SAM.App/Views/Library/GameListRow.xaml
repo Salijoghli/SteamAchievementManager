@@ -77,6 +77,32 @@
                     Style="{StaticResource CaptionTextBlockStyle}"
                     Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                     VerticalAlignment="Center" />
+                <!-- Achievement data Steam hasn't downloaded ("?/78"): "Load achievements". -->
+                <StackPanel
+                    Orientation="Horizontal"
+                    Spacing="4"
+                    VerticalAlignment="Center"
+                    ToolTipService.ToolTip="{x:Bind Card.ProgressText, Mode=OneWay}"
+                    Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.IsAchievementDataMissing), Mode=OneWay}">
+                    <Button
+                        Width="24"
+                        Height="24"
+                        Padding="0"
+                        VerticalAlignment="Center"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Command="{x:Bind Card.LoadAchievementsCommand, Mode=OneWay}"
+                        AutomationProperties.Name="{x:Bind Card.LoadAchievementsLabel}"
+                        ToolTipService.ToolTip="{x:Bind Card.LoadAchievementsLabel}"
+                        Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.CanLoadAchievements), Mode=OneWay}">
+                        <FontIcon Glyph="&#xE896;" FontSize="12" />
+                    </Button>
+                    <ProgressRing
+                        Width="14"
+                        Height="14"
+                        IsActive="{x:Bind Card.IsFetchingAchievements, Mode=OneWay}"
+                        Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.IsFetchingAchievements), Mode=OneWay}" />
+                </StackPanel>
             </Grid>
         </Grid>
 
