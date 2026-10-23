@@ -38,7 +38,11 @@ public static class AutopilotProtocol
     /// <summary>Worker exit code: the game has no achievement schema on this PC.</summary>
     public const int ExitNoSchema = 5;
 
-    /// <summary>Environment variable that makes workers log unlocks and stat changes instead of making them.</summary>
+    /// <summary>
+    /// Environment variable that puts Autopilot in dry-run mode: the library's engine starts its
+    /// workers with <see cref="Infrastructure.CommandLine.AutopilotDryRunOption"/>, and they log
+    /// unlocks and stat changes instead of making them.
+    /// </summary>
     public const string DryRunVariable = "SAM_AUTOPILOT_DRYRUN";
 
     /// <summary>Longest request or response line accepted (a game with thousands of achievements stays far below).</summary>
@@ -132,6 +136,9 @@ public sealed class AutopilotResponse
 
     /// <summary>Whether the worker is in dry-run mode (every response).</summary>
     public bool DryRun { get; set; }
+
+    /// <summary>Unlock, with Ok false: Steam didn't confirm in time, so the changes may or may not have been stored.</summary>
+    public bool Uncertain { get; set; }
 
     /// <summary>Unlock: the achievements that were actually unlocked (already unlocked ones are left out).</summary>
     public List<string>? Unlocked { get; set; }

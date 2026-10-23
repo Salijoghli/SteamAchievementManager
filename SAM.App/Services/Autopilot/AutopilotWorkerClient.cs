@@ -26,6 +26,9 @@ internal sealed class AutopilotWorkerClient : IDisposable
     private string? _lastError;
     private bool _disposed;
 
+    /// <summary>A request has been written and flushed; only its answer is outstanding (the writer is idle).</summary>
+    private volatile bool _awaitingAnswer;
+
     private AutopilotWorkerClient(uint appId, ulong steamId, Process process)
     {
         this.AppId = appId;
@@ -107,11 +110,20 @@ internal sealed class AutopilotWorkerClient : IDisposable
         }
     }
 
-    /// <summary>Starts <c>SAM.exe &lt;appid&gt; --autopilot-worker &lt;this pid&gt;</c> (inheriting this process's environment, so dry-run carries over).</summary>
-    public static AutopilotWorkerClient Start(uint appId, ulong steamId)
+    /// <summary>
+    /// Starts <c>SAM.exe &lt;appid&gt; --autopilot-worker &lt;this pid&gt;</c>, plus <c>--autopilot-dry-run</c>
+    /// when <paramref name="dryRun"/>. Dry-run is passed explicitly rather than inherited: the worker
+    /// never sees <see cref="AutopilotProtocol.DryRunVariable"/>.
+    /// </summary>
+    public static AutopilotWorkerClient Start(uint appId, ulong steamId, bool dryRun)
     {
         var path = Environment.ProcessPath ?? throw new AutopilotWorkerException(Strings.Format("AutopilotEngine_WorkerStartFailed", "no executable path"));
         var arguments = string.Create(CultureInfo.InvariantCulture, $"{appId} {Infrastructure.CommandLine.AutopilotWorkerOption} {Environment.ProcessId}");
+        if (dryRun)
+        {
+            arguments += " " + Infrastructure.CommandLine.AutopilotDryRunOption;
+        }
+
         var info = new ProcessStartInfo(path, arguments)
         {
             UseShellExecute = false,
@@ -119,6 +131,7 @@ internal sealed class AutopilotWorkerClient : IDisposable
             RedirectStandardError = true,
             WorkingDirectory = AppContext.BaseDirectory,
         };
+        info.Environment.Remove(AutopilotProtocol.DryRunVariable);
 
         Process? process;
         try
@@ -220,6 +233,7 @@ internal sealed class AutopilotWorkerClient : IDisposable
             {
                 await this._writer.WriteLineAsync(AutopilotProtocol.Serialize(request).AsMemory(), timeoutSource.Token);
                 await this._writer.FlushAsync(timeoutSource.Token);
+                this._awaitingAnswer = true;
                 line = await this._reader.ReadLineAsync(timeoutSource.Token);
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested == false)
@@ -244,9 +258,13 @@ internal sealed class AutopilotWorkerClient : IDisposable
         }
         finally
         {
+            this._awaitingAnswer = false;
             this._gate.Release();
         }
     }
+
+    /// <summary>Whether a request is in progress (sent, answer not read yet).</summary>
+    public bool IsBusy => this._gate.CurrentCount == 0;
 
     /// <summary>Asks the worker to stop and waits up to <paramref name="timeout"/> for it to exit, then kills it.</summary>
     public async Task StopAsync(TimeSpan timeout)
@@ -274,29 +292,45 @@ internal sealed class AutopilotWorkerClient : IDisposable
 
     /// <summary>
     /// Synchronous stop for shutdown (Dispose on the UI thread): writes "stop" without waiting
-    /// for the answer. The caller waits for the processes and kills what's left.
+    /// for the answer. The caller waits for the processes and kills what's left. While a request
+    /// is awaiting its answer (e.g. an unlock being stored) "stop" is queued behind it: the worker
+    /// handles requests in order, so it finishes the unlock first, then exits.
     /// </summary>
     public void RequestStop()
     {
         try
         {
-            if (this.HasExited == false && this._writer != null && this._gate.Wait(0))
+            if (this.HasExited || this._writer == null)
+            {
+                return;
+            }
+
+            if (this._gate.Wait(0))
             {
                 try
                 {
-                    this._writer.WriteLine(AutopilotProtocol.Serialize(new AutopilotRequest { Type = AutopilotProtocol.Stop }));
-                    this._writer.Flush();
+                    this.WriteStop();
                 }
                 finally
                 {
                     this._gate.Release();
                 }
             }
+            else if (this._awaitingAnswer)
+            {
+                this.WriteStop();
+            }
         }
         catch (Exception e) when (e is IOException or ObjectDisposedException or InvalidOperationException)
         {
             // Broken pipe: the worker exits on its own (or gets killed).
         }
+    }
+
+    private void WriteStop()
+    {
+        this._writer!.WriteLine(AutopilotProtocol.Serialize(new AutopilotRequest { Type = AutopilotProtocol.Stop }));
+        this._writer.Flush();
     }
 
     /// <summary>Waits up to <paramref name="timeout"/> for the process to exit. Blocking.</summary>

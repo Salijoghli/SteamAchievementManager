@@ -293,6 +293,18 @@
   <data name="AutopilotEngine_DryRunTag" xml:space="preserve">
     <value>(საცდელი გაშვება)</value>
   </data>
+  <data name="AutopilotEngine_DryRunForwardTitle" xml:space="preserve">
+    <value>ავტოპილოტის საცდელი გაშვება არ დაიწყო</value>
+  </data>
+  <data name="AutopilotEngine_DryRunForwardMessage" xml:space="preserve">
+    <value>SAM უკვე გაშვებულია, ამიტომ ეს საცდელი გაშვება მას არ გადაეცა: გაშვებული SAM ნამდვილ ცვლილებებს შეიტანდა. დახურეთ SAM (მისი ხატულაც შეტყობინებების არეში) და საცდელი გაშვება თავიდან დაიწყეთ.</value>
+  </data>
+  <data name="AutopilotEngine_DryRunMismatch" xml:space="preserve">
+    <value>თამაშის ავტოპილოტის პროცესი ავტოპილოტის საცდელი გაშვების რეჟიმში არ გაეშვა, ამიტომ შეჩერდა, სანამ რამეს შეცვლიდა.</value>
+  </data>
+  <data name="AutopilotEngine_UnlockUncertain" xml:space="preserve">
+    <value>შესაძლოა Steam-მა განბლოკვა მაინც შეინახა; ავტოპილოტმა ის ჩათვალა და შემდეგ ჯერზე შეამოწმებს.</value>
+  </data>
   <data name="AutopilotEngine_WorkerStartFailed" xml:space="preserve">
     <value>თამაშის ავტოპილოტის პროცესის გაშვება ვერ მოხერხდა: {0}</value>
   </data>
@@ -3037,7 +3049,13 @@
     <value>შეიძლება განიბლოკოს ყველა მიღწევა, რომელსაც წესები უშვებს.</value>
   </data>
   <data name="Autopilot_OverrideModeOnlyHint" xml:space="preserve">
-    <value>შეიძლება განიბლოკოს მხოლოდ მონიშნული მიღწევები (თუ არცერთი არ არის მონიშნული, წესები წყვეტს).</value>
+    <value>შეიძლება განიბლოკოს მხოლოდ მონიშნული მიღწევები (თუ არცერთი არ არის მონიშნული, არაფერი განიბლოკება).</value>
+  </data>
+  <data name="Autopilot_OverrideOnlyEmptyWarning.Title" xml:space="preserve">
+    <value>არაფერი განიბლოკება</value>
+  </data>
+  <data name="Autopilot_OverrideOnlyEmptyWarning.Message" xml:space="preserve">
+    <value>არცერთი მიღწევა არ არის მონიშნული, ამიტომ ავტოპილოტი ამ თამაშში არაფერს განბლოკავს. მონიშნეთ რამდენიმე ან აირჩიეთ სხვა რეჟიმი.</value>
   </data>
   <data name="Autopilot_OverrideModeExcludeHint" xml:space="preserve">
     <value>მონიშნული მიღწევები არასოდეს განიბლოკება.</value>

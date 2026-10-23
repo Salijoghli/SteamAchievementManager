@@ -57,6 +57,9 @@ public sealed class CommandLine
     /// <summary>Internal option the Autopilot engine starts its workers with: <c>&lt;appid&gt; --autopilot-worker &lt;parent pid&gt;</c>.</summary>
     public const string AutopilotWorkerOption = "--autopilot-worker";
 
+    /// <summary>Internal option the engine adds in Autopilot dry-run mode: the worker only logs what it would change.</summary>
+    public const string AutopilotDryRunOption = "--autopilot-dry-run";
+
     /// <summary>Usage text printed by <c>--help</c>.</summary>
     public const string Usage =
         """
@@ -134,6 +137,9 @@ public sealed class CommandLine
     /// <summary>Autopilot worker: the library process to watch (the worker exits when it does).</summary>
     public int ParentProcessId { get; private init; }
 
+    /// <summary>Autopilot worker: <c>--autopilot-dry-run</c>, log unlocks instead of making them.</summary>
+    public bool AutopilotDryRun { get; private init; }
+
     /// <summary>Why the arguments are invalid (when <see cref="Mode"/> is <see cref="LaunchMode.Invalid"/>).</summary>
     public string? Error { get; private init; }
 
@@ -194,6 +200,7 @@ public sealed class CommandLine
         var @lock = new List<string>();
         bool unlockAllPreset = false, lockAllPreset = false, unlockAll = false, commit = false, quiet = false, noBackup = false;
         var workerParent = 0;
+        var workerDryRun = false;
 
         for (var i = 1; i < args.Count; i++)
         {
@@ -258,6 +265,9 @@ public sealed class CommandLine
                 case "--no-backup" when value == null:
                     noBackup = true;
                     break;
+                case AutopilotDryRunOption when value == null:
+                    workerDryRun = true;
+                    break;
                 case AutopilotWorkerOption:
                 {
                     if (value == null && i + 1 < args.Count && args[i + 1].StartsWith("-", StringComparison.Ordinal) == false)
@@ -285,7 +295,12 @@ public sealed class CommandLine
                 return Invalid($"{AutopilotWorkerOption} can't be combined with other options.", appId);
             }
 
-            return new CommandLine { Mode = LaunchMode.AutopilotWorker, AppId = appId, ParentProcessId = workerParent };
+            return new CommandLine { Mode = LaunchMode.AutopilotWorker, AppId = appId, ParentProcessId = workerParent, AutopilotDryRun = workerDryRun };
+        }
+
+        if (workerDryRun)
+        {
+            return Invalid($"{AutopilotDryRunOption} only applies to {AutopilotWorkerOption}.", appId);
         }
 
         var both = unlock.Intersect(@lock, StringComparer.Ordinal).ToList();

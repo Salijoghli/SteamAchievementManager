@@ -1062,7 +1062,7 @@ public sealed partial class AutopilotViewModel : ObservableObject
         }
 
         var isEmpty = value.ProfileName == null && value.TargetMode == null && value.TargetHours == null && value.IncludeRare == null &&
-                      value.ExcludedAchievements.Count == 0 && value.OnlyAchievements.Count == 0;
+                      value.ExcludedAchievements.Count == 0 && value.OnlyAchievements.Count == 0 && value.OnlyMode == false;
         if (isEmpty)
         {
             this._edit.Overrides.Remove(appId);
@@ -1207,7 +1207,7 @@ public sealed partial class AutopilotViewModel : ObservableObject
             parts.Add(Strings.Get(value.IncludeRare == true ? "Autopilot_OverrideSummaryRareOn" : "Autopilot_OverrideSummaryRareOff"));
         }
 
-        if (value.OnlyAchievements.Count > 0)
+        if (AutopilotPlanner.IsOnlyMode(value))
         {
             parts.Add(Strings.Plural("Autopilot_OverrideSummaryOnly", value.OnlyAchievements.Count));
         }

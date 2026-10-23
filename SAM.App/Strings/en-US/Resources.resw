@@ -296,6 +296,18 @@ If you have this game through Family Sharing, it may be locked while the owner i
   <data name="AutopilotEngine_DryRunTag" xml:space="preserve">
     <value>(dry run)</value>
   </data>
+  <data name="AutopilotEngine_DryRunForwardTitle" xml:space="preserve">
+    <value>Autopilot dry run not started</value>
+  </data>
+  <data name="AutopilotEngine_DryRunForwardMessage" xml:space="preserve">
+    <value>SAM is already running, so this dry-run launch was not passed on to it: the running SAM would make real changes. Close SAM (including its tray icon), then start the dry run again.</value>
+  </data>
+  <data name="AutopilotEngine_DryRunMismatch" xml:space="preserve">
+    <value>The game's Autopilot process didn't start in the same dry-run mode as Autopilot, so it was stopped before changing anything.</value>
+  </data>
+  <data name="AutopilotEngine_UnlockUncertain" xml:space="preserve">
+    <value>Steam may still have stored the unlock; Autopilot counted it and will check on its next pass.</value>
+  </data>
   <data name="AutopilotEngine_WorkerStartFailed" xml:space="preserve">
     <value>Couldn't start the game's Autopilot process: {0}</value>
   </data>
@@ -3083,7 +3095,13 @@ Installed · {2}</value>
     <value>Every achievement the rules allow may unlock.</value>
   </data>
   <data name="Autopilot_OverrideModeOnlyHint" xml:space="preserve">
-    <value>Only the checked achievements may unlock (if none are checked, the rules decide).</value>
+    <value>Only the checked achievements may unlock (if none are checked, nothing unlocks).</value>
+  </data>
+  <data name="Autopilot_OverrideOnlyEmptyWarning.Title" xml:space="preserve">
+    <value>Nothing will unlock</value>
+  </data>
+  <data name="Autopilot_OverrideOnlyEmptyWarning.Message" xml:space="preserve">
+    <value>No achievements are checked, so Autopilot will unlock nothing in this game. Check some, or choose another mode.</value>
   </data>
   <data name="Autopilot_OverrideModeExcludeHint" xml:space="preserve">
     <value>The checked achievements never unlock.</value>

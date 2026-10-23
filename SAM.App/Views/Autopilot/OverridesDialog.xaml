@@ -81,6 +81,11 @@
                 Style="{StaticResource CaptionTextBlockStyle}"
                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                 TextWrapping="Wrap" />
+            <InfoBar
+                x:Uid="Autopilot_OverrideOnlyEmptyWarning"
+                Severity="Warning"
+                IsClosable="False"
+                IsOpen="{x:Bind ViewModel.IsOnlyListEmpty, Mode=OneWay}" />
         </StackPanel>
 
         <Grid Grid.Row="3" RowSpacing="8" IsHitTestVisible="{x:Bind ViewModel.IsListEnabled, Mode=OneWay}" Opacity="{x:Bind pages:AutopilotFormat.DimUnless(ViewModel.IsListEnabled), Mode=OneWay}">

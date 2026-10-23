@@ -151,8 +151,14 @@ public sealed class AutopilotGameOverride
     /// <summary>Never unlock these achievement IDs.</summary>
     public HashSet<string> ExcludedAchievements { get; set; } = [];
 
-    /// <summary>If non-empty, only these achievement IDs may be unlocked.</summary>
+    /// <summary>Only these achievement IDs may be unlocked when <see cref="OnlyMode"/> is on (or, for older files, when non-empty).</summary>
     public HashSet<string> OnlyAchievements { get; set; } = [];
+
+    /// <summary>
+    /// "Only these" mode: nothing outside <see cref="OnlyAchievements"/> may unlock, so an empty
+    /// list means nothing at all. Older files without it are read as on when the list is non-empty.
+    /// </summary>
+    public bool OnlyMode { get; set; }
 
     /// <summary>Overrides the profile's TargetMode/TargetHours when set.</summary>
     public AutopilotTargetMode? TargetMode { get; set; }
@@ -270,6 +276,19 @@ public sealed class AutopilotGameState
 
     /// <summary>Achievement IDs unlocked by Autopilot.</summary>
     public List<string> UnlockedByAutopilot { get; set; } = [];
+
+    /// <summary>
+    /// Requested IDs whose outcome isn't known yet (the request is in flight, timed out, or SAM
+    /// closed meanwhile). Already counted against the limits; the engine checks them on the next
+    /// state read and records the ones that turned out unlocked.
+    /// </summary>
+    public List<string> PendingUnlocks { get; set; } = [];
+
+    /// <summary>
+    /// Locked achievements on a stat Autopilot raised, not requested themselves. Any that turn out
+    /// unlocked on the next state read are recorded and counted against the limits.
+    /// </summary>
+    public List<string> WatchedUnlocks { get; set; } = [];
 
     public bool Completed { get; set; }
 

@@ -32,12 +32,12 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
     /// <summary>How often the engine re-evaluates while running.</summary>
     internal static readonly TimeSpan TickInterval = TimeSpan.FromSeconds(30);
 
-    /// <summary>Most running time credited per tick (a sleeping PC doesn't count as playtime).</summary>
-    private static readonly TimeSpan MaxCreditPerTick = TimeSpan.FromMinutes(2);
-
     private static readonly TimeSpan ResolveLifetime = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan PlaytimeLifetime = TimeSpan.FromMinutes(5);
     private static readonly TimeSpan PercentLifetime = TimeSpan.FromHours(6);
+
+    /// <summary>After a failed global-percentage lookup, how long before asking Steam again.</summary>
+    private static readonly TimeSpan PercentRetryDelay = TimeSpan.FromMinutes(2);
     private static readonly TimeSpan NextUnlockLifetime = TimeSpan.FromMinutes(10);
     private static readonly TimeSpan UnlockRetryDelay = TimeSpan.FromMinutes(10);
     private static readonly TimeSpan StableWorkerUptime = TimeSpan.FromMinutes(10);
@@ -45,16 +45,26 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
     private static readonly TimeSpan UnlockTimeout = TimeSpan.FromSeconds(90);
     private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(5);
 
+    /// <summary>On shutdown, how long a worker that's storing an unlock gets to finish (Steam's store timeout plus a margin).</summary>
+    private static readonly TimeSpan ShutdownUnlockTimeout = TimeSpan.FromSeconds(40);
+
     /// <summary>Queued games (beyond the running ones) that get a "next unlock" estimate.</summary>
     private const int PreviewedQueuedGames = 10;
 
     private readonly DispatcherQueue _dispatcher = DispatcherQueue.GetForCurrentThread();
     private readonly DispatcherQueueTimer _timer = DispatcherQueue.GetForCurrentThread().CreateTimer();
+
+    /// <summary>Dry run (<see cref="AutopilotProtocol.DryRunVariable"/> in this process): workers only log, and state lives in memory.</summary>
+    private readonly bool _dryRun = AutopilotProtocol.IsDryRun;
+
+    /// <summary>Serializes StartAsync and StopAsync, so an older stop can't undo a newer start.</summary>
+    private readonly SemaphoreSlim _lifecycle = new(1, 1);
     private readonly Dictionary<uint, AutopilotWorkerClient> _workers = [];
     private readonly Dictionary<uint, WorkerFailure> _failures = [];
     private readonly Dictionary<uint, DateTimeOffset> _unlockRetryAt = [];
-    private readonly Dictionary<uint, DateTimeOffset> _creditedUntil = [];
-    private readonly Dictionary<uint, (DateTimeOffset At, IReadOnlyDictionary<string, double>? Percents)> _percents = [];
+    private readonly Dictionary<uint, AwakeClock.Mark> _creditedUntil = [];
+    private readonly HashSet<uint> _unlocking = [];
+    private readonly Dictionary<uint, (DateTimeOffset At, GlobalPercentResult Result)> _percents = [];
     private readonly Dictionary<uint, IReadOnlyList<AutopilotAchievement>> _achievements = [];
     private readonly Dictionary<uint, (DateTimeOffset At, string? Name, DateTimeOffset? Estimate)> _nextUnlocks = [];
     private readonly Dictionary<uint, string> _names = [];
@@ -75,6 +85,9 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
     private bool _timerHooked;
     private bool _disposed;
     private bool _stateDirty;
+
+    /// <summary>The config Completed flags were last re-checked against (see RecheckCompletedAsync).</summary>
+    private AutopilotConfig? _completedCheckedFor;
     private DateOnly _summaryDay = Today(DateTimeOffset.Now);
     private int _summaryCount;
     private readonly List<string> _summaryGames = [];
@@ -90,13 +103,34 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
     /// <summary>The current configuration (a live object; call SaveConfig after editing a copy).</summary>
     public AutopilotConfig Config => this._config ??= services.AutopilotStore.LoadConfig();
 
-    private AutopilotState State => this._state ??= services.AutopilotStore.LoadState();
+    /// <summary>
+    /// Runtime state. In dry-run mode a copy that's never saved, so pretend unlocks, hours and
+    /// Completed flags don't leak into the real autopilot-state.json.
+    /// </summary>
+    private AutopilotState State
+    {
+        get
+        {
+            if (this._state == null)
+            {
+                this._state = services.AutopilotStore.LoadState();
+                if (this._dryRun)
+                {
+                    Diagnostics.Log("Autopilot dry run: using an in-memory copy of the state; nothing will be saved");
+                }
+            }
+
+            return this._state;
+        }
+    }
 
     /// <summary>Saves and applies a new configuration (takes effect on the next tick).</summary>
     public void SaveConfig(AutopilotConfig config)
     {
         ArgumentNullException.ThrowIfNull(config);
-        config.WasRunning = this._running;
+
+        // A dry run never records itself as running: the next normal start would resume for real.
+        config.WasRunning = this._dryRun ? this.Config.WasRunning : this._running;
         this._config = config;
         this.SaveConfigFile();
         StartupRegistration.Apply(config.StartWithWindows);
@@ -138,60 +172,80 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
 
     public async Task StartAsync()
     {
-        if (this._running || this._disposed)
+        await this._lifecycle.WaitAsync();
+        try
         {
-            return;
+            if (this._running || this._disposed)
+            {
+                return;
+            }
+
+            this._running = true;
+            this._cancel = new CancellationTokenSource();
+            if (this._dryRun == false)
+            {
+                this.Config.WasRunning = true;
+                this.SaveConfigFile();
+            }
+
+            if (this._timerHooked == false)
+            {
+                this._timerHooked = true;
+                this._timer.Interval = TickInterval;
+                this._timer.IsRepeating = true;
+                this._timer.Tick += async (_, _) => await this.TickAsync();
+            }
+
+            this._timer.Start();
+            this.RaiseChanged();
+        }
+        finally
+        {
+            this._lifecycle.Release();
         }
 
-        this._running = true;
-        this._cancel = new CancellationTokenSource();
-        this.Config.WasRunning = true;
-        this.SaveConfigFile();
-
-        if (this._timerHooked == false)
-        {
-            this._timerHooked = true;
-            this._timer.Interval = TickInterval;
-            this._timer.IsRepeating = true;
-            this._timer.Tick += async (_, _) => await this.TickAsync();
-        }
-
-        this._timer.Start();
-        this.RaiseChanged();
         await this.TickAsync();
     }
 
     /// <summary>Stops all workers and saves state.</summary>
     public async Task StopAsync()
     {
-        if (this._disposed)
+        await this._lifecycle.WaitAsync();
+        try
         {
-            return;
+            if (this._disposed)
+            {
+                return;
+            }
+
+            var wasRunning = this._running;
+            this._running = false;
+            this._timer.Stop();
+            this._cancel.Cancel();
+
+            // Let an in-flight tick finish (an unlock that's being stored isn't interrupted).
+            while (this._ticking)
+            {
+                await Task.Delay(100);
+            }
+
+            await this.StopAllWorkersAsync();
+            if (wasRunning && this._dryRun == false)
+            {
+                this.Config.WasRunning = false;
+                this.SaveConfigFile();
+            }
+
+            this.FlushSummary();
+            this.SaveState(force: true);
+            this.TrayStatus = null;
+            this.RaiseChanged();
+            this.RequestTick();
         }
-
-        var wasRunning = this._running;
-        this._running = false;
-        this._timer.Stop();
-        this._cancel.Cancel();
-
-        // Let an in-flight tick finish (an unlock that's being stored isn't interrupted).
-        while (this._ticking)
+        finally
         {
-            await Task.Delay(100);
+            this._lifecycle.Release();
         }
-
-        await this.StopAllWorkersAsync();
-        if (wasRunning)
-        {
-            this.Config.WasRunning = false;
-            this.SaveConfigFile();
-        }
-
-        this.FlushSummary();
-        this.SaveState(force: true);
-        this.TrayStatus = null;
-        this.RaiseChanged();
-        this.RequestTick();
     }
 
     public void PauseGame(uint appId) => this.SetPaused(appId, true);
@@ -201,39 +255,35 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
     /// <summary>Clears a game's Autopilot progress (hours, seeds, completed flag) — not its achievements.</summary>
     /// <remarks>
     /// Keeps the list of achievements Autopilot unlocked, today's unlock counters (so a reset can't
-    /// bypass the rate limits) and the paused flag. The baseline playtime is taken again.
+    /// bypass the rate limits), pending unlocks and the paused flag. The baseline playtime is taken
+    /// again. Resets the existing state object in place, so an unlock in flight still records
+    /// its result in it.
     /// </remarks>
     public void ResetGame(uint appId)
     {
-        var games = this.State.Games;
-        games.TryGetValue(appId, out var old);
-        var fresh = new AutopilotGameState
+        var state = this.GetOrCreateState(appId);
+        var today = Today(DateTimeOffset.Now);
+        state.BaselineSteamHours = this.SteamHours(appId);
+        state.AutopilotHours = 0;
+        state.HoursToday = 0;
+        if (state.Day != today)
         {
-            AppId = appId,
-            BaselineSteamHours = this.SteamHours(appId),
-            Day = Today(DateTimeOffset.Now),
-        };
-
-        if (old != null)
-        {
-            fresh.UnlockedByAutopilot = old.UnlockedByAutopilot;
-            fresh.RecentUnlocks = old.RecentUnlocks;
-            fresh.LastUnlockAt = old.LastUnlockAt;
-            fresh.Paused = old.Paused;
-            if (old.Day == fresh.Day)
-            {
-                fresh.UnlocksToday = old.UnlocksToday;
-            }
+            state.UnlocksToday = 0;
         }
 
-        games[appId] = fresh;
+        state.Day = today;
+        state.NextIntervalAtHours = null;
+        state.JitterSeeds = [];
+        state.Completed = false;
+        state.LastError = null;
+
         this._failures.Remove(appId);
         this._unlockRetryAt.Remove(appId);
         this._nextUnlocks.Remove(appId);
         this._creditedUntil.Remove(appId);
         if (this._workers.ContainsKey(appId))
         {
-            this._creditedUntil[appId] = DateTimeOffset.Now;
+            this._creditedUntil[appId] = AwakeClock.Now(DateTimeOffset.Now);
         }
 
         this._stateDirty = true;
@@ -292,6 +342,12 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
     /// Stops every worker (asks, waits up to a few seconds, then kills) and saves state, without
     /// clearing WasRunning, so Autopilot resumes next time when ResumeOnStartup is on.
     /// </summary>
+    /// <remarks>
+    /// A worker in the middle of an unlock gets up to <see cref="ShutdownUnlockTimeout"/> to finish
+    /// storing it (its "stop" is queued behind the unlock), so closing SAM doesn't kill it mid-store.
+    /// The engine can't read that answer any more; the requested IDs are already counted and kept
+    /// in PendingUnlocks, and the next run records the ones that turned out unlocked.
+    /// </remarks>
     public void Dispose()
     {
         if (this._disposed)
@@ -315,10 +371,16 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
             worker.RequestStop();
         }
 
-        var deadline = DateTimeOffset.Now + StopTimeout;
-        foreach (var worker in this._workers.Values)
+        var start = DateTimeOffset.Now;
+        foreach (var (appId, worker) in this._workers)
         {
-            var left = deadline - DateTimeOffset.Now;
+            var busy = this._unlocking.Contains(appId) || worker.IsBusy;
+            if (busy)
+            {
+                Diagnostics.Log($"Autopilot: waiting for the worker for {appId} to finish its unlock before exiting");
+            }
+
+            var left = start + (busy ? ShutdownUnlockTimeout : StopTimeout) - DateTimeOffset.Now;
             if (left <= TimeSpan.Zero || worker.WaitForExit(left) == false)
             {
                 worker.Kill();
@@ -439,6 +501,7 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
 
         var games = await this.GetResolvedAsync(config, token);
         await this.RefreshPlaytimeAsync();
+        await this.RecheckCompletedAsync(config, games, token);
         if (this.Live == false)
         {
             return;
@@ -481,7 +544,6 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
             decisions = this.Decide(config, games, gaming, now);
         }
 
-        var quiet = AutopilotPlanner.IsQuietTime(config, now);
         foreach (var (appId, worker) in this._workers.ToList())
         {
             if (this.Live == false)
@@ -489,7 +551,14 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
                 return;
             }
 
-            if (worker.IsReady == false || worker.HasExited)
+            if (ReferenceEquals(this.Config, config) == false)
+            {
+                // Saved meanwhile: the next pass works with the new rules.
+                this._tickAgain = true;
+                break;
+            }
+
+            if (worker.IsReady == false || worker.HasExited || this.IsCurrentWorker(appId, worker) == false)
             {
                 continue;
             }
@@ -497,7 +566,7 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
             var game = games.FirstOrDefault(g => g.AppId == appId);
             if (game != null)
             {
-                await this.ProcessGameAsync(config, game, worker, quiet, token);
+                await this.ProcessGameAsync(config, game, worker, token);
             }
         }
 
@@ -607,10 +676,15 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
     }
 
     /// <summary>One running game: refresh its live state, unlock what's due, mark it finished.</summary>
-    private async Task ProcessGameAsync(AutopilotConfig config, ResolvedGame game, AutopilotWorkerClient worker, bool quiet, CancellationToken token)
+    /// <remarks>
+    /// Rules (config, override, profile), the schedule and quiet hours are read again right before
+    /// unlocking, after every await: a config saved meanwhile skips the game for this pass (the
+    /// next pass uses the new rules), and a schedule window that ended stops the worker now.
+    /// </remarks>
+    private async Task ProcessGameAsync(AutopilotConfig config, ResolvedGame game, AutopilotWorkerClient worker, CancellationToken token)
     {
         var appId = game.AppId;
-        var state = this.GetOrCreateState(appId);
+        this.GetOrCreateState(appId);
 
         AutopilotResponse live;
         try
@@ -622,6 +696,12 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
             this.CreditRunningTime(appId, DateTimeOffset.Now);
             this.RecordFailure(appId, e.Message, DateTimeOffset.Now);
             this.RemoveWorker(appId);
+            return;
+        }
+
+        if (live.DryRun != this._dryRun)
+        {
+            this.RejectDryRunMismatch(appId, live.DryRun);
             return;
         }
 
@@ -638,30 +718,73 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
 
         var unlockedNow = live.Achievements.Where(a => a.Unlocked).Select(a => a.Id).ToHashSet(StringComparer.Ordinal);
         var known = live.Achievements.Select(a => a.Id).ToHashSet(StringComparer.Ordinal);
+
+        // Requests whose outcome wasn't known (timeout, SAM closed mid-store) and achievements a
+        // raised stat may have unlocked: record what Steam now reports unlocked.
+        if (AutopilotAccounting.Reconcile(this.GetOrCreateState(appId), unlockedNow, DateTimeOffset.Now))
+        {
+            this._stateDirty = true;
+            this.SaveState();
+        }
+
         var percents = await this.GetPercentsAsync(appId, token);
+        if (percents.Status == GlobalPercentStatus.Failed)
+        {
+            // Rarity unknown for now: unlocking would treat every achievement as UnknownPercentAs
+            // (rares included), and finishing could mark the game done when nothing qualifies.
+            // Do neither; GetPercentsAsync asks again in a few minutes.
+            return;
+        }
+
         // An achievement Steam didn't report is treated as unlocked, so it's never attempted.
-        var achievements = BuildAchievements(schema, a => unlockedNow.Contains(a.Id) || known.Contains(a.Id) == false, percents);
+        var achievements = BuildAchievements(schema, a => unlockedNow.Contains(a.Id) || known.Contains(a.Id) == false, percents.Percents);
         this._achievements[appId] = achievements;
 
+        // Fresh rules and time, after the awaits above.
+        if (this.Live == false || ReferenceEquals(this.Config, config) == false || this.IsCurrentWorker(appId, worker) == false)
+        {
+            return;
+        }
+
+        var now = DateTimeOffset.Now;
+        if (AutopilotPlanner.IsWithinSchedule(config, now) == false)
+        {
+            await this.StopWorkerAsync(appId);
+            return;
+        }
+
+        var state = this.GetOrCreateState(appId);
         var profile = AutopilotPlanner.ResolveProfile(config, appId);
         config.Overrides.TryGetValue(appId, out var gameOverride);
-        var now = DateTimeOffset.Now;
         var playtime = this.CurrentPlaytime(state);
 
-        if (quiet == false && (this._unlockRetryAt.TryGetValue(appId, out var retryAt) == false || retryAt <= now))
+        if (AutopilotPlanner.IsQuietTime(config, now) == false &&
+            (this._unlockRetryAt.TryGetValue(appId, out var retryAt) == false || retryAt <= now))
         {
             var due = AutopilotPlanner.DueNow(profile, gameOverride, achievements, state, playtime, now, this._random);
             this._stateDirty = true;
             if (due.Count > 0 && this.Live)
             {
-                var unlocked = await this.UnlockAsync(config, profile, game, state, worker, due);
+                var unlocked = await this.UnlockAsync(config, profile, game, worker, achievements, due);
                 if (unlocked.Count > 0)
                 {
                     achievements = achievements.Select(a => unlocked.Contains(a.Id) ? a with { IsUnlocked = true } : a).ToList();
                     this._achievements[appId] = achievements;
                     this._nextUnlocks.Remove(appId);
                 }
+
+                if (ReferenceEquals(this.Config, config) == false)
+                {
+                    return;
+                }
             }
+        }
+
+        state = this.GetOrCreateState(appId);
+        if (state.PendingUnlocks.Count > 0)
+        {
+            // Not finished until the uncertain unlocks have been checked.
+            return;
         }
 
         var remaining = achievements.Count(a => AutopilotPlanner.Classify(profile, gameOverride, a) == AutopilotSkipReason.None);
@@ -673,75 +796,105 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
         }
     }
 
-    /// <summary>Sends one unlock batch; records the result in state, history event and notifications. Returns the IDs unlocked.</summary>
+    /// <summary>
+    /// Sends one unlock batch; records the result in state, history event and notifications.
+    /// Returns the IDs unlocked.
+    /// </summary>
+    /// <remarks>
+    /// The batch is counted against the limits before it's sent (see <see cref="AutopilotAccounting"/>):
+    /// a timeout, broken pipe or Steam store timeout leaves it counted and pending until the next
+    /// state read. Linked stats are raised only when that can't unlock anything outside the batch
+    /// (<see cref="AutopilotPlanner.LinkedStatTargets"/>).
+    /// </remarks>
     private async Task<HashSet<string>> UnlockAsync(
         AutopilotConfig config,
         AutopilotProfile profile,
         ResolvedGame game,
-        AutopilotGameState state,
         AutopilotWorkerClient worker,
+        IReadOnlyList<AutopilotAchievement> achievements,
         IReadOnlyList<AutopilotAchievement> due)
     {
         var appId = game.AppId;
-        var stats = new Dictionary<string, double>(StringComparer.Ordinal);
-        if (profile.UpdateLinkedStats)
-        {
-            foreach (var achievement in due)
-            {
-                if (achievement.ProgressStatId is { } statId && AutopilotPlanner.LinkedStatTarget(profile, achievement) is { } target)
-                {
-                    stats[statId] = stats.TryGetValue(statId, out var existing) ? Math.Max(existing, target) : target;
-                }
-            }
-        }
+        var stats = AutopilotPlanner.LinkedStatTargets(profile, achievements, due);
+        var dueIds = due.Select(a => a.Id).ToList();
+        var watched = achievements
+            .Where(a => a.IsUnlocked == false && a.ProgressStatId != null && stats.ContainsKey(a.ProgressStatId) && dueIds.Contains(a.Id) == false)
+            .Select(a => a.Id)
+            .ToList();
 
         var request = new AutopilotRequest
         {
             Type = AutopilotProtocol.Unlock,
-            Ids = due.Select(a => a.Id).ToList(),
-            Stats = stats.Count > 0 ? stats : null,
+            Ids = dueIds,
+            Stats = stats.Count > 0 ? new Dictionary<string, double>(stats, StringComparer.Ordinal) : null,
             Backup = config.BackupBeforeUnlock,
         };
 
+        var ticket = AutopilotAccounting.Begin(this.GetOrCreateState(appId), dueIds, DateTimeOffset.Now);
+        this._stateDirty = true;
+        this.SaveState();
+
         AutopilotResponse response;
+        var uncertain = false;
+        this._unlocking.Add(appId);
         try
         {
             // Not cancellable: once Steam is storing, the result must be recorded.
             response = await worker.SendAsync(request, UnlockTimeout, CancellationToken.None);
+            uncertain = response.Ok == false && response.Uncertain;
         }
         catch (AutopilotWorkerException e)
         {
+            // No answer: the worker may have stored the unlock before it stopped answering.
             response = new AutopilotResponse { Ok = false, Message = e.Message };
+            uncertain = true;
             this.CreditRunningTime(appId, DateTimeOffset.Now);
+            this.RemoveWorker(appId);
+        }
+        finally
+        {
+            this._unlocking.Remove(appId);
+        }
+
+        if (response.Ok && response.DryRun != this._dryRun)
+        {
+            // Shouldn't happen (checked at connect); count it as uncertain and drop the worker.
+            response = new AutopilotResponse { Ok = false, Message = Strings.Get("AutopilotEngine_DryRunMismatch") };
+            uncertain = true;
             this.RemoveWorker(appId);
         }
 
         var now = DateTimeOffset.Now;
+
+        // Fetched again: ResetGame may have run meanwhile (it resets this same object in place).
+        var state = this.GetOrCreateState(appId);
         var unlocked = (response.Ok ? response.Unlocked : null) ?? [];
         var hadError = state.LastError != null;
         if (response.Ok)
         {
-            foreach (var id in unlocked)
+            AutopilotAccounting.Complete(state, ticket, unlocked);
+            if (response.StatChanges is { Count: > 0 })
             {
-                if (state.UnlockedByAutopilot.Contains(id) == false)
-                {
-                    state.UnlockedByAutopilot.Add(id);
-                }
-
-                state.RecentUnlocks.Add(now);
-            }
-
-            state.UnlocksToday += unlocked.Count;
-            if (unlocked.Count > 0)
-            {
-                state.LastUnlockAt = now;
+                AutopilotAccounting.Watch(state, watched);
             }
 
             state.LastError = null;
             this._unlockRetryAt.Remove(appId);
         }
+        else if (uncertain)
+        {
+            AutopilotAccounting.Uncertain(state, ticket);
+            if (stats.Count > 0)
+            {
+                AutopilotAccounting.Watch(state, watched);
+            }
+
+            state.LastError = (response.Message ?? Strings.Get("AutopilotEngine_WorkerNoAnswer")) + " " + Strings.Get("AutopilotEngine_UnlockUncertain");
+            this._unlockRetryAt[appId] = now + UnlockRetryDelay;
+        }
         else
         {
+            AutopilotAccounting.Fail(state, ticket);
             state.LastError = response.Message ?? Strings.Get("AutopilotEngine_WorkerNoAnswer");
             this._unlockRetryAt[appId] = now + UnlockRetryDelay;
         }
@@ -936,6 +1089,8 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
         var config = this.Config;
         var games = await this.GetResolvedAsync(config, CancellationToken.None);
         await this.RefreshPlaytimeAsync();
+        await this.RecheckCompletedAsync(config, games, CancellationToken.None);
+        this.SaveState();
         if (this._running || this._disposed)
         {
             return;
@@ -948,6 +1103,66 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
             this.PublishStatus(decisions, config, DateTimeOffset.Now);
         }
     }
+    /// <summary>
+    /// Clears Completed for games whose current rules would allow more (e.g. a raised time target,
+    /// rares now allowed, an override changed). Runs once per configuration object, i.e. on start
+    /// and after each save, using the schema and Steam's local stats cache.
+    /// </summary>
+    private async Task RecheckCompletedAsync(AutopilotConfig config, IReadOnlyList<ResolvedGame> games, CancellationToken token)
+    {
+        if (ReferenceEquals(this._completedCheckedFor, config))
+        {
+            return;
+        }
+
+        this._completedCheckedFor = config;
+        foreach (var game in games)
+        {
+            var appId = game.AppId;
+            if (this.State.Games.TryGetValue(appId, out var state) == false || state.Completed == false)
+            {
+                continue;
+            }
+
+            try
+            {
+                var schema = await Task.Run(() => services.Schemas.Load(appId), token);
+                var percents = await this.GetPercentsAsync(appId, token);
+                if (schema == null || percents.Status == GlobalPercentStatus.Failed || ReferenceEquals(this.Config, config) == false)
+                {
+                    continue;
+                }
+
+                var stats = await Task.Run(() => this.LoadStatsCache(appId), token);
+                var achievements = BuildAchievements(schema, a => stats.GetState(a).Unlocked || state.UnlockedByAutopilot.Contains(a.Id), percents.Percents);
+                var profile = AutopilotPlanner.ResolveProfile(config, appId);
+                config.Overrides.TryGetValue(appId, out var gameOverride);
+                var remaining = achievements.Count(a => AutopilotPlanner.Classify(profile, gameOverride, a) == AutopilotSkipReason.None);
+                if (AutopilotPlanner.IsFinished(profile, state, this.CurrentPlaytime(state), remaining) == false)
+                {
+                    Diagnostics.Log($"Autopilot: {appId} is no longer finished under the current rules");
+                    state.Completed = false;
+                    this._stateDirty = true;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Stopped midway: check everything again next time.
+                this._completedCheckedFor = null;
+                throw;
+            }
+            catch (Exception e)
+            {
+                Diagnostics.Log($"Autopilot: couldn't re-check whether {appId} is finished", e);
+            }
+        }
+
+        if (ReferenceEquals(this.Config, config) == false)
+        {
+            // Saved meanwhile: check again against the newer rules.
+            this._completedCheckedFor = null;
+        }
+    }
     #endregion
 
     #region Workers
@@ -956,7 +1171,7 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
         this.GetOrCreateState(appId);
         try
         {
-            this._workers[appId] = AutopilotWorkerClient.Start(appId, services.Steam.SteamId);
+            this._workers[appId] = AutopilotWorkerClient.Start(appId, services.Steam.SteamId, this._dryRun);
         }
         catch (AutopilotWorkerException e)
         {
@@ -974,7 +1189,13 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
         try
         {
             await worker.ConnectAsync(token);
-            this._creditedUntil[appId] = DateTimeOffset.Now;
+            if (worker.DryRun != this._dryRun)
+            {
+                this.RejectDryRunMismatch(appId, worker.DryRun);
+                return;
+            }
+
+            this._creditedUntil[appId] = AwakeClock.Now(DateTimeOffset.Now);
             if (worker.DryRun)
             {
                 Diagnostics.Log($"Autopilot: worker for {appId} runs in dry-run mode");
@@ -1012,6 +1233,18 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
         }
     }
 
+    /// <summary>Whether <paramref name="worker"/> is still the engine's worker for <paramref name="appId"/> (not stopped or replaced meanwhile).</summary>
+    private bool IsCurrentWorker(uint appId, AutopilotWorkerClient worker) =>
+        this._workers.TryGetValue(appId, out var current) && ReferenceEquals(current, worker);
+
+    /// <summary>The worker's dry-run mode isn't the engine's: kill it before it changes anything.</summary>
+    private void RejectDryRunMismatch(uint appId, bool workerDryRun)
+    {
+        Diagnostics.Log($"Autopilot: worker for {appId} reports dry run = {workerDryRun}, but the engine's is {this._dryRun}; stopping it");
+        this.RecordFailure(appId, Strings.Get("AutopilotEngine_DryRunMismatch"), DateTimeOffset.Now);
+        this.RemoveWorker(appId);
+    }
+
     private Task StopAllWorkersAsync() => Task.WhenAll(this._workers.Keys.ToList().Select(this.StopWorkerAsync));
 
     private void RemoveWorker(uint appId)
@@ -1040,7 +1273,10 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
         }
     }
 
-    /// <summary>Adds the time since the last credit to AutopilotHours/HoursToday (at most <see cref="MaxCreditPerTick"/>).</summary>
+    /// <summary>
+    /// Adds the time since the last credit to AutopilotHours/HoursToday: the time the PC was awake
+    /// (<see cref="AwakeClock"/>), so sleep and hibernation aren't credited but a slow tick is.
+    /// </summary>
     private void CreditRunningTime(uint appId, DateTimeOffset now)
     {
         if (this._creditedUntil.TryGetValue(appId, out var since) == false)
@@ -1048,16 +1284,12 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
             return;
         }
 
-        this._creditedUntil[appId] = now;
-        var elapsed = now - since;
+        var mark = AwakeClock.Now(now);
+        this._creditedUntil[appId] = mark;
+        var elapsed = AwakeClock.Elapsed(since, mark);
         if (elapsed <= TimeSpan.Zero)
         {
             return;
-        }
-
-        if (elapsed > MaxCreditPerTick)
-        {
-            elapsed = MaxCreditPerTick;
         }
 
         var state = this.GetOrCreateState(appId);
@@ -1216,7 +1448,7 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
 
         var stats = await Task.Run(() => this.LoadStatsCache(appId), token);
         var percents = await this.GetPercentsAsync(appId, token);
-        return BuildAchievements(schema, a => stats.GetState(a).Unlocked, percents);
+        return BuildAchievements(schema, a => stats.GetState(a).Unlocked, percents.Percents);
     }
 
     internal static List<AutopilotAchievement> BuildAchievements(
@@ -1233,17 +1465,39 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
         return result;
     }
 
-    private async Task<IReadOnlyDictionary<string, double>?> GetPercentsAsync(uint appId, CancellationToken token)
+    /// <summary>
+    /// Global percentages for a game, kept for <see cref="PercentLifetime"/>. A failed lookup is
+    /// remembered only for <see cref="PercentRetryDelay"/> (so it's retried within minutes, without
+    /// asking Steam on every tick) and never replaces an earlier answer.
+    /// </summary>
+    private async Task<GlobalPercentResult> GetPercentsAsync(uint appId, CancellationToken token)
     {
-        if (this._percents.TryGetValue(appId, out var cached) && DateTimeOffset.Now - cached.At < PercentLifetime)
+        if (this._percents.TryGetValue(appId, out var cached))
         {
-            return cached.Percents;
+            var age = DateTimeOffset.Now - cached.At;
+            var lifetime = cached.Result.Status == GlobalPercentStatus.Failed ? PercentRetryDelay : PercentLifetime;
+            if (age >= TimeSpan.Zero && age < lifetime)
+            {
+                return cached.Result;
+            }
         }
 
-        var percents = await services.GlobalPercents.GetAsync(appId, token);
+        var result = await services.GlobalPercents.FetchAsync(appId, token);
         token.ThrowIfCancellationRequested();
-        this._percents[appId] = (DateTimeOffset.Now, percents);
-        return percents;
+        if (result.Status == GlobalPercentStatus.Failed && cached.Result is { Status: not GlobalPercentStatus.Failed } previous)
+        {
+            // Keep the older answer and ask again after the retry delay.
+            this._percents[appId] = (DateTimeOffset.Now - PercentLifetime + PercentRetryDelay, previous);
+            return previous;
+        }
+
+        if (result.Status == GlobalPercentStatus.Failed)
+        {
+            Diagnostics.Log($"Autopilot: global percentages for {appId} are unavailable; no unlocks for it until they are");
+        }
+
+        this._percents[appId] = (DateTimeOffset.Now, result);
+        return result;
     }
 
     private async Task RefreshPlaytimeAsync()
@@ -1350,6 +1604,13 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
     {
         if ((this._stateDirty == false && force == false) || this._state == null)
         {
+            return;
+        }
+
+        if (this._dryRun)
+        {
+            // Dry run: the state is an in-memory copy and never written.
+            this._stateDirty = false;
             return;
         }
 

@@ -142,6 +142,14 @@ public partial class App : Application
             WaitForExit(command.RestartAfterProcessId);
         }
 
+        // Autopilot dry-run is a property of the library process that runs the engine. Forwarding
+        // this launch would let an already-running (real) library start Autopilot for real.
+        if (appId == 0 && AutopilotProtocol.IsDryRun && AutopilotWorker.IsWindowOpen(0))
+        {
+            this.RefuseDryRunForward();
+            return;
+        }
+
         // One window per game (and one library): if it's already open, hand it our arguments
         // (so "--unlock-all" etc. still apply), focus it and quit.
         this._instance = SingleInstance.TryClaim(appId, arguments);
@@ -276,13 +284,31 @@ public partial class App : Application
         }
     }
 
+    /// <summary>A dry-run library launch while SAM's library already runs: say so and exit without forwarding.</summary>
+    private void RefuseDryRunForward()
+    {
+        var message = Strings.Get("AutopilotEngine_DryRunForwardMessage");
+        Diagnostics.Log("Autopilot dry run: refused because the library is already running; nothing was forwarded");
+        if (ConsoleOutput.IsAvailable)
+        {
+            ConsoleOutput.WriteError(message);
+            this.ExitWith(CommandLine.ExitBusy);
+        }
+        else
+        {
+            this.Show(new ErrorWindow(Strings.Get("AutopilotEngine_DryRunForwardTitle"), message));
+        }
+    }
+
     /// <summary>Runs a headless Autopilot worker until it stops, then exits with its exit code.</summary>
     private async void RunAutopilotWorker(CommandLine command)
     {
         var code = AutopilotProtocol.ExitSteamFailed;
         try
         {
-            code = await AutopilotWorker.RunAsync(command.AppId, command.ParentProcessId, this._settings);
+            // The engine passes dry-run explicitly; the variable still works for a worker started by hand.
+            var dryRun = command.AutopilotDryRun || AutopilotProtocol.IsDryRun;
+            code = await AutopilotWorker.RunAsync(command.AppId, command.ParentProcessId, this._settings, dryRun);
         }
         catch (Exception e)
         {
