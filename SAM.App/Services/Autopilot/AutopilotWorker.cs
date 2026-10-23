@@ -16,7 +16,7 @@ namespace SAM.App.Services.Autopilot;
 /// </summary>
 /// <remarks>
 /// Exits when told to, when the parent (library) process exits, or when no engine has been
-/// connected for <see cref="DisconnectedTimeout"/>. With <c>SAM_AUTOPILOT_DRYRUN=1</c> it logs
+/// connected for <see cref="DisconnectedTimeout"/>. In dry-run mode (<c>--autopilot-dry-run</c>) it logs
 /// intended changes instead of making them (and writes no backups or history).
 /// </remarks>
 public sealed class AutopilotWorker
@@ -30,7 +30,7 @@ public sealed class AutopilotWorker
     private readonly uint _appId;
     private readonly int _parentProcessId;
     private readonly AppSettings _settings;
-    private readonly bool _dryRun = AutopilotProtocol.IsDryRun;
+    private readonly bool _dryRun;
     private readonly CancellationTokenSource _stop = new();
 
     private AppServices? _services;
@@ -43,9 +43,10 @@ public sealed class AutopilotWorker
     /// <summary>Dry run: achievements "unlocked" this session, reported as unlocked so plans move on.</summary>
     private readonly HashSet<string> _dryRunUnlocked = new(StringComparer.Ordinal);
 
-    private AutopilotWorker(uint appId, int parentProcessId, AppSettings settings)
+    private AutopilotWorker(uint appId, int parentProcessId, AppSettings settings, bool dryRun)
     {
         this._appId = appId;
+        this._dryRun = dryRun;
         this._parentProcessId = parentProcessId;
         this._settings = settings;
     }
@@ -55,8 +56,9 @@ public sealed class AutopilotWorker
     /// <see cref="AutopilotProtocol"/>). Call on the UI thread; it never shows a window. Startup
     /// errors are also written to stderr (the engine redirects it) as one line.
     /// </summary>
-    public static Task<int> RunAsync(uint appId, int parentProcessId, AppSettings settings) =>
-        new AutopilotWorker(appId, parentProcessId, settings).RunAsync();
+    /// <param name="dryRun">Log intended changes instead of making them (the engine passes <c>--autopilot-dry-run</c>).</param>
+    public static Task<int> RunAsync(uint appId, int parentProcessId, AppSettings settings, bool dryRun) =>
+        new AutopilotWorker(appId, parentProcessId, settings, dryRun).RunAsync();
 
     private async Task<int> RunAsync()
     {
@@ -568,7 +570,7 @@ public sealed class AutopilotWorker
             {
                 // Timed out: the upload may still go through, so don't undo anything.
                 this.AppendHistory(unlockedIds, statRecords, false, e.Message);
-                return new AutopilotResponse { Ok = false, Message = e.Message };
+                return new AutopilotResponse { Ok = false, Uncertain = true, Message = e.Message };
             }
         }
 

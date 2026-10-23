@@ -167,6 +167,9 @@ public sealed class AutopilotStore
             gameOverride.ProfileName = string.IsNullOrWhiteSpace(gameOverride.ProfileName) ? null : gameOverride.ProfileName;
             gameOverride.ExcludedAchievements = CleanSet(gameOverride.ExcludedAchievements);
             gameOverride.OnlyAchievements = CleanSet(gameOverride.OnlyAchievements);
+
+            // Files from before OnlyMode existed: a non-empty "only" list meant only-mode.
+            gameOverride.OnlyMode = gameOverride.OnlyMode || gameOverride.OnlyAchievements.Count > 0;
             if (gameOverride.TargetMode is { } mode && Enum.IsDefined(mode) == false)
             {
                 gameOverride.TargetMode = null;
@@ -270,6 +273,8 @@ public sealed class AutopilotStore
                 .Where(p => p.Key != null && double.IsFinite(p.Value))
                 .ToDictionary(p => p.Key, p => Math.Clamp(p.Value, 0, 1));
             game.UnlockedByAutopilot = (game.UnlockedByAutopilot ?? []).Where(id => id != null).Distinct().ToList();
+            game.PendingUnlocks = (game.PendingUnlocks ?? []).Where(id => id != null).Distinct().ToList();
+            game.WatchedUnlocks = (game.WatchedUnlocks ?? []).Where(id => id != null).Distinct().ToList();
             games[appId] = game;
         }
 

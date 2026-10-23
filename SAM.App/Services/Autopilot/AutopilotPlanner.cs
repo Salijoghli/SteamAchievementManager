@@ -60,7 +60,8 @@ public static class AutopilotPlanner
     /// <summary>Why <paramref name="achievement"/> would be skipped under these rules, or None if it may be unlocked.</summary>
     /// <remarks>
     /// The first matching reason wins, in this order: AlreadyUnlocked, Protected, Excluded (the
-    /// override's exclusion list), NotInOnlyList (the override's non-empty "only" list), Hidden
+    /// override's exclusion list), NotInOnlyList (the override's "only" list, see <see cref="IsOnlyMode"/>;
+    /// an empty list in only-mode allows nothing), Hidden
     /// (when SkipHidden), UnknownRarity (no percent and !IncludeUnknownRarity),
     /// BelowMinimumPercent, Rare (below RareThresholdPercent and !IncludeRare). The last two use
     /// UnknownPercentAs for achievements without a percent.
@@ -85,7 +86,7 @@ public static class AutopilotPlanner
             return AutopilotSkipReason.Excluded;
         }
 
-        if (gameOverride?.OnlyAchievements is { Count: > 0 } only && only.Contains(achievement.Id) == false)
+        if (IsOnlyMode(gameOverride) && gameOverride!.OnlyAchievements?.Contains(achievement.Id) != true)
         {
             return AutopilotSkipReason.NotInOnlyList;
         }
@@ -418,6 +419,61 @@ public static class AutopilotPlanner
             AutopilotTargetMode.AddHours => state.AutopilotHours >= profile.TargetHours,
             _ => false,
         };
+    }
+
+    /// <summary>Whether the override restricts the game to its "only" list (OnlyMode, or a non-empty list from an older file).</summary>
+    public static bool IsOnlyMode(AutopilotGameOverride? gameOverride) =>
+        gameOverride != null && (gameOverride.OnlyMode || gameOverride.OnlyAchievements is { Count: > 0 });
+
+    /// <summary>
+    /// The linked stats to raise before unlocking <paramref name="due"/> (stat ID → value), such that
+    /// raising them can't unlock anything that isn't in <paramref name="due"/>.
+    /// </summary>
+    /// <remarks>
+    /// For each stat, the highest <see cref="LinkedStatTarget"/> among the due achievements on it
+    /// for which every other locked achievement on that stat with ProgressMax ≤ the target is also
+    /// due. A locked achievement outside the batch (excluded, not in the only-list, rare, protected,
+    /// hidden, or simply not due yet under the limits) would otherwise unlock as a side effect.
+    /// When no target is safe the stat is left alone and the achievement is unlocked by itself.
+    /// </remarks>
+    public static IReadOnlyDictionary<string, double> LinkedStatTargets(
+        AutopilotProfile profile,
+        IReadOnlyList<AutopilotAchievement> achievements,
+        IReadOnlyList<AutopilotAchievement> due)
+    {
+        ArgumentNullException.ThrowIfNull(profile);
+        ArgumentNullException.ThrowIfNull(achievements);
+        ArgumentNullException.ThrowIfNull(due);
+
+        var result = new Dictionary<string, double>(StringComparer.Ordinal);
+        if (profile.UpdateLinkedStats == false)
+        {
+            return result;
+        }
+
+        var dueIds = due.Select(a => a.Id).ToHashSet(StringComparer.Ordinal);
+        var byStat = due
+            .Where(a => a.ProgressStatId != null && LinkedStatTarget(profile, a) != null)
+            .GroupBy(a => a.ProgressStatId!, StringComparer.Ordinal);
+        foreach (var group in byStat)
+        {
+            var others = achievements
+                .Where(a => a.IsUnlocked == false && dueIds.Contains(a.Id) == false &&
+                            string.Equals(a.ProgressStatId, group.Key, StringComparison.Ordinal) && a.ProgressMax != null)
+                .Select(a => a.ProgressMax!.Value)
+                .ToList();
+
+            foreach (var target in group.Select(a => LinkedStatTarget(profile, a)!.Value).Distinct().OrderDescending())
+            {
+                if (others.All(max => max > target))
+                {
+                    result[group.Key] = target;
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 
     /// <summary>The value a linked stat should be raised to before unlocking (ProgressMax), or null if not applicable.</summary>

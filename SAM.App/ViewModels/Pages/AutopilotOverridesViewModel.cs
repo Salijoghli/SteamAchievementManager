@@ -43,6 +43,9 @@ public sealed partial class AutopilotOverridesViewModel : ObservableObject
     private readonly IReadOnlyList<string> _profileNames;
     private List<AutopilotAchievementRow> _all = [];
 
+    /// <summary>The checks of each list mode (1 = only, 2 = never), kept separately so switching modes never moves one list into the other.</summary>
+    private readonly Dictionary<int, HashSet<string>> _checks = [];
+
     public AutopilotOverridesViewModel(AppServices services, uint appId, string gameName, AutopilotGameOverride value, AutopilotConfig config)
     {
         this._services = services;
@@ -68,7 +71,9 @@ public sealed partial class AutopilotOverridesViewModel : ObservableObject
         this._targetIndex = value.TargetMode is { } mode ? Array.IndexOf(AutopilotProfileEditor.TargetModes, mode) + 1 : 0;
         this._targetHours = value.TargetHours ?? 10;
         this._rareIndex = value.IncludeRare switch { true => 1, false => 2, null => 0 };
-        this._modeIndex = value.OnlyAchievements.Count > 0 ? 1 : value.ExcludedAchievements.Count > 0 ? 2 : 0;
+        this._modeIndex = AutopilotPlanner.IsOnlyMode(value) ? 1 : value.ExcludedAchievements.Count > 0 ? 2 : 0;
+        this._checks[1] = new HashSet<string>(value.OnlyAchievements, StringComparer.Ordinal);
+        this._checks[2] = new HashSet<string>(value.ExcludedAchievements, StringComparer.Ordinal);
     }
 
     public uint AppId { get; }
@@ -105,10 +110,13 @@ public sealed partial class AutopilotOverridesViewModel : ObservableObject
 
     /// <summary>0 = rules decide, 1 = only the checked ones, 2 = never the checked ones.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsListEnabled), nameof(ModeHint))]
+    [NotifyPropertyChangedFor(nameof(IsListEnabled), nameof(ModeHint), nameof(IsOnlyListEmpty))]
     private int _modeIndex;
 
     public bool IsListEnabled => this.ModeIndex != 0;
+
+    /// <summary>"Only these" with nothing checked: Autopilot will unlock nothing in this game (shown as a warning).</summary>
+    public bool IsOnlyListEmpty => this.ModeIndex == 1 && this._checks[1].Count == 0;
 
     public string ModeHint => Strings.Get(this.ModeIndex switch
     {
@@ -147,6 +155,17 @@ public sealed partial class AutopilotOverridesViewModel : ObservableObject
 
     partial void OnSearchTextChanged(string value) => this.ApplyFilter();
 
+    /// <summary>Shows the checks of the new mode's own list (none for "rules decide").</summary>
+    partial void OnModeIndexChanged(int value)
+    {
+        foreach (var row in this._all)
+        {
+            row.IsChecked = this._checks.TryGetValue(value, out var checks) && checks.Contains(row.Id);
+        }
+
+        this.UpdateCount();
+    }
+
     /// <summary>Loads the schema, unlocked state and global percentages.</summary>
     public async Task LoadAsync()
     {
@@ -177,7 +196,7 @@ public sealed partial class AutopilotOverridesViewModel : ObservableObject
                 Diagnostics.Log($"Autopilot: couldn't get global percentages for {appId}", e);
             }
 
-            var chosen = this.ModeIndex == 1 ? this._value.OnlyAchievements : this._value.ExcludedAchievements;
+            var chosen = this._checks.GetValueOrDefault(this.ModeIndex) ?? [];
             this._all = schema.Achievements.Select((a, index) =>
             {
                 var unlocked = stats?.GetState(a).Unlocked == true;
@@ -194,7 +213,7 @@ public sealed partial class AutopilotOverridesViewModel : ObservableObject
 
             foreach (var row in this._all)
             {
-                row.PropertyChanged += (_, _) => this.UpdateCount();
+                row.PropertyChanged += (_, _) => this.OnRowChanged(row);
             }
 
             this.ApplyFilter();
@@ -236,8 +255,29 @@ public sealed partial class AutopilotOverridesViewModel : ObservableObject
         this.UpdateCount();
     }
 
-    private void UpdateCount() =>
+    /// <summary>A check changed: remember it in the current mode's list.</summary>
+    private void OnRowChanged(AutopilotAchievementRow row)
+    {
+        if (this._checks.TryGetValue(this.ModeIndex, out var checks))
+        {
+            if (row.IsChecked)
+            {
+                checks.Add(row.Id);
+            }
+            else
+            {
+                checks.Remove(row.Id);
+            }
+        }
+
+        this.UpdateCount();
+    }
+
+    private void UpdateCount()
+    {
         this.CountText = Strings.Format("Autopilot_OverrideChecked", this._all.Count(r => r.IsChecked), this._all.Count);
+        this.OnPropertyChanged(nameof(this.IsOnlyListEmpty));
+    }
 
     /// <summary>Writes the choices back into the override being edited.</summary>
     public void Apply()
@@ -247,20 +287,10 @@ public sealed partial class AutopilotOverridesViewModel : ObservableObject
         this._value.TargetHours = this.HasTargetHours ? Math.Max(0.1, this.TargetHours) : null;
         this._value.IncludeRare = this.RareIndex switch { 1 => true, 2 => false, _ => null };
 
-        // Without a loaded list (no schema, or still loading), keep the stored achievement choices.
-        if (this._all.Count == 0)
-        {
-            if (this.ModeIndex == 0)
-            {
-                this._value.OnlyAchievements = [];
-                this._value.ExcludedAchievements = [];
-            }
-
-            return;
-        }
-
-        var chosen = this._all.Where(r => r.IsChecked).Select(r => r.Id).ToHashSet(StringComparer.Ordinal);
-        this._value.OnlyAchievements = this.ModeIndex == 1 ? chosen : [];
-        this._value.ExcludedAchievements = this.ModeIndex == 2 ? chosen : [];
+        // Without a loaded list (no schema, or still loading) the checks are the stored ones, so
+        // this keeps them; only the list of the chosen mode is kept, never moved to the other.
+        this._value.OnlyMode = this.ModeIndex == 1;
+        this._value.OnlyAchievements = this.ModeIndex == 1 ? new HashSet<string>(this._checks[1], StringComparer.Ordinal) : [];
+        this._value.ExcludedAchievements = this.ModeIndex == 2 ? new HashSet<string>(this._checks[2], StringComparer.Ordinal) : [];
     }
 }
