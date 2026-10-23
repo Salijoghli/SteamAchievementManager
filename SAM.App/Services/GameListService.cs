@@ -14,7 +14,8 @@ namespace SAM.App.Services;
 /// </summary>
 /// <remarks>
 /// Games added with <see cref="TryAddOwnedApp"/> are also kept in
-/// cache\users\&lt;steamid64&gt;\extra-apps.json so a refresh doesn't drop them.
+/// data\users\&lt;steamid64&gt;\extra-apps.json (user data, so neither a refresh nor "Clear cache"
+/// nor an account switch drops them; older versions kept it under cache\).
 /// </remarks>
 public sealed class GameListService(AppCache cache, SteamSession steam, HttpClient http)
 {
@@ -33,7 +34,44 @@ public sealed class GameListService(AppCache cache, SteamSession steam, HttpClie
 
     private string OwnedListPath => Path.Combine(cache.UserCacheDirectory, "games.json");
 
-    private string ExtraAppsPath => Path.Combine(cache.UserCacheDirectory, "extra-apps.json");
+    private bool _extraAppsMigrated;
+
+    /// <summary>Manually added games. Call under the file lock.</summary>
+    private string ExtraAppsPath
+    {
+        get
+        {
+            var path = Path.Combine(cache.UserDataDirectory, "extra-apps.json");
+            if (this._extraAppsMigrated == false)
+            {
+                this._extraAppsMigrated = true;
+                MigrateExtraApps(Path.Combine(cache.UserCacheDirectory, "extra-apps.json"), path);
+            }
+
+            return path;
+        }
+    }
+
+    /// <summary>
+    /// One-time move of extra-apps.json from cache\users\&lt;steamid64&gt;\ (which "Clear cache" and
+    /// account switches delete) to data\users\&lt;steamid64&gt;\: copies it unless the new file
+    /// already exists. The old copy is left for older SAM versions.
+    /// </summary>
+    internal static void MigrateExtraApps(string oldPath, string newPath)
+    {
+        try
+        {
+            if (File.Exists(newPath) == false && File.Exists(oldPath))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(newPath)!);
+                File.Copy(oldPath, newPath, overwrite: false);
+            }
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+        {
+            Diagnostics.Log($"Couldn't move {oldPath} to {newPath}", e);
+        }
+    }
 
     /// <summary>The owned list saved by the last refresh, or null if there isn't one yet.</summary>
     public IReadOnlyList<GameEntry>? LoadCached()

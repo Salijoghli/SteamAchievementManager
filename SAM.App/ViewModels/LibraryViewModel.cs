@@ -875,8 +875,15 @@ public sealed partial class LibraryViewModel : ObservableObject
 
         // Only written when the user picks a language, so a hand-edited culture (e.g. "de-DE" for
         // date formats) survives other settings changes.
-        this._services.Settings.Language = Languages[value];
-        this.SaveSettings();
+        var language = Languages[value];
+        try
+        {
+            this._services.Settings.Update(s => s.Language = language);
+        }
+        catch (Exception e)
+        {
+            this.LogOnce("SaveSettings", e);
+        }
     }
 
     /// <summary>Starts a new SAM in the chosen language and closes this one.</summary>
@@ -901,6 +908,37 @@ public sealed partial class LibraryViewModel : ObservableObject
         this.ApplyFilter();
     }
 
+    /// <summary>
+    /// Picks up the settings game windows change too (spoiler protection, backup before commit)
+    /// from settings.json, so the Settings dialog doesn't show a stale value. Call when the
+    /// library window is activated.
+    /// </summary>
+    public void RefreshSharedSettings()
+    {
+        AppSettings? latest;
+        try
+        {
+            latest = this._services.Settings.ReadLatest();
+        }
+        catch (Exception e)
+        {
+            this.LogOnce("RefreshSettings", e);
+            return;
+        }
+
+        if (latest == null)
+        {
+            return;
+        }
+
+        // In-memory copy first, so the property-changed handlers below find nothing to save.
+        var settings = this._services.Settings;
+        settings.SpoilerProtection = latest.SpoilerProtection;
+        settings.BackupBeforeCommit = latest.BackupBeforeCommit;
+        this.SpoilerProtection = latest.SpoilerProtection;
+        this.BackupBeforeCommit = latest.BackupBeforeCommit;
+    }
+
     private void SaveSettings()
     {
         if (this._initializing)
@@ -908,39 +946,47 @@ public sealed partial class LibraryViewModel : ObservableObject
             return;
         }
 
-        var settings = this._services.Settings;
-        settings.LibrarySort = Enum.IsDefined((LibrarySort)this.SortIndex) ? (LibrarySort)this.SortIndex : LibrarySort.Name;
-        settings.SortDescending = this.SortDescending;
-        settings.PinFavorites = this.PinFavorites;
-        settings.ShowGames = this.ShowGames;
-        settings.ShowDemos = this.ShowDemos;
-        settings.ShowMods = this.ShowMods;
-        settings.ShowJunk = this.ShowJunk;
-        settings.FavoritesOnly = this.FavoritesOnly;
-        settings.CompletionFilter = this.CompletionFilterIndex;
-        settings.LastPlayedFilter = this.LastPlayedFilterIndex;
-        settings.LastPlayedFrom = this.CustomFrom;
-        settings.LastPlayedTo = this.CustomTo;
-        settings.Theme = this.ThemeIndex switch
+        // Only the settings that differ from the in-memory copy are written (re-read under a
+        // cross-process lock), so a setting a game window changed meanwhile isn't overwritten.
+        var sort = Enum.IsDefined((LibrarySort)this.SortIndex) ? (LibrarySort)this.SortIndex : LibrarySort.Name;
+        var theme = this.ThemeIndex switch
         {
             1 => "Light",
             2 => "Dark",
             _ => "System",
         };
-        settings.KeepOtherAccountsCache = this.KeepOtherAccountsCache;
-        settings.InstalledOnly = false; // Migrated into CollectionFilter.
-        settings.ShowHidden = this.ShowHidden;
-        settings.CollectionFilter = this.CollectionFilter;
-        settings.SmartList = this.SmartList;
-        settings.LibraryViewMode = this.IsListView ? "List" : "Grid";
-        settings.SpoilerProtection = this.SpoilerProtection;
-        settings.BackupBeforeCommit = this.BackupBeforeCommit;
-        settings.MinimizeToTray = this.MinimizeToTray;
-        settings.ShowNotifications = this.ShowNotifications;
-        settings.CheckForUpdates = this.CheckForUpdates;
+
+        void Apply(AppSettings settings)
+        {
+            settings.LibrarySort = sort;
+            settings.SortDescending = this.SortDescending;
+            settings.PinFavorites = this.PinFavorites;
+            settings.ShowGames = this.ShowGames;
+            settings.ShowDemos = this.ShowDemos;
+            settings.ShowMods = this.ShowMods;
+            settings.ShowJunk = this.ShowJunk;
+            settings.FavoritesOnly = this.FavoritesOnly;
+            settings.CompletionFilter = this.CompletionFilterIndex;
+            settings.LastPlayedFilter = this.LastPlayedFilterIndex;
+            settings.LastPlayedFrom = this.CustomFrom;
+            settings.LastPlayedTo = this.CustomTo;
+            settings.Theme = theme;
+            settings.KeepOtherAccountsCache = this.KeepOtherAccountsCache;
+            settings.InstalledOnly = false; // Migrated into CollectionFilter.
+            settings.ShowHidden = this.ShowHidden;
+            settings.CollectionFilter = this.CollectionFilter;
+            settings.SmartList = this.SmartList;
+            settings.LibraryViewMode = this.IsListView ? "List" : "Grid";
+            settings.SpoilerProtection = this.SpoilerProtection;
+            settings.BackupBeforeCommit = this.BackupBeforeCommit;
+            settings.MinimizeToTray = this.MinimizeToTray;
+            settings.ShowNotifications = this.ShowNotifications;
+            settings.CheckForUpdates = this.CheckForUpdates;
+        }
+
         try
         {
-            settings.Save();
+            this._services.Settings.UpdateChanged(Apply);
         }
         catch (Exception e)
         {

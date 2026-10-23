@@ -235,10 +235,9 @@ public sealed partial class LibraryViewModel
             return;
         }
 
-        this._services.Settings.SkippedUpdateVersion = update.Version;
         try
         {
-            this._services.Settings.Save();
+            this._services.Settings.Update(s => s.SkippedUpdateVersion = update.Version);
         }
         catch (Exception e)
         {

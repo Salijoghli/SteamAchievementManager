@@ -6,7 +6,9 @@ namespace SAM.App.Services;
 
 /// <summary>
 /// Append-only log of commits, in data\users\&lt;steamid64&gt;\history.jsonl (one JSON object per line).
-/// The file is only rewritten when it grows past <see cref="MaxLines"/> lines. Thread-safe.
+/// The file is only rewritten when it grows past <see cref="MaxLines"/> lines. Thread-safe, and
+/// safe across SAM processes: appends and trims take the same cross-process lock, so a record
+/// appended by another process while one trims isn't lost.
 /// </summary>
 public sealed class HistoryService
 {
@@ -16,8 +18,12 @@ public sealed class HistoryService
     /// <summary>Lines kept after a trim (below <see cref="MaxLines"/> so trims don't happen on every append).</summary>
     internal const int TrimToLines = 9_000;
 
+    private const int AppendAttempts = 3;
+
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = false };
     private static readonly UTF8Encoding Utf8NoBom = new(false);
+
+    private static readonly TimeSpan RetryDelay = TimeSpan.FromMilliseconds(100);
 
     private readonly string _path;
     private readonly object _lock = new();
@@ -49,22 +55,26 @@ public sealed class HistoryService
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(this._path)!);
-                if (this._lineCount < 0)
+                using (JsonFile.Lock(this._path))
                 {
-                    this._lineCount = File.Exists(this._path) ? this.ReadLines().Count : 0;
-                }
-
-                // If a previous write was cut off mid-line, start on a fresh line so this record stays readable.
-                var prefix = EndsWithNewline(this._path) ? "" : "\n";
-                File.AppendAllText(this._path, prefix + line + "\n", Utf8NoBom);
-                this._lineCount++;
-
-                if (this._lineCount > MaxLines)
-                {
-                    this.Trim();
+                    this.AppendLine(line);
+                    this._lineCount = this._lineCount < 0 ? this.ReadLines().Count : this._lineCount + 1;
+                    if (this._lineCount > MaxLines)
+                    {
+                        try
+                        {
+                            this.Trim();
+                        }
+                        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+                        {
+                            // The record is in; trimming can wait for the next append.
+                            Diagnostics.Log($"Couldn't trim {this._path}", e);
+                            this._lineCount = -1;
+                        }
+                    }
                 }
             }
-            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or TimeoutException)
             {
                 Diagnostics.Log($"Couldn't append to {this._path}", e);
                 this._lineCount = -1;
@@ -125,7 +135,12 @@ public sealed class HistoryService
     /// <summary>Non-empty lines of the log, oldest first. Call under the lock.</summary>
     private List<string> ReadLines()
     {
-        using var stream = new FileStream(this._path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        if (File.Exists(this._path) == false)
+        {
+            return [];
+        }
+
+        using var stream = new FileStream(this._path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
         using var reader = new StreamReader(stream, Utf8NoBom);
         var lines = new List<string>();
         while (reader.ReadLine() is { } line)
@@ -139,6 +154,31 @@ public sealed class HistoryService
         return lines;
     }
 
+    /// <summary>
+    /// Appends <paramref name="line"/> (in append mode, shared with other processes), retrying
+    /// briefly if the file is busy. Call under both locks.
+    /// </summary>
+    private void AppendLine(string line)
+    {
+        for (var attempt = 1; ; attempt++)
+        {
+            try
+            {
+                // If a previous write was cut off mid-line, start on a fresh line so this record stays readable.
+                var prefix = EndsWithNewline(this._path) ? "" : "\n";
+                var bytes = Utf8NoBom.GetBytes(prefix + line + "\n");
+                using var stream = new FileStream(this._path, FileMode.Append, FileAccess.Write, FileShare.ReadWrite | FileShare.Delete);
+                stream.Write(bytes);
+                return;
+            }
+            catch (IOException e) when (attempt < AppendAttempts &&
+                                        e is not FileNotFoundException and not DirectoryNotFoundException)
+            {
+                Thread.Sleep(RetryDelay);
+            }
+        }
+    }
+
     /// <summary>True if the file is missing, empty, or ends with a line feed.</summary>
     private static bool EndsWithNewline(string path)
     {
@@ -147,7 +187,7 @@ public sealed class HistoryService
             return true;
         }
 
-        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
         if (stream.Length == 0)
         {
             return true;
@@ -157,14 +197,40 @@ public sealed class HistoryService
         return stream.ReadByte() == '\n';
     }
 
-    /// <summary>Rewrites the log keeping the newest <see cref="TrimToLines"/> lines. Call under the lock.</summary>
+    /// <summary>
+    /// Rewrites the log keeping the newest <see cref="TrimToLines"/> lines. Call under both locks
+    /// (the cross-process one keeps other processes from appending meanwhile).
+    /// </summary>
     private void Trim()
     {
+        // The count may be stale: other processes append too, and may have trimmed already.
         var lines = this.ReadLines();
-        var keep = lines.Skip(Math.Max(0, lines.Count - TrimToLines)).ToList();
-        var temp = this._path + ".tmp";
-        File.WriteAllText(temp, string.Join("\n", keep) + "\n", Utf8NoBom);
-        File.Move(temp, this._path, overwrite: true);
+        if (lines.Count <= MaxLines)
+        {
+            this._lineCount = lines.Count;
+            return;
+        }
+
+        var keep = lines.Skip(lines.Count - TrimToLines).ToList();
+        var temp = this._path + "." + Guid.NewGuid().ToString("N") + ".tmp";
+        try
+        {
+            File.WriteAllText(temp, string.Join("\n", keep) + "\n", Utf8NoBom);
+            JsonFile.MoveWithRetry(temp, this._path);
+        }
+        catch
+        {
+            try
+            {
+                File.Delete(temp);
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+            }
+
+            throw;
+        }
+
         this._lineCount = keep.Count;
     }
 }

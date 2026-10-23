@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace SAM.App.Services;
 
 public enum LibrarySort
@@ -9,10 +11,22 @@ public enum LibrarySort
     Progress,
 }
 
-/// <summary>User preferences, persisted to settings.json. Call <see cref="Save"/> after changing.</summary>
+/// <summary>
+/// User preferences, persisted to settings.json. Several SAM processes share the file, so change
+/// settings with <see cref="Update"/> (or <see cref="UpdateChanged"/>), which re-read the file
+/// under a cross-process lock and write only the change; never write the whole in-memory copy.
+/// </summary>
 public sealed class AppSettings
 {
-    private static readonly string FilePath = Path.Combine(AppCache.RootDirectory, "settings.json");
+    private static readonly string DefaultPath = Path.Combine(AppCache.RootDirectory, "settings.json");
+
+    private static readonly PropertyInfo[] Properties = typeof(AppSettings)
+        .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+        .Where(p => p.CanRead && p.CanWrite && p.GetIndexParameters().Length == 0)
+        .ToArray();
+
+    /// <summary>The settings.json this instance was loaded from (and saves to).</summary>
+    private SharedJsonFile<AppSettings> _file = new(DefaultPath);
 
     /// <summary>Keep other Steam accounts' cached data when a different account logs in.</summary>
     public bool KeepOtherAccountsCache { get; set; }
@@ -96,7 +110,67 @@ public sealed class AppSettings
     public string? SkippedUpdateVersion { get; set; }
     #endregion
 
-    public static AppSettings Load() => JsonFile.Read<AppSettings>(FilePath) ?? new AppSettings();
+    /// <summary>
+    /// Loads settings.json. Defaults when it's missing; a corrupt file is set aside (see
+    /// <see cref="JsonFile.TryRead{T}"/>); when it can't be read, defaults are used and the
+    /// file is never written this session.
+    /// </summary>
+    public static AppSettings Load() => Load(DefaultPath);
 
-    public void Save() => JsonFile.Write(FilePath, this);
+    /// <summary>Loads the settings stored at <paramref name="path"/> (for tests).</summary>
+    internal static AppSettings Load(string path)
+    {
+        var file = new SharedJsonFile<AppSettings>(path);
+        var settings = file.Read() ?? new AppSettings();
+        settings._file = file;
+        return settings;
+    }
+
+    /// <summary>
+    /// Applies <paramref name="change"/> to this instance and to the latest settings.json (re-read
+    /// under a cross-process lock, so settings other processes saved meanwhile are kept), then
+    /// saves the file. If the file can't be read, only this instance changes.
+    /// </summary>
+    public void Update(Action<AppSettings> change)
+    {
+        ArgumentNullException.ThrowIfNull(change);
+        change(this);
+        this._file.Update(current =>
+        {
+            current ??= new AppSettings();
+            change(current);
+            return current;
+        });
+    }
+
+    /// <summary>
+    /// Applies <paramref name="change"/> to a copy of this instance and saves only the properties
+    /// that it actually changed (see <see cref="Update"/>). For callers that set every setting
+    /// they own each time, so they don't overwrite settings another process changed.
+    /// </summary>
+    public void UpdateChanged(Action<AppSettings> change)
+    {
+        ArgumentNullException.ThrowIfNull(change);
+        var desired = (AppSettings)this.MemberwiseClone();
+        change(desired);
+        var changed = Properties.Where(p => Equals(p.GetValue(this), p.GetValue(desired)) == false).ToList();
+        if (changed.Count == 0)
+        {
+            return;
+        }
+
+        this.Update(settings =>
+        {
+            foreach (var property in changed)
+            {
+                property.SetValue(settings, property.GetValue(desired));
+            }
+        });
+    }
+
+    /// <summary>
+    /// The latest settings.json as another process may have saved it, or null if it's missing or
+    /// can't be read. Doesn't change this instance.
+    /// </summary>
+    public AppSettings? ReadLatest() => JsonFile.Read<AppSettings>(this._file.Path);
 }

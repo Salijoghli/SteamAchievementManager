@@ -932,15 +932,11 @@ public sealed partial class GameViewModel : ObservableObject
             achievement.IsSpoilerProtectionOn = value;
         }
 
-        this._services.Settings.SpoilerProtection = value;
         try
         {
             // Other windows (e.g. the library, in another process) may have saved settings
-            // since this one started; merge into the file instead of overwriting it with a
-            // stale copy.
-            var latest = AppSettings.Load();
-            latest.SpoilerProtection = value;
-            latest.Save();
+            // since this one started: only this setting is written, into the latest file.
+            this._services.Settings.Update(s => s.SpoilerProtection = value);
         }
         catch (Exception e)
         {
@@ -1331,7 +1327,7 @@ public sealed partial class GameViewModel : ObservableObject
     private async Task<bool> BackUpBeforeCommitAsync(string source, Func<string, Task<bool>>? confirmWithoutBackup)
     {
         var isRestore = source == CommitSource.Restore;
-        if (isRestore == false && this._services.Settings.BackupBeforeCommit == false)
+        if (isRestore == false && this.IsBackupBeforeCommitOn() == false)
         {
             return true;
         }
@@ -1359,6 +1355,21 @@ public sealed partial class GameViewModel : ObservableObject
                 return false;
             }
         }
+    }
+
+    /// <summary>
+    /// <see cref="AppSettings.BackupBeforeCommit"/> as currently saved (the library may have
+    /// changed it since this window opened); the startup value if settings.json can't be read.
+    /// </summary>
+    private bool IsBackupBeforeCommitOn()
+    {
+        var settings = this._services.Settings;
+        if (settings.ReadLatest() is { } latest)
+        {
+            settings.BackupBeforeCommit = latest.BackupBeforeCommit;
+        }
+
+        return settings.BackupBeforeCommit;
     }
 
     private void AppendHistory(CommitRecord record)

@@ -7,14 +7,16 @@ namespace SAM.App.Services;
 /// <summary>
 /// Game collections: the user's Steam collections (read-only, from Steam's
 /// userdata\&lt;accountid&gt;\config\cloudstorage\cloud-storage-namespace-1.json), SAM's own
-/// collections and the hidden-games list (data\users\&lt;steamid64&gt;\collections.json). Thread-safe.
+/// collections and the hidden-games list (data\users\&lt;steamid64&gt;\collections.json). Each change
+/// re-reads collections.json under a cross-process lock, so changes made in other SAM processes
+/// are kept. Thread-safe.
 /// </summary>
 public sealed class CollectionsService
 {
     private const string SteamCollectionPrefix = "user-collections.";
 
     private readonly Func<string?> _steamCollectionsPath;
-    private readonly string _path;
+    private readonly SharedJsonFile<StoredCollections> _file;
     private readonly object _lock = new();
     private StoredCollections? _data;
 
@@ -30,7 +32,7 @@ public sealed class CollectionsService
     internal CollectionsService(Func<string?> steamCollectionsPath, string path)
     {
         this._steamCollectionsPath = steamCollectionsPath;
-        this._path = path;
+        this._file = new SharedJsonFile<StoredCollections>(path);
     }
 
     /// <summary>Raised (on the calling thread) after any change to SAM's collections or the hidden list.</summary>
@@ -84,17 +86,20 @@ public sealed class CollectionsService
         GameCollection result;
         lock (this._lock)
         {
-            var data = this.Data;
-            string id;
-            do
+            string? id = null;
+            this.Mutate(data =>
             {
-                id = Guid.NewGuid().ToString("N")[..8];
-            }
-            while (data.Collections.Any(c => c.Id == id));
+                // A fresh ID per attempt: the file may have changed since the last one.
+                do
+                {
+                    id = Guid.NewGuid().ToString("N")[..8];
+                }
+                while (data.Collections.Any(c => c.Id == id));
 
-            data.Collections.Add(new StoredCollection { Id = id, Name = name });
-            this.Save();
-            result = new GameCollection(id, name, false, new HashSet<uint>());
+                data.Collections.Add(new StoredCollection { Id = id, Name = name });
+                return true;
+            });
+            result = new GameCollection(id!, name, false, new HashSet<uint>());
         }
 
         this.Changed?.Invoke(this, EventArgs.Empty);
@@ -107,14 +112,21 @@ public sealed class CollectionsService
         name = ValidateName(name);
         lock (this._lock)
         {
-            var collection = this.Find(id);
-            if (collection == null || collection.Name == name)
+            var changed = this.Mutate(data =>
+            {
+                var collection = Find(data, id);
+                if (collection == null || collection.Name == name)
+                {
+                    return false;
+                }
+
+                collection.Name = name;
+                return true;
+            });
+            if (changed == false)
             {
                 return;
             }
-
-            collection.Name = name;
-            this.Save();
         }
 
         this.Changed?.Invoke(this, EventArgs.Empty);
@@ -125,12 +137,10 @@ public sealed class CollectionsService
     {
         lock (this._lock)
         {
-            if (this.Data.Collections.RemoveAll(c => c.Id == id) == 0)
+            if (this.Mutate(data => data.Collections.RemoveAll(c => c.Id == id) > 0) == false)
             {
                 return;
             }
-
-            this.Save();
         }
 
         this.Changed?.Invoke(this, EventArgs.Empty);
@@ -141,27 +151,27 @@ public sealed class CollectionsService
     {
         lock (this._lock)
         {
-            var collection = this.Find(id);
-            if (collection == null)
+            var changed = this.Mutate(data =>
             {
-                return;
-            }
+                var collection = Find(data, id);
+                if (collection == null)
+                {
+                    return false;
+                }
 
-            var changed = included
-                ? collection.AppIds.Contains(appId) == false
-                : collection.AppIds.Remove(appId);
+                var added = included && collection.AppIds.Contains(appId) == false;
+                if (added)
+                {
+                    collection.AppIds.Add(appId);
+                    collection.AppIds.Sort();
+                }
+
+                return added || (included == false && collection.AppIds.Remove(appId));
+            });
             if (changed == false)
             {
                 return;
             }
-
-            if (included)
-            {
-                collection.AppIds.Add(appId);
-                collection.AppIds.Sort();
-            }
-
-            this.Save();
         }
 
         this.Changed?.Invoke(this, EventArgs.Empty);
@@ -172,20 +182,22 @@ public sealed class CollectionsService
     {
         lock (this._lock)
         {
-            var list = this.Data.Hidden;
-            var changed = hidden ? list.Contains(appId) == false : list.Remove(appId);
+            var changed = this.Mutate(data =>
+            {
+                var list = data.Hidden;
+                var added = hidden && list.Contains(appId) == false;
+                if (added)
+                {
+                    list.Add(appId);
+                    list.Sort();
+                }
+
+                return added || (hidden == false && list.Remove(appId));
+            });
             if (changed == false)
             {
                 return;
             }
-
-            if (hidden)
-            {
-                list.Add(appId);
-                list.Sort();
-            }
-
-            this.Save();
         }
 
         this.Changed?.Invoke(this, EventArgs.Empty);
@@ -377,36 +389,54 @@ public sealed class CollectionsService
     }
 
     /// <summary>The stored data, loaded from disk on first access. Call under the lock.</summary>
-    private StoredCollections Data
+    private StoredCollections Data => this._data ??= Normalize(this._file.Read());
+
+    private static StoredCollection? Find(StoredCollections data, string id) => data.Collections.FirstOrDefault(c => c.Id == id);
+
+    /// <summary>Cleans up loaded data: drops entries without IDs and duplicates, sorts app IDs.</summary>
+    private static StoredCollections Normalize(StoredCollections? loaded)
     {
-        get
+        loaded ??= new StoredCollections();
+        loaded.Collections = (loaded.Collections ?? [])
+            .Where(c => c != null && string.IsNullOrEmpty(c.Id) == false)
+            .GroupBy(c => c.Id)
+            .Select(g => g.First())
+            .ToList();
+        foreach (var c in loaded.Collections)
         {
-            if (this._data == null)
-            {
-                var loaded = JsonFile.Read<StoredCollections>(this._path) ?? new StoredCollections();
-                loaded.Collections = (loaded.Collections ?? [])
-                    .Where(c => c != null && string.IsNullOrEmpty(c.Id) == false)
-                    .GroupBy(c => c.Id)
-                    .Select(g => g.First())
-                    .ToList();
-                foreach (var c in loaded.Collections)
-                {
-                    c.Name ??= c.Id;
-                    c.AppIds = (c.AppIds ?? []).Distinct().Order().ToList();
-                }
-
-                loaded.Hidden = (loaded.Hidden ?? []).Distinct().Order().ToList();
-                this._data = loaded;
-            }
-
-            return this._data;
+            c.Name ??= c.Id;
+            c.AppIds = (c.AppIds ?? []).Distinct().Order().ToList();
         }
+
+        loaded.Hidden = (loaded.Hidden ?? []).Distinct().Order().ToList();
+        return loaded;
     }
 
-    private StoredCollection? Find(string id) => this.Data.Collections.FirstOrDefault(c => c.Id == id);
+    /// <summary>
+    /// Applies <paramref name="change"/> (which returns true if it changed anything) to the latest
+    /// collections.json under the cross-process lock and saves it; when the file can't be saved
+    /// to, applies it in memory only. Returns false only when nothing changed, in memory or on
+    /// disk (the latest file replaces the in-memory copy). Call under the lock.
+    /// </summary>
+    private bool Mutate(Func<StoredCollections, bool> change)
+    {
+        StoredCollections? latest = null;
+        var saved = this._file.Update(current =>
+        {
+            latest = Normalize(current);
+            return change(latest) ? latest : null;
+        });
 
-    /// <summary>Writes the data to disk. Call under the lock.</summary>
-    private void Save() => JsonFile.Write(this._path, this.Data);
+        if (saved && latest != null)
+        {
+            // Also picks up changes other processes saved since this one loaded, so report a
+            // change even when this one was already on disk: listeners need to refresh either way.
+            this._data = latest;
+            return true;
+        }
+
+        return change(this.Data);
+    }
 
     /// <summary>On-disk format of collections.json.</summary>
     private sealed class StoredCollections

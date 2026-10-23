@@ -28,10 +28,18 @@ public sealed class AppCache
         this.UserCacheDirectory = Path.Combine(CacheDirectory, "users", steamId.ToString());
         this.UserDataDirectory = Path.Combine(RootDirectory, "data", "users", steamId.ToString());
 
-        Directory.CreateDirectory(this.ImagesDirectory);
-        Directory.CreateDirectory(this.SharedDirectory);
-        Directory.CreateDirectory(this.UserCacheDirectory);
-        Directory.CreateDirectory(this.UserDataDirectory);
+        foreach (var directory in new[] { this.ImagesDirectory, this.SharedDirectory, this.UserCacheDirectory, this.UserDataDirectory })
+        {
+            try
+            {
+                Directory.CreateDirectory(directory);
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                // Reads and writes there fail (and are handled) later; don't stop SAM from starting.
+                Diagnostics.Log($"Couldn't create {directory}", e);
+            }
+        }
     }
 
     public ulong SteamId { get; }
@@ -57,8 +65,9 @@ public sealed class AppCache
         {
             previous = File.Exists(marker) ? File.ReadAllText(marker).Trim() : null;
         }
-        catch (IOException)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
+            Diagnostics.Log($"Couldn't read {marker}", e);
         }
 
         var current = this.SteamId.ToString();
@@ -66,12 +75,19 @@ public sealed class AppCache
 
         if (switched && keepOtherAccounts == false)
         {
-            foreach (var dir in Directory.EnumerateDirectories(Path.Combine(CacheDirectory, "users")))
+            try
             {
-                if (Path.GetFileName(dir) != current)
+                foreach (var dir in Directory.EnumerateDirectories(Path.Combine(CacheDirectory, "users")))
                 {
-                    TryDeleteDirectory(dir);
+                    if (Path.GetFileName(dir) != current)
+                    {
+                        TryDeleteDirectory(dir);
+                    }
                 }
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException)
+            {
+                Diagnostics.Log("Couldn't clear other accounts' cache", e);
             }
         }
 
@@ -79,8 +95,9 @@ public sealed class AppCache
         {
             File.WriteAllText(marker, current);
         }
-        catch (IOException)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
+            Diagnostics.Log($"Couldn't write {marker}", e);
         }
 
         return switched;
