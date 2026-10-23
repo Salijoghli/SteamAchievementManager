@@ -278,7 +278,7 @@
                         <AppBarButton
                             x:Uid="Game_ResetStatsButton"
                             Click="OnResetAllStats"
-                            IsEnabled="{x:Bind ViewModel.IsLoaded, Mode=OneWay}">
+                            IsEnabled="{x:Bind game:GameFormat.IsIdle(ViewModel.IsLoaded, ViewModel.IsBusy), Mode=OneWay}">
                             <AppBarButton.Icon>
                                 <FontIcon Glyph="&#xE74D;" />
                             </AppBarButton.Icon>
@@ -649,7 +649,7 @@
                                                 MinWidth="0"
                                                 x:Uid="Game_RowToggle"
                                                 IsOn="{x:Bind IsChecked, Mode=TwoWay}"
-                                                IsEnabled="{x:Bind CanChange}"
+                                                IsEnabled="{x:Bind CanChange, Mode=OneWay}"
                                                 AutomationProperties.Name="{x:Bind Name}" />
                                         </Border>
                                     </Grid>
@@ -683,7 +683,8 @@
                     <ToggleSwitch
                         Grid.Row="1"
                         x:Uid="Game_StatsEditToggle"
-                        IsOn="{x:Bind ViewModel.IsStatEditingEnabled, Mode=TwoWay}" />
+                        IsOn="{x:Bind ViewModel.IsStatEditingEnabled, Mode=TwoWay}"
+                        IsEnabled="{x:Bind game:GameFormat.Not(ViewModel.IsBusy), Mode=OneWay}" />
 
                     <TextBlock
                         Grid.Row="2"

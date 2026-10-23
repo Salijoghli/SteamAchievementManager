@@ -19,10 +19,22 @@ public enum SteamStoreFailure
     TimedOut,
 }
 
-/// <summary>Thrown by <see cref="SteamSession.StoreStatsAsync"/>. The message is user-facing.</summary>
-public sealed class SteamStoreException(SteamStoreFailure failure, string message) : SteamUnavailableException(message)
+/// <summary>
+/// Thrown by <see cref="SteamSession.StoreStatsAsync"/> and <see cref="SteamSession.ResetAllStatsAsync"/>.
+/// The message is user-facing.
+/// </summary>
+public sealed class SteamStoreException(SteamStoreFailure failure, string message, int? result = null) : SteamUnavailableException(message)
 {
+    /// <summary>EResult k_EResultInvalidParam: some values were rejected and Steam sent back the server's values.</summary>
+    public const int InvalidParamResult = 8;
+
+    /// <summary>EResult k_EResultTimeout: Steam's servers timed out, so the outcome is unknown.</summary>
+    public const int ServerTimeoutResult = 16;
+
     public SteamStoreFailure Failure { get; } = failure;
+
+    /// <summary>The UserStatsStored EResult for <see cref="SteamStoreFailure.Rejected"/>; null otherwise.</summary>
+    public int? Result { get; } = result;
 }
 
 /// <summary>
@@ -193,15 +205,30 @@ public sealed class SteamSession : IDisposable
     /// upload was queued. Must be called on the UI thread. Throws <see cref="SteamStoreException"/>
     /// with a readable message when Steam refuses, rejects or doesn't answer.
     /// </summary>
-    public async Task StoreStatsAsync(TimeSpan? timeout = null)
+    public Task StoreStatsAsync(TimeSpan? timeout = null) =>
+        this.WaitForStoreAsync(() => this._client.SteamUserStats.StoreStats(), Strings.Get("Steam_StoreRefused"), timeout);
+
+    /// <summary>
+    /// Resets every stat for <see cref="AppId"/> (and optionally its achievements). Steam
+    /// stores the reset itself; this waits for its servers to confirm it like
+    /// <see cref="StoreStatsAsync"/>, and throws <see cref="SteamStoreException"/> the same way.
+    /// </summary>
+    public Task ResetAllStatsAsync(bool achievementsToo, TimeSpan? timeout = null) =>
+        this.WaitForStoreAsync(
+            () => this._client.SteamUserStats.ResetAllStats(achievementsToo),
+            Strings.Get("Game_ResetRefused"),
+            timeout);
+
+    /// <summary>Runs <paramref name="start"/> (which queues an upload) and waits for UserStatsStored.</summary>
+    private async Task WaitForStoreAsync(Func<bool> start, string refusedMessage, TimeSpan? timeout)
     {
         var request = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
         this._pendingStore = request;
         try
         {
-            if (this._client.SteamUserStats.StoreStats() == false)
+            if (start() == false)
             {
-                throw new SteamStoreException(SteamStoreFailure.Refused, Strings.Get("Steam_StoreRefused"));
+                throw new SteamStoreException(SteamStoreFailure.Refused, refusedMessage);
             }
 
             var finished = await Task.WhenAny(request.Task, Task.Delay(timeout ?? TimeSpan.FromSeconds(30)));
@@ -213,7 +240,7 @@ public sealed class SteamSession : IDisposable
             var result = request.Task.Result;
             if (result != 1)
             {
-                throw new SteamStoreException(SteamStoreFailure.Rejected, DescribeStoreResult(result));
+                throw new SteamStoreException(SteamStoreFailure.Rejected, DescribeStoreResult(result), result);
             }
         }
         finally
@@ -246,7 +273,6 @@ public sealed class SteamSession : IDisposable
         _ => Strings.Format("Steam_StoreRejectedError", result),
     };
 
-    public bool ResetAllStats(bool achievementsToo) => this._client.SteamUserStats.ResetAllStats(achievementsToo);
     #endregion
 
     public void Dispose()

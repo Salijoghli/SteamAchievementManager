@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using SAM.App.Services;
 using SAM.App.ViewModels;
 using SAM.App.ViewModels.Pages;
@@ -24,9 +25,36 @@ public sealed partial class ActivityPage : UserControl
     {
         if (e.PropertyName == nameof(ActivityViewModel.Groups))
         {
+            // A refresh keeps the reader's place; a filter change starts from the top.
+            var scroller = this.ViewModel.KeepScrollPosition ? FindScrollViewer(this.Feed) : null;
+            var offset = scroller?.VerticalOffset ?? 0;
+
             this.DaysSource.Source = this.ViewModel.Groups;
             this.Feed.ItemsSource = this.DaysSource.View;
+
+            if (scroller != null && offset > 0)
+            {
+                this.DispatcherQueue.TryEnqueue(() => scroller.ChangeView(null, offset, null, disableAnimation: true));
+            }
         }
+    }
+
+    private static ScrollViewer? FindScrollViewer(Microsoft.UI.Xaml.DependencyObject root)
+    {
+        if (root is ScrollViewer viewer)
+        {
+            return viewer;
+        }
+
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+        {
+            if (FindScrollViewer(VisualTreeHelper.GetChild(root, i)) is { } found)
+            {
+                return found;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>Loads a row's icon and rarity once it's realized (the list is virtualized).</summary>

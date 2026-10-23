@@ -45,8 +45,11 @@ public enum AchievementSort
     NewestUnlockFirst,
 }
 
-/// <summary>Outcome of a store or reset, for the status InfoBar.</summary>
-public sealed record GameOperationResult(bool Success, string Title, string Message);
+/// <summary>
+/// Outcome of a store or reset, for the status InfoBar. <paramref name="IsWarning"/> marks a
+/// failure whose outcome is unknown or partial (shown as a warning instead of an error).
+/// </summary>
+public sealed record GameOperationResult(bool Success, string Title, string Message, bool IsWarning = false);
 
 /// <summary>
 /// The achievement manager for one game: load pipeline, filtering, bulk actions and
@@ -235,9 +238,27 @@ public sealed partial class GameViewModel : ObservableObject
 
     public bool CanCommit() => this.PendingCount > 0 && this.InvalidStatCount == 0 && this.IsBusy == false && this.IsLoaded;
 
-    partial void OnIsLoadingChanged(bool value) => this.RefreshCommandStates();
+    partial void OnIsLoadingChanged(bool value) => this.OnBusyChanged();
 
-    partial void OnIsWorkingChanged(bool value) => this.RefreshCommandStates();
+    partial void OnIsWorkingChanged(bool value) => this.OnBusyChanged();
+
+    private void OnBusyChanged()
+    {
+        this.RefreshCommandStates();
+
+        // Rows can't be changed while loading or storing: a commit stages the values it
+        // captured, and edits made meanwhile would be marked committed by mistake.
+        var busy = this.IsBusy;
+        foreach (var achievement in this._achievements)
+        {
+            achievement.IsEditingBlocked = busy;
+        }
+
+        foreach (var stat in this.Stats)
+        {
+            stat.IsEditingBlocked = busy;
+        }
+    }
 
     partial void OnIsLoadedChanged(bool value) => this.RefreshCommandStates();
 
@@ -277,11 +298,16 @@ public sealed partial class GameViewModel : ObservableObject
     [ObservableProperty]
     private InfoBarSeverity _statusSeverity;
 
-    public void ShowStatus(GameOperationResult result)
+    public void ShowStatus(GameOperationResult result) => this.ShowStatus(
+        result.Title,
+        result.Message,
+        result.Success ? InfoBarSeverity.Success : result.IsWarning ? InfoBarSeverity.Warning : InfoBarSeverity.Error);
+
+    public void ShowStatus(string title, string message, InfoBarSeverity severity)
     {
-        this.StatusTitle = result.Title;
-        this.StatusMessage = result.Message;
-        this.StatusSeverity = result.Success ? InfoBarSeverity.Success : InfoBarSeverity.Error;
+        this.StatusTitle = title;
+        this.StatusMessage = message;
+        this.StatusSeverity = severity;
         this.IsStatusOpen = true;
     }
     #endregion
@@ -651,7 +677,10 @@ public sealed partial class GameViewModel : ObservableObject
                 }
 
                 var vm = new AchievementViewModel(
-                    definition, index++, achieved, unlockTime, this.AppId, this._services.Images, this.OnAchievementChanged);
+                    definition, index++, achieved, unlockTime, this.AppId, this._services.Images, this.OnAchievementChanged)
+                {
+                    IsEditingBlocked = this.IsBusy,
+                };
                 this.ApplyPercent(vm);
                 vm.IsSpoilerProtectionOn = this.IsSpoilerProtectionOn;
                 vm.Note = notes.GetValueOrDefault(definition.Id);
@@ -698,6 +727,7 @@ public sealed partial class GameViewModel : ObservableObject
                 var stat = new StatViewModel(definition, value, this.UpdatePending)
                 {
                     IsEditingAllowed = this.IsStatEditingEnabled,
+                    IsEditingBlocked = this.IsBusy,
                 };
                 foreach (var usage in usagesByStat[definition.Id].OrderBy(u => u.TargetValue))
                 {
@@ -910,7 +940,7 @@ public sealed partial class GameViewModel : ObservableObject
     /// <summary>Flips one achievement (for the Space key). Ignores protected ones.</summary>
     public void Toggle(AchievementViewModel achievement)
     {
-        if (achievement.IsProtected == false && this.IsBusy == false)
+        if (achievement.CanChange && this.IsBusy == false)
         {
             achievement.IsChecked = !achievement.IsChecked;
         }
@@ -1031,6 +1061,9 @@ public sealed partial class GameViewModel : ObservableObject
 
     /// <summary>Reason recorded on the automatic backup before restoring a backup.</summary>
     public const string BeforeRestoreReason = "Before restore";
+
+    /// <summary>Reason recorded on the automatic backup before resetting all stats.</summary>
+    public const string BeforeResetReason = "Before reset";
 
     /// <summary>Reason recorded on a backup the user asked for.</summary>
     public const string ManualReason = "Manual";
@@ -1238,9 +1271,10 @@ public sealed partial class GameViewModel : ObservableObject
     /// <summary>
     /// Writes the pending changes to Steam: SetAchievement for each changed achievement,
     /// SetStat for each modified stat, then StoreStats, waiting for Steam's servers to accept
-    /// them. All or nothing: if any Set call fails, or Steam refuses or rejects the store,
-    /// the changes already staged in Steam are undone. Reloads afterwards unless nothing
-    /// reached Steam (then the pending edits stay so the user can retry).
+    /// them. If any Set call fails, or Steam refuses the store, the changes already staged in
+    /// Steam are undone and the pending edits stay so the user can retry. If Steam's servers
+    /// reject some values (they may have kept the rest) or don't answer in time (the outcome
+    /// is unknown), nothing is undone and the window reloads to show what Steam has now.
     /// </summary>
     /// <param name="source">Recorded in the commit history (<see cref="CommitSource"/>).</param>
     /// <param name="confirmWithoutBackup">
@@ -1277,8 +1311,16 @@ public sealed partial class GameViewModel : ObservableObject
                 return new GameOperationResult(false, Strings.Get("Game_ResultNothingStoredTitle"), Strings.Get("Game_ResultNoBackup"));
             }
 
-            var achievements = this._achievements.Where(a => a.IsPending && a.IsProtected == false).ToList();
-            var stats = this.Stats.Where(s => s.IsModified && s.IsReadOnly == false && s.HasError == false).ToList();
+            // The values to store, captured once: they're what gets staged, recorded and marked
+            // committed, whatever happens to the rows while Steam answers.
+            var achievements = this._achievements
+                .Where(a => a.IsPending && a.IsProtected == false)
+                .Select(a => new AchievementEdit(a, a.IsChecked))
+                .ToList();
+            var stats = this.Stats
+                .Where(s => s.IsModified && s.IsReadOnly == false && s.HasError == false)
+                .Select(s => new StatEdit(s, s.Value))
+                .ToList();
             if (achievements.Count > 0 || stats.Count > 0)
             {
                 // Captured before the store: MarkCommitted overwrites the originals.
@@ -1286,9 +1328,9 @@ public sealed partial class GameViewModel : ObservableObject
                     DateTimeOffset.Now,
                     this.AppId,
                     this.GameName,
-                    achievements.Where(a => a.IsChecked).Select(a => a.Id).ToList(),
-                    achievements.Where(a => a.IsChecked == false).Select(a => a.Id).ToList(),
-                    stats.Select(s => new StatChange(s.Id, s.OriginalValue, s.Value)).ToList(),
+                    achievements.Where(a => a.Achieved).Select(a => a.Achievement.Id).ToList(),
+                    achievements.Where(a => a.Achieved == false).Select(a => a.Achievement.Id).ToList(),
+                    stats.Select(s => new StatChange(s.Stat.Id, s.Stat.OriginalValue, s.Value)).ToList(),
                     source,
                     false,
                     null);
@@ -1376,9 +1418,15 @@ public sealed partial class GameViewModel : ObservableObject
     /// <summary>A change staged in Steam's local state, and how to put it back.</summary>
     private sealed record StagedChange(string Id, Func<bool> Undo);
 
+    /// <summary>An achievement to store and the state captured for it.</summary>
+    private sealed record AchievementEdit(AchievementViewModel Achievement, bool Achieved);
+
+    /// <summary>A stat to store and the value captured for it.</summary>
+    private sealed record StatEdit(StatViewModel Stat, double Value);
+
     private async Task<(GameOperationResult Result, bool Reload)> StoreCoreAsync(
-        List<AchievementViewModel> achievements,
-        List<StatViewModel> stats)
+        List<AchievementEdit> achievements,
+        List<StatEdit> stats)
     {
         var steam = this._services.Steam;
         if (achievements.Count == 0 && stats.Count == 0)
@@ -1390,12 +1438,12 @@ public sealed partial class GameViewModel : ObservableObject
         string? failure = null;
         try
         {
-            foreach (var achievement in achievements)
+            foreach (var (achievement, achieved) in achievements)
             {
-                if (steam.SetAchievement(achievement.Id, achievement.IsChecked) == false)
+                if (steam.SetAchievement(achievement.Id, achieved) == false)
                 {
                     failure = Strings.Format(
-                        achievement.IsChecked ? "Game_FailureRefusedUnlock" : "Game_FailureRefusedLock",
+                        achieved ? "Game_FailureRefusedUnlock" : "Game_FailureRefusedLock",
                         achievement.Name,
                         achievement.Id);
                     break;
@@ -1407,9 +1455,9 @@ public sealed partial class GameViewModel : ObservableObject
 
             if (failure == null)
             {
-                foreach (var stat in stats)
+                foreach (var (stat, value) in stats)
                 {
-                    if (SetStatValue(steam, stat, stat.Value) == false)
+                    if (SetStatValue(steam, stat, value) == false)
                     {
                         failure = Strings.Format("Game_FailureRefusedStat", stat.DisplayName, stat.Id);
                         break;
@@ -1437,22 +1485,47 @@ public sealed partial class GameViewModel : ObservableObject
         {
             await steam.StoreStatsAsync();
         }
-        catch (SteamStoreException e) when (e.Failure is SteamStoreFailure.Refused or SteamStoreFailure.Rejected)
+        catch (SteamStoreException e) when (e.Failure == SteamStoreFailure.Refused)
         {
-            // Refused: nothing was sent, the edits stay. Rejected: Steam's servers didn't
-            // take them; reload to show what Steam has now.
-            return (this.FailAndUndo(steam, staged, e.Message), e.Failure == SteamStoreFailure.Rejected);
+            // Nothing was sent: undo, and keep the edits for a retry.
+            return (this.FailAndUndo(steam, staged, e.Message), false);
+        }
+        catch (SteamStoreException e) when (
+            e.Failure == SteamStoreFailure.TimedOut || e.Result == SteamStoreException.ServerTimeoutResult)
+        {
+            // The upload may or may not have gone through (Steam may still retry it). Undoing
+            // could revert changes that did reach the servers, so leave them and reload.
+            Diagnostics.Log($"Storing stats for app {this.AppId}: no confirmation from Steam ({e.Message})");
+            return (UnknownOutcome("Game_ResultUnknownTitle", "Game_ResultUnknownMessage"), true);
+        }
+        catch (SteamStoreException e) when (e.Result == SteamStoreException.InvalidParamResult)
+        {
+            // Steam's servers rejected one or more values and sent back their own; the rest
+            // may have been stored. Re-staging the old values would silently revert those on
+            // the next store, so nothing is undone: reload to show what Steam has now.
+            Diagnostics.Log($"Storing stats for app {this.AppId}: Steam rejected some values ({e.Message})");
+            return (new GameOperationResult(
+                false,
+                Strings.Get("Game_ResultPartialTitle"),
+                Strings.Get("Game_ResultPartialMessage"),
+                IsWarning: true), true);
+        }
+        catch (SteamStoreException e) when (e.Failure == SteamStoreFailure.Rejected)
+        {
+            // Rejected outright (no connection, access denied, ...): nothing was stored, so
+            // undo what's staged (Steam could upload it later) and reload.
+            return (this.FailAndUndo(steam, staged, e.Message), true);
         }
 
         // Stored: the rows are no longer pending, so closing during the reload doesn't warn.
-        foreach (var achievement in achievements)
+        foreach (var (achievement, achieved) in achievements)
         {
-            achievement.MarkCommitted();
+            achievement.MarkCommitted(achieved);
         }
 
-        foreach (var stat in stats)
+        foreach (var (stat, value) in stats)
         {
-            stat.MarkCommitted();
+            stat.MarkCommitted(value);
         }
 
         this.UpdatePending();
@@ -1508,32 +1581,164 @@ public sealed partial class GameViewModel : ObservableObject
         return new GameOperationResult(false, Strings.Get("Game_ResultStoreFailedTitle"), message);
     }
 
-    /// <summary>Resets every stat for this game (and optionally its achievements) on Steam, then reloads.</summary>
-    public async Task<GameOperationResult> ResetAllStatsAsync(bool achievementsToo)
+    /// <summary>A failure whose outcome is unknown (Steam didn't confirm in time), shown as a warning.</summary>
+    private static GameOperationResult UnknownOutcome(string titleKey, string messageKey) =>
+        new(false, Strings.Get(titleKey), Strings.Get(messageKey), IsWarning: true);
+
+    /// <summary>
+    /// Resets every stat for this game (and optionally its achievements) on Steam, waits for
+    /// Steam's servers to confirm it, then reloads. Pending edits are discarded. A "Before
+    /// reset" backup is saved first; when it can't be, <paramref name="confirmWithoutBackup"/>
+    /// is asked with the reason (null, or false, cancels with nothing reset). Every attempt
+    /// that reaches Steam is added to the commit history.
+    /// </summary>
+    public async Task<GameOperationResult> ResetAllStatsAsync(
+        bool achievementsToo,
+        Func<string, Task<bool>>? confirmWithoutBackup = null)
     {
+        if (this.IsLoaded == false || this.IsBusy)
+        {
+            return new GameOperationResult(false, Strings.Get("Game_ResetFailedTitle"), Strings.Get("Game_ResetNotIdle"));
+        }
+
+        // The state before the reset, for the history entry.
+        var unlockedBefore = this._achievements.Where(a => a.IsAchieved).Select(a => a.Id).ToList();
+        var statsBefore = this.Stats.Select(s => (s.Id, s.OriginalValue)).ToList();
+
         this.IsWorking = true;
         GameOperationResult result;
         try
         {
-            result = this._services.Steam.ResetAllStats(achievementsToo)
-                ? new GameOperationResult(true, Strings.Get("Game_ResetCompleteTitle"), achievementsToo
-                    ? Strings.Get("Game_ResetAllDone")
-                    : Strings.Get("Game_ResetStatsDone"))
-                : new GameOperationResult(false, Strings.Get("Game_ResetFailedTitle"), Strings.Get("Game_ResetRefused"));
-        }
-        catch (Exception e)
-        {
-            Diagnostics.Log($"Resetting stats for app {this.AppId} failed", e);
-            result = new GameOperationResult(false, Strings.Get("Game_ResetFailedTitle"), e.Message);
+            if (await this.BackUpBeforeResetAsync(confirmWithoutBackup) == false)
+            {
+                // Nothing was sent to Steam.
+                return new GameOperationResult(false, Strings.Get("Game_ResetFailedTitle"), Strings.Get("Game_ResetNoBackup"));
+            }
+
+            // The reload replaces every row anyway; drop the edits now so nothing looks pending.
+            this.DiscardChanges();
+            try
+            {
+                await this._services.Steam.ResetAllStatsAsync(achievementsToo);
+                result = new GameOperationResult(
+                    true,
+                    Strings.Get("Game_ResetCompleteTitle"),
+                    Strings.Get(achievementsToo ? "Game_ResetAllDone" : "Game_ResetStatsDone"));
+            }
+            catch (SteamStoreException e) when (
+                e.Failure == SteamStoreFailure.TimedOut || e.Result == SteamStoreException.ServerTimeoutResult)
+            {
+                Diagnostics.Log($"Resetting stats for app {this.AppId}: no confirmation from Steam ({e.Message})");
+                result = UnknownOutcome("Game_ResetUnknownTitle", "Game_ResetUnknownMessage");
+            }
+            catch (Exception e)
+            {
+                Diagnostics.Log($"Resetting stats for app {this.AppId} failed", e);
+                result = new GameOperationResult(false, Strings.Get("Game_ResetFailedTitle"), e.Message);
+            }
         }
         finally
         {
             this.IsWorking = false;
         }
 
-        await this.LoadAsync();
+        var loaded = await this.LoadAsync();
+        this.AppendHistory(this.CreateResetRecord(achievementsToo, result, loaded, unlockedBefore, statsBefore));
         this.ShowStatus(result);
         return result;
+    }
+
+    /// <summary>
+    /// The history entry for a reset. When the reload after it succeeded, the changes are what
+    /// Steam reports now compared with before; otherwise a confirmed reset of achievements
+    /// records every previously unlocked one as locked, and stat changes are left out.
+    /// </summary>
+    private CommitRecord CreateResetRecord(
+        bool achievementsToo,
+        GameOperationResult result,
+        bool reloaded,
+        List<string> unlockedBefore,
+        List<(string Id, double Value)> statsBefore)
+    {
+        List<string> unlocked = [];
+        List<string> locked = [];
+        List<StatChange> stats = [];
+        if (reloaded)
+        {
+            var wasUnlocked = new HashSet<string>(unlockedBefore, StringComparer.Ordinal);
+            foreach (var achievement in this._achievements)
+            {
+                if (achievement.IsAchieved && wasUnlocked.Contains(achievement.Id) == false)
+                {
+                    unlocked.Add(achievement.Id);
+                }
+                else if (achievement.IsAchieved == false && wasUnlocked.Contains(achievement.Id))
+                {
+                    locked.Add(achievement.Id);
+                }
+            }
+
+            var now = new Dictionary<string, StatViewModel>(StringComparer.Ordinal);
+            foreach (var stat in this.Stats)
+            {
+                now.TryAdd(stat.Id, stat);
+            }
+
+            foreach (var (id, before) in statsBefore)
+            {
+                if (now.TryGetValue(id, out var stat) && SameStatValue(stat, before, stat.OriginalValue) == false)
+                {
+                    stats.Add(new StatChange(id, before, stat.OriginalValue));
+                }
+            }
+        }
+        else if (result.Success && achievementsToo)
+        {
+            locked = unlockedBefore;
+        }
+
+        var label = Strings.Get(achievementsToo ? "Game_ResetHistoryAll" : "Game_ResetHistoryStats");
+        return new CommitRecord(
+            DateTimeOffset.Now,
+            this.AppId,
+            this.GameName,
+            unlocked,
+            locked,
+            stats,
+            CommitSource.Manual,
+            result.Success,
+            result.Success ? label : Strings.Format("Game_ResetHistoryFailed", label, result.Message));
+    }
+
+    /// <summary>
+    /// Saves the "Before reset" backup. Returns false when it couldn't be saved and the user
+    /// didn't choose to reset anyway.
+    /// </summary>
+    private async Task<bool> BackUpBeforeResetAsync(Func<string, Task<bool>>? confirmWithoutBackup)
+    {
+        try
+        {
+            this._services.Backups.Save(this.CreateSnapshot(BeforeResetReason));
+            return true;
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log($"Couldn't back up app {this.AppId} before resetting its stats", e);
+            if (confirmWithoutBackup == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                return await confirmWithoutBackup(e.Message);
+            }
+            catch (Exception confirmError)
+            {
+                Diagnostics.Log("Asking to reset without a backup failed", confirmError);
+                return false;
+            }
+        }
     }
     #endregion
 }

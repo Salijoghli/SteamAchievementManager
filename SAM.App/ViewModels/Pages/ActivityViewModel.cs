@@ -34,6 +34,7 @@ public sealed partial class ActivityViewModel : ObservableObject
     private readonly GlobalPercentLoader _percents;
     private IReadOnlyList<UnlockItemViewModel> _all = [];
     private CancellationTokenSource? _cts;
+    private CancellationTokenSource? _searchDebounce;
     private DateTime _loadedAt = DateTime.MinValue;
     private int _loadedGameCount;
 
@@ -96,9 +97,37 @@ public sealed partial class ActivityViewModel : ObservableObject
     /// <summary>Unlocks exist, but none match the filters.</summary>
     public bool IsNoMatches => this.IsLoading == false && this.Error == null && this.TotalCount > 0 && this.ShownCount == 0;
 
-    partial void OnSearchTextChanged(string value) => this.ApplyFilter();
+    /// <summary>
+    /// True while the feed is rebuilt by a refresh (not a filter change): the page keeps its
+    /// scroll position instead of jumping to the top.
+    /// </summary>
+    public bool KeepScrollPosition { get; private set; }
+
+    partial void OnSearchTextChanged(string value) => this.DebounceFilter();
 
     partial void OnRangeIndexChanged(int value) => this.ApplyFilter();
+
+    /// <summary>Rebuilding the feed is expensive, so the search waits until typing pauses.</summary>
+    private async void DebounceFilter()
+    {
+        this._searchDebounce?.Cancel();
+        var cts = this._searchDebounce = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(200, cts.Token);
+        }
+        catch (TaskCanceledException)
+        {
+            return;
+        }
+
+        if (ReferenceEquals(this._searchDebounce, cts))
+        {
+            this._searchDebounce = null;
+        }
+
+        this.ApplyFilter();
+    }
 
     /// <summary>Loads on first show, and again when the data is a few minutes old.</summary>
     public void OnShown()
@@ -130,6 +159,7 @@ public sealed partial class ActivityViewModel : ObservableObject
     {
         this.SearchText = "";
         this.RangeIndex = 3;
+        this.ApplyFilter(); // Don't wait out the search debounce.
     }
 
     private async Task LoadAsync()
@@ -173,17 +203,38 @@ public sealed partial class ActivityViewModel : ObservableObject
         this._loadedAt = DateTime.UtcNow;
         this._loadedGameCount = gameCount;
         this.Error = error;
+
+        // Rows that were already loaded keep their view models (and loaded icons), so a refresh
+        // that finds nothing new leaves the feed as it is.
+        var existing = new Dictionary<UnlockEvent, UnlockItemViewModel>();
+        foreach (var item in this._all)
+        {
+            existing.TryAdd(item.Event, item);
+        }
+
         this._all = (events ?? [])
             .OrderByDescending(e => e.Time)
-            .Select(e => new UnlockItemViewModel(e, this._services.Images, this._percents))
+            .Select(e => existing.GetValueOrDefault(e) ?? new UnlockItemViewModel(e, this._services.Images, this._percents))
             .ToList();
         this.TotalCount = this._all.Count;
         this.IsLoading = false;
-        this.ApplyFilter();
+        this.KeepScrollPosition = true;
+        try
+        {
+            this.ApplyFilter();
+        }
+        finally
+        {
+            this.KeepScrollPosition = false;
+        }
     }
 
     private void ApplyFilter()
     {
+        // A search waiting out its debounce is covered by this pass.
+        this._searchDebounce?.Cancel();
+        this._searchDebounce = null;
+
         var query = this.SearchText.Trim();
         DateTime? since = this.RangeIndex switch
         {
@@ -205,11 +256,35 @@ public sealed partial class ActivityViewModel : ObservableObject
             .ToList();
 
         this.ShownCount = groups.Sum(g => g.Count);
-        this.Groups = groups;
+
+        // Same rows as now (e.g. a trailing space, or a refresh with nothing new): keep the
+        // feed, and with it the scroll position.
+        if (SameGroups(this.Groups, groups) == false)
+        {
+            this.Groups = groups;
+        }
         this.CountText = this.Error != null ? ""
             : this.ShownCount == this.TotalCount ? Unlocks(this.TotalCount)
             : Strings.Plural("Activity_ShownOfTotal", this.TotalCount, LibraryFormat.Count(this.ShownCount));
     }
 
     private static string Unlocks(int count) => Strings.Plural("Pages_Unlocks", count);
+
+    private static bool SameGroups(IReadOnlyList<ActivityDayGroup> a, IReadOnlyList<ActivityDayGroup> b)
+    {
+        if (a.Count != b.Count)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < a.Count; i++)
+        {
+            if (a[i].Title != b[i].Title || a[i].SequenceEqual(b[i]) == false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

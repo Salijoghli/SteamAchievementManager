@@ -1503,6 +1503,61 @@
   <data name="Game_ResetRefused" xml:space="preserve">
     <value>Steam-მა სტატისტიკის ჩამოყრაზე უარი თქვა.</value>
   </data>
+  <data name="Game_ResultUnknownTitle" xml:space="preserve">
+    <value>Steam-მა დროულად არ დაადასტურა</value>
+  </data>
+  <data name="Game_ResultUnknownMessage" xml:space="preserve">
+    <value>ცვლილებები შეიძლება შენახულია, შეიძლება — არა. ქვემოთ სიაში ისინი ორივე შემთხვევაში შეიძლება ჩანდეს; რა აქვს Steam-ს, რომ შეამოწმოთ, ერთ წუთში ხელახლა ჩატვირთეთ (F5).</value>
+  </data>
+  <data name="Game_ResultPartialTitle" xml:space="preserve">
+    <value>Steam-მა ზოგიერთი ცვლილება უარყო</value>
+  </data>
+  <data name="Game_ResultPartialMessage" xml:space="preserve">
+    <value>Steam-ის სერვერებმა ზოგიერთი ცვლილება უარყო (მაგალითად, მნიშვნელობა, რომელიც თამაშის წესს არღვევს); დანარჩენი შეიძლება შენახულია. ქვემოთ სიაში ჩანს, რა აქვს Steam-ს ახლა.</value>
+  </data>
+  <data name="Game_ResetUnknownTitle" xml:space="preserve">
+    <value>Steam-მა ჩამოყრა დროულად არ დაადასტურა</value>
+  </data>
+  <data name="Game_ResetUnknownMessage" xml:space="preserve">
+    <value>ჩამოყრა შეიძლება მოხდა, შეიძლება — არა. რა აქვს Steam-ს, რომ შეამოწმოთ, ერთ წუთში ხელახლა ჩატვირთეთ (F5).</value>
+  </data>
+  <data name="Game_ResetNotIdle" xml:space="preserve">
+    <value>დაელოდეთ ჩატვირთვის ან შენახვის დასრულებას.</value>
+  </data>
+  <data name="Game_ResetNoBackup" xml:space="preserve">
+    <value>ჩამოყრა გაუქმდა, რადგან სარეზერვო ასლის შექმნა ვერ მოხერხდა.</value>
+  </data>
+  <data name="Game_ResetDiscardsPending" xml:space="preserve">
+    <value>თქვენი მომლოდინე ცვლილებები გაუქმდება.</value>
+  </data>
+  <data name="Game_ResetBackupFailedMessage" xml:space="preserve">
+    <value>სარეზერვო ასლის შექმნა ვერ მოხერხდა ({0}). მაინც ჩამოიყაროს?</value>
+  </data>
+  <data name="Game_ResetAnywayButton" xml:space="preserve">
+    <value>მაინც ჩამოყრა</value>
+  </data>
+  <data name="Game_ResetHistoryStats" xml:space="preserve">
+    <value>მთელი სტატისტიკის ჩამოყრა</value>
+    <comment>Commit history message.</comment>
+  </data>
+  <data name="Game_ResetHistoryAll" xml:space="preserve">
+    <value>მთელი სტატისტიკისა და მიღწევების ჩამოყრა</value>
+    <comment>Commit history message.</comment>
+  </data>
+  <data name="Game_ResetHistoryFailed" xml:space="preserve">
+    <value>{0}: {1}</value>
+    <comment>{0} = what was reset (Game_ResetHistoryStats/All), {1} = why it failed.</comment>
+  </data>
+  <data name="Game_BackupReasonBeforeReset" xml:space="preserve">
+    <value>ჩამოყრამდე</value>
+    <comment>Reason shown on the automatic backup taken before a reset.</comment>
+  </data>
+  <data name="Game_CloseWhenDoneTitle" xml:space="preserve">
+    <value>Steam-ში ინახება…</value>
+  </data>
+  <data name="Game_CloseWhenDoneMessage" xml:space="preserve">
+    <value>ფანჯარა დასრულებისას დაიხურება.</value>
+  </data>
   <data name="Game_NoteSaveFailed" xml:space="preserve">
     <value>შენიშვნის შენახვა ვერ მოხერხდა</value>
   </data>

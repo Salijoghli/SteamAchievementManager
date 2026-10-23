@@ -67,7 +67,13 @@ public sealed partial class AchievementViewModel : ObservableObject
 
     public bool IsProtected => this.Definition.IsProtected;
 
-    public bool CanChange => this.IsProtected == false;
+    /// <summary>Not protected, and the window isn't loading or storing (bound to the row's switch).</summary>
+    public bool CanChange => this.IsProtected == false && this.IsEditingBlocked == false;
+
+    /// <summary>Set by the game window while it's loading or storing, so the row can't be changed mid-commit.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanChange))]
+    private bool _isEditingBlocked;
 
     /// <summary>State reported by Steam when loaded (or last committed).</summary>
     public bool IsAchieved { get; private set; }
@@ -93,17 +99,18 @@ public sealed partial class AchievementViewModel : ObservableObject
     partial void OnIsCheckedChanged(bool value) => this._changed();
 
     /// <summary>
-    /// Records that the desired state was stored on Steam, so the row stops counting as
-    /// pending (e.g. while the post-commit reload runs). Doesn't notify the owner.
+    /// Records that <paramref name="achieved"/> (the state that was staged) was stored on
+    /// Steam, so the row stops counting as pending (e.g. while the post-commit reload runs).
+    /// Doesn't notify the owner.
     /// </summary>
-    public void MarkCommitted()
+    public void MarkCommitted(bool achieved)
     {
-        if (this.IsAchieved == this.IsChecked)
+        if (this.IsAchieved == achieved)
         {
             return;
         }
 
-        this.IsAchieved = this.IsChecked;
+        this.IsAchieved = achieved;
         this.OnPropertyChanged(nameof(this.IsAchieved));
         this.OnPropertyChanged(nameof(this.IsPending));
         this.OnPropertyChanged(nameof(this.PendingText));

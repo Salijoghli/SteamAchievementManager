@@ -1526,6 +1526,61 @@ Installed · {2}</value>
   <data name="Game_ResetRefused" xml:space="preserve">
     <value>Steam refused to reset the stats.</value>
   </data>
+  <data name="Game_ResultUnknownTitle" xml:space="preserve">
+    <value>Steam didn't confirm in time</value>
+  </data>
+  <data name="Game_ResultUnknownMessage" xml:space="preserve">
+    <value>The changes may or may not have been saved. The list below may show them either way; reload (F5) in a minute to check what Steam has.</value>
+  </data>
+  <data name="Game_ResultPartialTitle" xml:space="preserve">
+    <value>Steam rejected some changes</value>
+  </data>
+  <data name="Game_ResultPartialMessage" xml:space="preserve">
+    <value>Steam's servers rejected some of the changes (for example a value that breaks one of the game's rules); others may have been saved. The list below shows what Steam has now.</value>
+  </data>
+  <data name="Game_ResetUnknownTitle" xml:space="preserve">
+    <value>Steam didn't confirm the reset in time</value>
+  </data>
+  <data name="Game_ResetUnknownMessage" xml:space="preserve">
+    <value>The reset may or may not have happened. Reload (F5) in a minute to check what Steam has.</value>
+  </data>
+  <data name="Game_ResetNotIdle" xml:space="preserve">
+    <value>Wait until loading or saving has finished.</value>
+  </data>
+  <data name="Game_ResetNoBackup" xml:space="preserve">
+    <value>The reset was cancelled because no backup could be created.</value>
+  </data>
+  <data name="Game_ResetDiscardsPending" xml:space="preserve">
+    <value>Your pending changes will be discarded.</value>
+  </data>
+  <data name="Game_ResetBackupFailedMessage" xml:space="preserve">
+    <value>Couldn't create a backup ({0}). Reset anyway?</value>
+  </data>
+  <data name="Game_ResetAnywayButton" xml:space="preserve">
+    <value>Reset anyway</value>
+  </data>
+  <data name="Game_ResetHistoryStats" xml:space="preserve">
+    <value>Reset all stats</value>
+    <comment>Commit history message.</comment>
+  </data>
+  <data name="Game_ResetHistoryAll" xml:space="preserve">
+    <value>Reset all stats and achievements</value>
+    <comment>Commit history message.</comment>
+  </data>
+  <data name="Game_ResetHistoryFailed" xml:space="preserve">
+    <value>{0}: {1}</value>
+    <comment>{0} = what was reset (Game_ResetHistoryStats/All), {1} = why it failed.</comment>
+  </data>
+  <data name="Game_BackupReasonBeforeReset" xml:space="preserve">
+    <value>Before reset</value>
+    <comment>Reason shown on the automatic backup taken before a reset.</comment>
+  </data>
+  <data name="Game_CloseWhenDoneTitle" xml:space="preserve">
+    <value>Saving to Steam…</value>
+  </data>
+  <data name="Game_CloseWhenDoneMessage" xml:space="preserve">
+    <value>The window will close when it's done.</value>
+  </data>
   <data name="Game_NoteSaveFailed" xml:space="preserve">
     <value>Couldn't save the note</value>
   </data>

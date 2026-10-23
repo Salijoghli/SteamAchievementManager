@@ -22,6 +22,7 @@ public sealed class BackupItemViewModel(GameSnapshot snapshot, bool canRestore)
         null or "" => Strings.Get("Backups_ReasonDefault"),
         GameViewModel.BeforeCommitReason => Strings.Get("Backups_ReasonBeforeCommit"),
         GameViewModel.BeforeRestoreReason => Strings.Get("Backups_ReasonBeforeRestore"),
+        GameViewModel.BeforeResetReason => Strings.Get("Game_BackupReasonBeforeReset"),
         GameViewModel.ManualReason => Strings.Get("Backups_ReasonManual"),
         BeforeCommandLineCommitReason => Strings.Get("Backups_ReasonBeforeCli"),
         var reason when string.IsNullOrWhiteSpace(reason) => Strings.Get("Backups_ReasonDefault"),

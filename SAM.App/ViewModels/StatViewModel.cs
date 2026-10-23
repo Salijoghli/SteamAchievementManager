@@ -129,7 +129,12 @@ public sealed partial class StatViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(CanEdit))]
     private bool _isEditingAllowed;
 
-    public bool CanEdit => this.IsEditingAllowed && this.IsReadOnly == false;
+    /// <summary>Set by the game window while it's loading or storing, so the value can't change mid-commit.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanEdit))]
+    private bool _isEditingBlocked;
+
+    public bool CanEdit => this.IsEditingAllowed && this.IsReadOnly == false && this.IsEditingBlocked == false;
 
     public bool IsModified => this.IsInteger
         ? (long)this.Value != (long)this.OriginalValue
@@ -173,17 +178,17 @@ public sealed partial class StatViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Records that <see cref="Value"/> was stored on Steam, so the stat stops counting as
-    /// modified (e.g. while the post-commit reload runs).
+    /// Records that <paramref name="value"/> (the value that was staged) was stored on Steam,
+    /// so the stat stops counting as modified (e.g. while the post-commit reload runs).
     /// </summary>
-    public void MarkCommitted()
+    public void MarkCommitted(double value)
     {
-        if (this.OriginalValue.Equals(this.Value))
+        if (this.OriginalValue.Equals(value))
         {
             return;
         }
 
-        this.OriginalValue = this.Value;
+        this.OriginalValue = value;
         this.OnPropertyChanged(nameof(this.OriginalValue));
         this.OnPropertyChanged(nameof(this.OriginalValueText));
         this.OnPropertyChanged(nameof(this.IsModified));

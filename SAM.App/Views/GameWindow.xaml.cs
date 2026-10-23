@@ -32,6 +32,9 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
     private bool _dialogOpen;
     private bool _closeConfirmed;
 
+    /// <summary>The user tried to close while a commit or reset was waiting for Steam.</summary>
+    private bool _closeWhenDone;
+
     /// <param name="unlockAllOnOpen">
     /// After loading, check every unlockable achievement and prompt the user to commit.
     /// </param>
@@ -463,14 +466,18 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
 
     private void OnCommitAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
     {
+        args.Handled = true;
+        if (this.ViewModel.IsBusy)
+        {
+            return; // Nothing may change while loading or storing.
+        }
+
         // A value typed into a stat box only counts once committed; it may enable (or block) the commit.
         this.CommitFocusedNumberBox();
         if (this.ViewModel.CommitCommand.CanExecute(null))
         {
             this.ViewModel.CommitCommand.Execute(null);
         }
-
-        args.Handled = true;
     }
 
     private void OnReloadAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
@@ -487,6 +494,11 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
 
     private async Task ReloadAsync()
     {
+        if (this.ViewModel.IsBusy)
+        {
+            return;
+        }
+
         this.CommitFocusedNumberBox();
         if (this.ViewModel.HasUnsavedChanges &&
             await this.ShowDialogAsync(
@@ -643,8 +655,33 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
 
         if (await this.ShowDialogAsync(Strings.Get("Game_CommitDialogTitle"), content, Strings.Get("Game_CommitDialogButton")) == ContentDialogResult.Primary)
         {
-            await this.ViewModel.StoreAsync(CommitSource.Manual, this.ConfirmCommitWithoutBackupAsync);
+            await this.RunOperationAsync(this.ViewModel.StoreAsync(CommitSource.Manual, this.ConfirmCommitWithoutBackupAsync));
         }
+    }
+
+    /// <summary>
+    /// Awaits a commit or reset. If the user tried to close the window meanwhile, closes it
+    /// once the operation succeeded; otherwise leaves it open with the result showing.
+    /// </summary>
+    private async Task<GameOperationResult> RunOperationAsync(Task<GameOperationResult> operation)
+    {
+        var result = await operation;
+        if (this._closeWhenDone)
+        {
+            this._closeWhenDone = false;
+            if (result.Success && this.ViewModel.HasUnsavedChanges == false && this.ViewModel.IsBusy == false)
+            {
+                this._closeConfirmed = true;
+                this.Close();
+            }
+            else
+            {
+                // Replaces the "will close when done" note (not every outcome shows a status).
+                this.ViewModel.ShowStatus(result);
+            }
+        }
+
+        return result;
     }
 
     /// <summary>Asked when the automatic backup before a commit fails. True = commit anyway.</summary>
@@ -696,6 +733,8 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
             return;
         }
 
+        // Staging may switch stat editing on; put it back if the restore doesn't go through.
+        var wasStatEditingEnabled = this.ViewModel.IsStatEditingEnabled;
         var notRestorable = this.ViewModel.StageRestore(snapshot);
         var when = snapshot.CreatedAt.ToLocalTime().ToString("d MMM yyyy, HH:mm", CultureInfo.CurrentCulture);
 
@@ -745,19 +784,33 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
 
         if (this.ViewModel.CanCommit() == false)
         {
-            this.ViewModel.DiscardChanges();
+            this.DiscardStagedRestore(wasStatEditingEnabled);
             await this.ShowDialogAsync(Strings.Get("Game_RestoreDialogTitle"), content, Strings.Get("Common_Ok"), closeText: "");
             return;
         }
 
-        if (await this.ShowDialogAsync(Strings.Get("Game_RestoreConfirmTitle"), content, Strings.Get("Common_Restore")) == ContentDialogResult.Primary)
+        if (await this.ShowDialogAsync(Strings.Get("Game_RestoreConfirmTitle"), content, Strings.Get("Common_Restore")) != ContentDialogResult.Primary)
         {
-            await this.ViewModel.StoreAsync(CommitSource.Restore, this.ConfirmCommitWithoutBackupAsync);
+            this.DiscardStagedRestore(wasStatEditingEnabled);
+            return;
         }
-        else
+
+        await this.RunOperationAsync(this.ViewModel.StoreAsync(CommitSource.Restore, this.ConfirmCommitWithoutBackupAsync));
+
+        // Cancelled at the backup prompt, or refused before anything reached Steam: the staged
+        // restore is still pending. Drop it rather than leave a half-made restore behind.
+        // After a store that reached Steam the window has reloaded, so this only resets the switch.
+        if (this._closeConfirmed == false && this.ViewModel.IsBusy == false)
         {
-            this.ViewModel.DiscardChanges();
+            this.DiscardStagedRestore(wasStatEditingEnabled);
         }
+    }
+
+    /// <summary>Drops the staged restore and puts the stat editing switch back as it was.</summary>
+    private void DiscardStagedRestore(bool wasStatEditingEnabled)
+    {
+        this.ViewModel.DiscardChanges();
+        this.ViewModel.IsStatEditingEnabled = wasStatEditingEnabled;
     }
     #endregion
 
@@ -765,9 +818,21 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
 
     private async void OnResetAllStats(object sender, RoutedEventArgs e)
     {
+        this.CommitFocusedNumberBox();
+        if (GameFormat.IsIdle(this.ViewModel.IsLoaded, this.ViewModel.IsBusy) == false)
+        {
+            return;
+        }
+
+        var message = Strings.Get("Game_ResetStatsMessage");
+        if (this.ViewModel.HasUnsavedChanges)
+        {
+            message += Environment.NewLine + Environment.NewLine + Strings.Get("Game_ResetDiscardsPending");
+        }
+
         if (await this.ShowDialogAsync(
                 Strings.Get("Game_ResetStatsTitle"),
-                Strings.Get("Game_ResetStatsMessage"),
+                message,
                 Strings.Get("Game_Continue"),
                 defaultButton: ContentDialogButton.Close) != ContentDialogResult.Primary)
         {
@@ -795,13 +860,40 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
             return;
         }
 
-        await this.ViewModel.ResetAllStatsAsync(achievementsToo);
+        await this.RunOperationAsync(this.ViewModel.ResetAllStatsAsync(achievementsToo, this.ConfirmResetWithoutBackupAsync));
     }
+
+    /// <summary>Asked when the backup before a reset fails. True = reset anyway.</summary>
+    private async Task<bool> ConfirmResetWithoutBackupAsync(string reason) =>
+        await this.ShowDialogAsync(
+            Strings.Get("Game_BackupFailedTitle"),
+            Strings.Format("Game_ResetBackupFailedMessage", reason),
+            Strings.Get("Game_ResetAnywayButton"),
+            destructive: true,
+            defaultButton: ContentDialogButton.Close) == ContentDialogResult.Primary;
 
     private async void OnAppWindowClosing(AppWindow sender, AppWindowClosingEventArgs args)
     {
+        if (this._closeConfirmed)
+        {
+            return;
+        }
+
+        // Closing now would end the process while Steam is storing (or resetting) the changes:
+        // no history entry, no reload, and an unknown outcome. Close once it's done instead.
+        if (this.ViewModel.IsWorking)
+        {
+            args.Cancel = true;
+            this._closeWhenDone = true;
+            this.ViewModel.ShowStatus(
+                Strings.Get("Game_CloseWhenDoneTitle"),
+                Strings.Get("Game_CloseWhenDoneMessage"),
+                InfoBarSeverity.Informational);
+            return;
+        }
+
         this.CommitFocusedNumberBox();
-        if (this._closeConfirmed || this.ViewModel.HasUnsavedChanges == false)
+        if (this.ViewModel.HasUnsavedChanges == false)
         {
             return;
         }
