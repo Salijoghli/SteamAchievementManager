@@ -28,7 +28,11 @@ public sealed class BackupService
         this._directory = directory;
     }
 
-    /// <summary>Saves <paramref name="snapshot"/> (assigning Id and CreatedAt if unset) and prunes old ones. Returns it.</summary>
+    /// <summary>
+    /// Saves <paramref name="snapshot"/> (assigning Id and CreatedAt if unset) and prunes old ones.
+    /// Returns it. Throws <see cref="IOException"/> or <see cref="UnauthorizedAccessException"/>
+    /// if it couldn't be written.
+    /// </summary>
     public GameSnapshot Save(GameSnapshot snapshot)
     {
         ArgumentNullException.ThrowIfNull(snapshot);
@@ -50,7 +54,8 @@ public sealed class BackupService
                 throw new ArgumentException($"Invalid snapshot ID '{snapshot.Id}'.", nameof(snapshot));
             }
 
-            JsonFile.Write(Path.Combine(gameDirectory, snapshot.Id + ".json"), snapshot);
+            // Throws if the snapshot can't be written: callers must not commit without it.
+            JsonFile.WriteOrThrow(Path.Combine(gameDirectory, snapshot.Id + ".json"), snapshot);
             this.Prune(snapshot.AppId);
             return snapshot;
         }

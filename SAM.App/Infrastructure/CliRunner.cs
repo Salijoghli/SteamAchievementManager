@@ -52,15 +52,16 @@ public static class CliRunner
         var appId = command.AppId;
         var title = $"SAM: App {appId.ToString(CultureInfo.InvariantCulture)}";
 
-        // Same name SingleInstance uses: if it exists, the game's window is open in SAM, and
-        // committing behind its back would leave the window showing stale state. Holding it
-        // for the run also stops a window from opening for this game meanwhile.
-        using var instance = new EventWaitHandle(
-            false, EventResetMode.AutoReset, $"SteamAchievementManager.{appId}.Activate", out var createdNew);
-        if (createdNew == false)
+        // If the game's window is open in SAM, committing behind its back would leave the window
+        // showing stale state. Holding the claim for the run also stops a window from opening
+        // for this game meanwhile (the launch says a command-line commit is running instead).
+        using var instance = SingleInstance.TryClaimForCommandLine(appId, out var commitRunning);
+        if (instance == null)
         {
             Report(settings, title,
-                $"SAM's window for App ID {appId} is open. Close the game's window first, then run the command again. Nothing was changed.",
+                commitRunning
+                    ? $"Another command-line commit for App ID {appId} is running. Wait for it to finish, then run the command again. Nothing was changed."
+                    : $"SAM's window for App ID {appId} is open. Close the game's window first, then run the command again. Nothing was changed.",
                 isError: true, command.Quiet);
             return CommandLine.ExitBusy;
         }
@@ -130,6 +131,7 @@ public static class CliRunner
 
         var unknown = new List<string>();
         var protectedIds = new List<string>();
+        var conflicting = new List<string>();
         var targets = new List<(AchievementDefinition Definition, bool Unlock)>();
 
         void Resolve(IEnumerable<string> ids, bool unlock)
@@ -145,7 +147,15 @@ public static class CliRunner
                 {
                     protectedIds.Add(definition.Id);
                 }
-                else if (targets.Any(t => t.Definition.Id == definition.Id) == false)
+                else if (targets.FindIndex(t => t.Definition.Id == definition.Id) is var index and >= 0)
+                {
+                    // E.g. "--unlock ach_win --lock ACH_WIN": both resolve to the same achievement.
+                    if (targets[index].Unlock != unlock && conflicting.Contains(definition.Id) == false)
+                    {
+                        conflicting.Add(definition.Id);
+                    }
+                }
+                else
                 {
                     targets.Add((definition, unlock));
                 }
@@ -171,9 +181,14 @@ public static class CliRunner
             }
         }
 
-        if (unknown.Count > 0 || protectedIds.Count > 0)
+        if (unknown.Count > 0 || protectedIds.Count > 0 || conflicting.Count > 0)
         {
             var errors = new List<string>();
+            if (conflicting.Count > 0)
+            {
+                errors.Add($"Can't both unlock and lock {string.Join(", ", conflicting)}.");
+            }
+
             if (unknown.Count > 0)
             {
                 errors.Add($"{gameName} has no achievement {string.Join(", ", unknown)}.");

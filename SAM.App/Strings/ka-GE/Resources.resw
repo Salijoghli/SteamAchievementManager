@@ -165,6 +165,15 @@
   <data name="App_TrayHintMessage" xml:space="preserve">
     <value>ბიბლიოთეკის გასახსნელად დააწკაპუნეთ ხატულაზე სისტემურ არეში, ან დააწკაპუნეთ მასზე მარჯვენა ღილაკით და აირჩიეთ „გასვლა“.</value>
   </data>
+  <data name="App_CantStart" xml:space="preserve">
+    <value>SAM ვერ გაეშვა</value>
+  </data>
+  <data name="App_CommitRunningTitle" xml:space="preserve">
+    <value>თამაში დაკავებულია</value>
+  </data>
+  <data name="App_CommitRunningMessage" xml:space="preserve">
+    <value>ამ თამაშის ცვლილებები ახლა ბრძანების ხაზიდან ინახება; სცადეთ ცოტა ხანში.</value>
+  </data>
   <data name="Tray_OpenLibrary" xml:space="preserve">
     <value>ბიბლიოთეკის გახსნა</value>
   </data>

@@ -288,7 +288,8 @@ public sealed class CommandLine
             return new CommandLine { Mode = LaunchMode.AutopilotWorker, AppId = appId, ParentProcessId = workerParent };
         }
 
-        var both = unlock.Intersect(@lock, StringComparer.Ordinal).ToList();
+        // Case-insensitive: the runner resolves IDs that differ only in case to the same achievement.
+        var both = unlock.Intersect(@lock, StringComparer.OrdinalIgnoreCase).ToList();
         if (both.Count > 0)
         {
             return Invalid($"Can't both unlock and lock {string.Join(", ", both)}.", appId);

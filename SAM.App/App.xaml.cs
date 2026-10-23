@@ -144,20 +144,42 @@ public partial class App : Application
 
         // One window per game (and one library): if it's already open, hand it our arguments
         // (so "--unlock-all" etc. still apply), focus it and quit.
-        this._instance = SingleInstance.TryClaim(appId, arguments);
+        this._instance = SingleInstance.TryClaim(appId, arguments, out var commandLineCommitRunning);
         if (this._instance == null)
         {
+            if (commandLineCommitRunning)
+            {
+                // A headless "--commit" for this game has no window to bring forward; say why
+                // nothing opens instead of vanishing.
+                this.Show(new ErrorWindow(Strings.Get("App_CommitRunningTitle"), Strings.Get("App_CommitRunningMessage")));
+                return;
+            }
+
             this.Exit();
+            return;
+        }
+
+        SteamSession steam;
+        try
+        {
+            steam = SteamSession.Initialize(appId);
+        }
+        catch (SteamUnavailableException e)
+        {
+            this.Show(new ErrorWindow(Strings.Get("App_CantConnectToSteam"), e.Message));
             return;
         }
 
         try
         {
-            Services = new AppServices(SteamSession.Initialize(appId), this._settings);
+            Services = new AppServices(steam, this._settings);
         }
-        catch (SteamUnavailableException e)
+        catch (Exception e)
         {
-            this.Show(new ErrorWindow(Strings.Get("App_CantConnectToSteam"), e.Message));
+            // E.g. SAM's data folder can't be read or written: explain instead of crashing.
+            Diagnostics.Log("Couldn't start SAM's services", e);
+            steam.Dispose();
+            this.Show(new ErrorWindow(Strings.Get("App_CantStart"), e.Message));
             return;
         }
 

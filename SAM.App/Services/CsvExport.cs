@@ -64,12 +64,21 @@ public static class CsvExport
         }));
     }
 
-    /// <summary>Quotes <paramref name="field"/> per RFC 4180 if it contains a comma, quote, CR or LF.</summary>
+    /// <summary>
+    /// Quotes <paramref name="field"/> per RFC 4180 if it contains a comma, quote, CR or LF. A
+    /// field that a spreadsheet would run as a formula (starting with =, +, -, @, tab or CR, e.g.
+    /// a game or achievement name) gets a leading apostrophe so it's shown as text.
+    /// </summary>
     internal static string Escape(string? field)
     {
         if (string.IsNullOrEmpty(field))
         {
             return "";
+        }
+
+        if (field[0] is '=' or '+' or '-' or '@' or '\t' or '\r')
+        {
+            field = "'" + field;
         }
 
         return field.AsSpan().IndexOfAny(",\"\r\n") < 0

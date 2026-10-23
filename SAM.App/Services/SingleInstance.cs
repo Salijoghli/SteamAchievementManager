@@ -36,11 +36,16 @@ public sealed class SingleInstance : IDisposable
     /// Claims the App ID for this process. Returns null if another process already owns it;
     /// in that case <paramref name="arguments"/> (the command line without the executable) have
     /// been handed to that process, it has been asked to show its window, and this one should exit.
+    /// When the owner is a headless command-line commit (<see cref="TryClaimForCommandLine"/>),
+    /// which has no window, nothing is forwarded and <paramref name="commandLineCommitRunning"/>
+    /// is true, so the caller can say so instead of silently exiting.
     /// </summary>
-    public static SingleInstance? TryClaim(uint appId, IReadOnlyList<string> arguments)
+    public static SingleInstance? TryClaim(uint appId, IReadOnlyList<string> arguments, out bool commandLineCommitRunning)
     {
+        commandLineCommitRunning = false;
+
         // Session-local name, so different Windows users don't collide.
-        var signal = new EventWaitHandle(false, EventResetMode.AutoReset, $"SteamAchievementManager.{appId}.Activate", out var createdNew);
+        var signal = new EventWaitHandle(false, EventResetMode.AutoReset, ActivateEventName(appId), out var createdNew);
         if (createdNew)
         {
             // Arguments left by launches whose target exited before reading them.
@@ -52,6 +57,13 @@ public sealed class SingleInstance : IDisposable
             return new SingleInstance(appId, signal);
         }
 
+        if (IsCommandLineCommitRunning(appId))
+        {
+            signal.Dispose();
+            commandLineCommitRunning = true;
+            return null;
+        }
+
         WriteArguments(appId, arguments);
 
         // Let the running copy take the foreground, then wake it.
@@ -59,6 +71,42 @@ public sealed class SingleInstance : IDisposable
         signal.Set();
         signal.Dispose();
         return null;
+    }
+
+    /// <summary>
+    /// Claims the App ID for a headless command-line commit, so no window opens for the game
+    /// meanwhile (a launch says a commit is running instead). Returns null, claiming nothing, when
+    /// the game's window is open or another command-line commit for it is running
+    /// (<paramref name="commitRunning"/> tells which). Dispose the result when the commit is done.
+    /// </summary>
+    public static IDisposable? TryClaimForCommandLine(uint appId, out bool commitRunning)
+    {
+        // The marker goes first, so a window launch that finds the game claimed can tell that
+        // it's a command-line commit (which has no window to bring to the front).
+        var marker = new EventWaitHandle(false, EventResetMode.ManualReset, CommandLineEventName(appId), out var markerCreated);
+        var activate = new EventWaitHandle(false, EventResetMode.AutoReset, ActivateEventName(appId), out var activateCreated);
+        if (activateCreated)
+        {
+            commitRunning = false;
+            return new CommandLineClaim(marker, activate);
+        }
+
+        commitRunning = markerCreated == false;
+        activate.Dispose();
+        marker.Dispose();
+        return null;
+    }
+
+    /// <summary>True while a headless command-line commit holds <paramref name="appId"/>.</summary>
+    internal static bool IsCommandLineCommitRunning(uint appId)
+    {
+        if (EventWaitHandle.TryOpenExisting(CommandLineEventName(appId), out var marker))
+        {
+            marker.Dispose();
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -105,6 +153,14 @@ public sealed class SingleInstance : IDisposable
         this._registration?.Unregister(null);
         this._activateSignal.Dispose();
     }
+
+    /// <summary>The event that exists while a process owns <paramref name="appId"/> (also checked by Autopilot).</summary>
+    private static string ActivateEventName(uint appId) =>
+        "SteamAchievementManager." + appId.ToString(CultureInfo.InvariantCulture) + ".Activate";
+
+    /// <summary>The event that exists while a command-line commit owns <paramref name="appId"/>.</summary>
+    private static string CommandLineEventName(uint appId) =>
+        "SteamAchievementManager." + appId.ToString(CultureInfo.InvariantCulture) + ".CommandLine";
 
     private static string FilePrefix(uint appId) => appId.ToString(CultureInfo.InvariantCulture) + "-";
 
@@ -171,6 +227,16 @@ public sealed class SingleInstance : IDisposable
         }
 
         return result;
+    }
+
+    /// <summary>Holds a command-line commit's claim on a game until disposed.</summary>
+    private sealed class CommandLineClaim(EventWaitHandle marker, EventWaitHandle activate) : IDisposable
+    {
+        public void Dispose()
+        {
+            activate.Dispose();
+            marker.Dispose();
+        }
     }
 
     private const int AsfwAny = -1;

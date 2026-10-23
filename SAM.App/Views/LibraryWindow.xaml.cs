@@ -50,12 +50,13 @@ public sealed partial class LibraryWindow : Window
         this.ViewModel.PropertyChanged += this.OnViewModelPropertyChanged;
         this.Root.Loaded += this.OnRootLoaded;
 
-        // Coming back from a game window: pick up achievements committed there.
+        // Coming back from a game window: pick up achievements committed and settings changed there.
         this.Activated += (_, e) =>
         {
             if (e.WindowActivationState != WindowActivationState.Deactivated)
             {
                 this.ViewModel.RefreshProgress();
+                this.ViewModel.RefreshSharedSettings();
             }
         };
         this.Closed += (_, _) =>

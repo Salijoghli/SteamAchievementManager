@@ -167,6 +167,15 @@
   <data name="App_TrayHintMessage" xml:space="preserve">
     <value>Click the tray icon to open the library, or right-click it and choose Exit to quit.</value>
   </data>
+  <data name="App_CantStart" xml:space="preserve">
+    <value>SAM couldn't start</value>
+  </data>
+  <data name="App_CommitRunningTitle" xml:space="preserve">
+    <value>This game is busy</value>
+  </data>
+  <data name="App_CommitRunningMessage" xml:space="preserve">
+    <value>A command-line commit for this game is running; try again in a moment.</value>
+  </data>
   <data name="Tray_OpenLibrary" xml:space="preserve">
     <value>Open library</value>
   </data>
