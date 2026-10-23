@@ -4,10 +4,10 @@
     <RootNamespace>SAM.App</RootNamespace>
     <AssemblyTitle>Steam Achievement Manager</AssemblyTitle>
     <Description>Manage achievements and statistics for your Steam games.</Description>
-    <Version>8.1.0</Version>
-    <AssemblyVersion>8.1.0.0</AssemblyVersion>
-    <FileVersion>8.1.0.0</FileVersion>
-    <!-- Show "8.1.0" in the file properties, not "8.1.0+<commit hash>". -->
+    <Version>8.1.1</Version>
+    <AssemblyVersion>8.1.1.0</AssemblyVersion>
+    <FileVersion>8.1.1.0</FileVersion>
+    <!-- Show e.g. "8.1.1" in the file properties, not "8.1.1+<commit hash>". -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <RepositoryUrl>https://github.com/Salijoghli/SteamAchievementManager/</RepositoryUrl>
   </PropertyGroup>
