@@ -3417,6 +3417,6 @@ Installed · {2}</value>
     <value>Couldn't load achievements for {0}</value>
   </data>
   <data name="Library_LoadAchievementsFailed" xml:space="preserve">
-    <value>Steam didn't send the game's achievement data. Make sure Steam is running and online, then try again.</value>
+    <value>Steam didn't send this game's achievement data. Some games only provide it after you've launched the game once, and a few (such as Team Fortress 2) never do. Make sure Steam is online, or play the game briefly and the card updates by itself.</value>
   </data>
 </root>

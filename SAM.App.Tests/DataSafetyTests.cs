@@ -33,6 +33,20 @@ public sealed class JsonFileTests : IDisposable
     }
 
     [Fact]
+    public void TryReadAcceptsByteOrderMark()
+    {
+        // Notepad and PowerShell's Set-Content -Encoding utf8 write a UTF-8 BOM; that's not corruption.
+        var path = Path.Combine(this._dir.Path, "data.json");
+        File.WriteAllBytes(path, [0xEF, 0xBB, 0xBF, .. "[1,2]"u8]);
+
+        Assert.Equal(JsonReadStatus.Ok, JsonFile.TryRead<List<int>>(path, out var value));
+        Assert.Equal([1, 2], value!);
+        Assert.True(File.Exists(path));
+        Assert.Empty(Directory.GetFiles(this._dir.Path, "data.json.corrupt-*"));
+        Assert.Equal([1, 2], JsonFile.Read<List<int>>(path)!);
+    }
+
+    [Fact]
     public void TryReadSetsCorruptFileAside()
     {
         var path = this._dir.Write("data.json", "{ not json");

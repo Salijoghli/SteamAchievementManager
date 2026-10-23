@@ -92,8 +92,8 @@
                         Background="Transparent"
                         BorderThickness="0"
                         Command="{x:Bind Card.LoadAchievementsCommand, Mode=OneWay}"
-                        AutomationProperties.Name="{x:Bind Card.LoadAchievementsLabel}"
-                        ToolTipService.ToolTip="{x:Bind Card.LoadAchievementsLabel}"
+                        AutomationProperties.Name="{x:Bind Card.LoadAchievementsLabel, Mode=OneWay}"
+                        ToolTipService.ToolTip="{x:Bind Card.LoadAchievementsLabel, Mode=OneWay}"
                         Visibility="{x:Bind vm:LibraryFormat.VisibleIf(Card.CanLoadAchievements), Mode=OneWay}">
                         <FontIcon Glyph="&#xE896;" FontSize="12" />
                     </Button>

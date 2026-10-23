@@ -230,7 +230,23 @@ public static class JsonFile
         }
     }
 
-    private static T? Deserialize<T>(byte[] bytes) => JsonSerializer.Deserialize<T>(bytes, Options);
+    /// <summary>
+    /// Parses UTF-8 JSON, skipping a UTF-8 byte-order mark: editors such as Notepad (and
+    /// PowerShell's Set-Content -Encoding utf8) add one, and the span-based parser rejects it,
+    /// which would make a perfectly good file look corrupt.
+    /// </summary>
+    private static T? Deserialize<T>(byte[] bytes)
+    {
+        ReadOnlySpan<byte> json = bytes;
+        if (json.StartsWith(Utf8Bom))
+        {
+            json = json[Utf8Bom.Length..];
+        }
+
+        return JsonSerializer.Deserialize<T>(json, Options);
+    }
+
+    private static ReadOnlySpan<byte> Utf8Bom => [0xEF, 0xBB, 0xBF];
 
     private sealed class MutexLock(Mutex mutex) : IDisposable
     {
