@@ -75,6 +75,8 @@ public sealed partial class LibraryViewModel : ObservableObject
 
     public const string RarestOwnedList = "rarest-owned";
 
+    public const string EasyWinsList = "easy-wins";
+
     // Column keys for the list view's sortable headers.
     public const string NameColumn = "name";
     public const string ProgressColumn = "progress";
@@ -146,6 +148,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         new(AlmostPerfectList, Strings.Get("Library_SmartAlmostPerfect"), Strings.Get("Library_SmartAlmostPerfectHint")),
         new(NeverStartedList, Strings.Get("Library_SmartNeverStarted"), Strings.Get("Library_SmartNeverStartedHint")),
         new(RarestOwnedList, Strings.Get("Library_SmartRarestOwned"), Strings.Get("Library_SmartRarestOwnedHint")),
+        new(EasyWinsList, Strings.Get("Suggest_SmartEasyWins"), Strings.Get("Suggest_SmartEasyWinsHint")),
     ];
 
     /// <summary>Every owned game (unfiltered), for pages that summarize the whole library.</summary>
@@ -693,10 +696,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         this.FlushProgress(results, token, final: true);
         this.StartStoreLookups(cards.Where(c => c.Progress == null && c.StoreCount is null or { Status: StoreAchievementStatus.Failed }));
         this.UpdateSummary();
-        if (this.SmartList == RarestOwnedList)
-        {
-            this.StartRarestLoad();
-        }
+        this.StartSmartListLoad(this.SmartList);
 
         if (this.CompletionFilterIndex != 0 || this.SortIndex == (int)LibrarySort.Progress || this.IsSmartListActive)
         {
@@ -851,9 +851,9 @@ public sealed partial class LibraryViewModel : ObservableObject
 
     partial void OnSmartListChanged(string? value)
     {
-        if (value == RarestOwnedList && this._initializing == false)
+        if (this._initializing == false)
         {
-            this.StartRarestLoad();
+            this.StartSmartListLoad(value);
         }
 
         this.OnViewSettingChanged();
@@ -1097,7 +1097,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         foreach (var card in this._master.Values)
         {
             card.SmartBadge = this.GetSmartBadge(card, smartList);
-            card.IsSmartBadgeLoading = smartList == RarestOwnedList && this.IsRarestPending(card);
+            card.IsSmartBadgeLoading = this.IsSmartBadgePending(card, smartList);
 
             if (this.IsTypeShown(card.Type) == false ||
                 (this.FavoritesOnly && card.IsFavorite == false) ||

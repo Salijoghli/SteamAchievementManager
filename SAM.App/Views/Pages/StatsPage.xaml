@@ -316,6 +316,268 @@
                     </Border>
                 </Grid>
 
+                <!-- Up next: the easiest achievements left and the games closest to 100%. -->
+                <Border Style="{StaticResource PanelStyle}" x:Uid="Suggest_Panel">
+                    <StackPanel Spacing="12">
+                        <Grid ColumnSpacing="12" RowSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock x:Uid="Suggest_Title" Style="{StaticResource PanelTitleStyle}" />
+                                    <FontIcon
+                                        Glyph="&#xE946;"
+                                        FontSize="12"
+                                        VerticalAlignment="Center"
+                                        Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                        ToolTipService.ToolTip="{x:Bind pages:StatsViewModel.SuggestExplanation}"
+                                        AutomationProperties.Name="{x:Bind pages:StatsViewModel.SuggestExplanation}" />
+                                </StackPanel>
+                                <TextBlock x:Uid="Suggest_Subtitle" Style="{StaticResource PanelSubtitleStyle}" />
+                            </StackPanel>
+                            <StackPanel
+                                Grid.Column="1"
+                                VerticalAlignment="Center"
+                                Spacing="4"
+                                MinWidth="160">
+                                <TextBlock
+                                    Text="{x:Bind ViewModel.SuggestStatusText, Mode=OneWay}"
+                                    Style="{StaticResource TileDetailStyle}"
+                                    HorizontalAlignment="Right" />
+                                <ProgressBar
+                                    Maximum="100"
+                                    Value="{x:Bind ViewModel.SuggestProgress, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.IsSuggesting, Mode=OneWay}"
+                                    x:Uid="Suggest_Progress" />
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="16">
+                                <CheckBox x:Uid="Suggest_InstalledOnly" IsChecked="{x:Bind ViewModel.SuggestInstalledOnly, Mode=TwoWay}" />
+                                <CheckBox x:Uid="Suggest_HideRare" IsChecked="{x:Bind ViewModel.SuggestHideRare, Mode=TwoWay}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid x:Name="UpNext" ColumnSpacing="24" RowSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Easiest achievements you're missing. -->
+                            <StackPanel Spacing="8">
+                                <TextBlock x:Uid="Suggest_EasiestTitle" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                <StackPanel Spacing="12" Visibility="{x:Bind ViewModel.IsEasiestSkeletonVisible, Mode=OneWay}" x:Uid="Suggest_EasiestLoading">
+                                    <Grid ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <controls:Skeleton Width="40" Height="40" />
+                                        <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                                            <controls:Skeleton Width="160" Height="12" HorizontalAlignment="Left" />
+                                            <controls:Skeleton Width="240" Height="10" HorizontalAlignment="Left" />
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <controls:Skeleton Width="40" Height="40" />
+                                        <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                                            <controls:Skeleton Width="130" Height="12" HorizontalAlignment="Left" />
+                                            <controls:Skeleton Width="210" Height="10" HorizontalAlignment="Left" />
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <controls:Skeleton Width="40" Height="40" />
+                                        <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                                            <controls:Skeleton Width="180" Height="12" HorizontalAlignment="Left" />
+                                            <controls:Skeleton Width="190" Height="10" HorizontalAlignment="Left" />
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                                <TextBlock
+                                    x:Uid="Suggest_EasiestEmpty"
+                                    TextWrapping="Wrap"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Visibility="{x:Bind ViewModel.IsEasiestEmpty, Mode=OneWay}" />
+                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.EasiestMissing}" x:Uid="Suggest_EasiestList">
+                                    <ItemsRepeater.Layout>
+                                        <StackLayout Spacing="4" />
+                                    </ItemsRepeater.Layout>
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate x:DataType="pages:SuggestedAchievementItem">
+                                            <Grid ColumnSpacing="10" Padding="0,4" AutomationProperties.Name="{x:Bind AutomationName}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="40" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Border
+                                                    Width="40"
+                                                    Height="40"
+                                                    CornerRadius="4"
+                                                    VerticalAlignment="Center"
+                                                    Background="{ThemeResource SubtleFillColorSecondaryBrush}">
+                                                    <Grid>
+                                                        <FontIcon
+                                                            Glyph="&#xE734;"
+                                                            FontSize="16"
+                                                            Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                                            Visibility="{x:Bind IsIconMissing, Mode=OneWay}" />
+                                                        <Image Source="{x:Bind IconSource, Mode=OneWay}" Stretch="UniformToFill" />
+                                                    </Grid>
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" ToolTipService.ToolTip="{x:Bind Name}" />
+                                                    <TextBlock
+                                                        Text="{x:Bind DisplayDescription, Mode=OneWay}"
+                                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        TextTrimming="CharacterEllipsis"
+                                                        ToolTipService.ToolTip="{x:Bind DisplayDescription, Mode=OneWay}" />
+                                                    <HyperlinkButton
+                                                        Padding="0"
+                                                        FontSize="12"
+                                                        Command="{x:Bind OpenGameCommand}"
+                                                        ToolTipService.ToolTip="{x:Bind OpenGameLabel}"
+                                                        AutomationProperties.Name="{x:Bind OpenGameLabel}">
+                                                        <TextBlock Text="{x:Bind GameName}" TextTrimming="CharacterEllipsis" />
+                                                    </HyperlinkButton>
+                                                </StackPanel>
+                                                <StackPanel
+                                                    Grid.Column="2"
+                                                    VerticalAlignment="Center"
+                                                    Spacing="2"
+                                                    ToolTipService.ToolTip="{x:Bind RarityToolTip}">
+                                                    <Border
+                                                        Padding="6,1,6,2"
+                                                        CornerRadius="8"
+                                                        HorizontalAlignment="Right"
+                                                        Background="{x:Bind game:GameFormat.RarityBrush(Rarity)}">
+                                                        <TextBlock Text="{x:Bind RarityTierText}" FontSize="11" FontWeight="SemiBold" Foreground="White" />
+                                                    </Border>
+                                                    <TextBlock
+                                                        Text="{x:Bind PercentText}"
+                                                        FontSize="12"
+                                                        HorizontalAlignment="Right"
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+                            </StackPanel>
+
+                            <!-- Perfect games within reach. -->
+                            <StackPanel Grid.Column="1" Spacing="8">
+                                <TextBlock x:Uid="Suggest_ReachableTitle" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                                <StackPanel Spacing="14" Visibility="{x:Bind ViewModel.IsReachableSkeletonVisible, Mode=OneWay}" x:Uid="Suggest_ReachableLoading">
+                                    <StackPanel Spacing="6">
+                                        <controls:Skeleton Width="180" Height="12" HorizontalAlignment="Left" />
+                                        <controls:Skeleton Width="230" Height="10" HorizontalAlignment="Left" />
+                                        <controls:Skeleton Height="4" />
+                                    </StackPanel>
+                                    <StackPanel Spacing="6">
+                                        <controls:Skeleton Width="140" Height="12" HorizontalAlignment="Left" />
+                                        <controls:Skeleton Width="200" Height="10" HorizontalAlignment="Left" />
+                                        <controls:Skeleton Height="4" />
+                                    </StackPanel>
+                                    <StackPanel Spacing="6">
+                                        <controls:Skeleton Width="200" Height="12" HorizontalAlignment="Left" />
+                                        <controls:Skeleton Width="170" Height="10" HorizontalAlignment="Left" />
+                                        <controls:Skeleton Height="4" />
+                                    </StackPanel>
+                                </StackPanel>
+                                <TextBlock
+                                    x:Uid="Suggest_ReachableEmpty"
+                                    TextWrapping="Wrap"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                    Visibility="{x:Bind ViewModel.IsReachableEmpty, Mode=OneWay}" />
+                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.PerfectWithinReach}" x:Uid="Suggest_ReachableList">
+                                    <ItemsRepeater.Layout>
+                                        <StackLayout Spacing="6" />
+                                    </ItemsRepeater.Layout>
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate x:DataType="pages:ReachableGameItem">
+                                            <Grid ColumnSpacing="10" Padding="0,4" AutomationProperties.Name="{x:Bind AutomationName}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <HyperlinkButton
+                                                    Padding="0"
+                                                    Command="{x:Bind OpenCommand}"
+                                                    ToolTipService.ToolTip="{x:Bind CompletionText}"
+                                                    AutomationProperties.Name="{x:Bind Name}">
+                                                    <TextBlock Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" />
+                                                </HyperlinkButton>
+                                                <TextBlock
+                                                    Grid.Column="1"
+                                                    Text="{x:Bind RemainingText}"
+                                                    FontWeight="SemiBold"
+                                                    VerticalAlignment="Center" />
+                                                <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" Spacing="6">
+                                                    <Ellipse
+                                                        Width="8"
+                                                        Height="8"
+                                                        VerticalAlignment="Center"
+                                                        Fill="{x:Bind game:GameFormat.RarityBrush(Rarity)}"
+                                                        Visibility="{x:Bind HasRarity}"
+                                                        AutomationProperties.AccessibilityView="Raw" />
+                                                    <TextBlock
+                                                        Text="{x:Bind DetailText}"
+                                                        Style="{StaticResource CaptionTextBlockStyle}"
+                                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                        TextTrimming="CharacterEllipsis" />
+                                                </StackPanel>
+                                                <ProgressBar
+                                                    Grid.Row="2"
+                                                    Grid.ColumnSpan="2"
+                                                    Margin="0,6,0,0"
+                                                    Maximum="100"
+                                                    Value="{x:Bind CompletionPercent}"
+                                                    IsTabStop="False"
+                                                    AutomationProperties.AccessibilityView="Raw" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Games whose achievement data isn't loaded can't be suggested. -->
+                        <StackPanel Orientation="Horizontal" Spacing="6" Visibility="{x:Bind ViewModel.HasSuggestNotLoaded, Mode=OneWay}">
+                            <FontIcon
+                                Glyph="&#xE946;"
+                                FontSize="12"
+                                VerticalAlignment="Center"
+                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                AutomationProperties.AccessibilityView="Raw" />
+                            <TextBlock
+                                Text="{x:Bind ViewModel.SuggestNotLoadedText, Mode=OneWay}"
+                                Style="{StaticResource CaptionTextBlockStyle}"
+                                Foreground="{ThemeResource TextFillColorTertiaryBrush}"
+                                TextWrapping="Wrap" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
                 <!-- Unlock history could not be read. -->
                 <InfoBar
                     IsOpen="{x:Bind ViewModel.HasTimelineError, Mode=OneWay}"

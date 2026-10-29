@@ -39,7 +39,7 @@ public sealed partial class RankedGameItem(int rank, uint appId, string name, st
 /// <summary>
 /// Library-wide statistics. Everything is computed off the UI thread from the cached game list,
 /// Steam's local schemas/stats/playtime and the unlock timeline; global percentages for the
-/// hunter score and rarest unlocks are fetched afterwards, a few games at a time.
+/// hunter score, rarest unlocks and "Up next" suggestions are fetched afterwards, a few games at a time.
 /// </summary>
 public sealed partial class StatsViewModel : ObservableObject
 {
@@ -188,6 +188,10 @@ public sealed partial class StatsViewModel : ObservableObject
         {
             _ = this.LoadAsync();
         }
+        else if (e.PropertyName == nameof(LibraryViewModel.SpoilerProtection))
+        {
+            this.OnSpoilerProtectionChanged();
+        }
     }
 
     [RelayCommand]
@@ -237,7 +241,7 @@ public sealed partial class StatsViewModel : ObservableObject
         this.IsEmpty = snapshot.GameCount == 0;
         this.IsLoading = false;
 
-        await this.CalculateHunterScoreAsync(snapshot.Events, token);
+        await Task.WhenAll(this.CalculateHunterScoreAsync(snapshot.Events, token), this.LoadSuggestionsAsync(token));
     }
 
     private sealed record Snapshot(

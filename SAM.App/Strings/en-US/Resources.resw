@@ -3422,4 +3422,106 @@ Installed · {2}</value>
   <data name="Library_LoadAchievementsFailed" xml:space="preserve">
     <value>Steam didn't send this game's achievement data. Some games only provide it after you've launched the game once, and a few (such as Team Fortress 2) never do. Make sure Steam is online, or play the game briefly and the card updates by itself.</value>
   </data>
+  <data name="Suggest_Panel.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Up next</value>
+  </data>
+  <data name="Suggest_Title.Text" xml:space="preserve">
+    <value>Up next</value>
+  </data>
+  <data name="Suggest_Subtitle.Text" xml:space="preserve">
+    <value>Achievements most players have and you don't, and games close to 100%</value>
+  </data>
+  <data name="Suggest_Explanation" xml:space="preserve">
+    <value>Ranked by global unlock rate: the more players have an achievement, the easier it probably is. Uses the achievement data on this PC and Steam's global percentages (cached for a day). Hidden games are left out.</value>
+  </data>
+  <data name="Suggest_Progress.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Suggestions progress</value>
+  </data>
+  <data name="Suggest_InstalledOnly.Content" xml:space="preserve">
+    <value>Installed games only</value>
+  </data>
+  <data name="Suggest_HideRare.Content" xml:space="preserve">
+    <value>Hide games with only rare achievements left</value>
+  </data>
+  <data name="Suggest_HideRare.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Leaves out games where every remaining achievement is unlocked by fewer than 5% of players</value>
+  </data>
+  <data name="Suggest_EasiestTitle.Text" xml:space="preserve">
+    <value>Easiest achievements you're missing</value>
+  </data>
+  <data name="Suggest_EasiestLoading.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading suggestions</value>
+  </data>
+  <data name="Suggest_EasiestEmpty.Text" xml:space="preserve">
+    <value>Nothing to suggest. Achievements show up here once their global unlock rates are known.</value>
+  </data>
+  <data name="Suggest_EasiestList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Easiest achievements you're missing</value>
+  </data>
+  <data name="Suggest_ReachableTitle.Text" xml:space="preserve">
+    <value>Perfect games within reach</value>
+  </data>
+  <data name="Suggest_ReachableLoading.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Loading games within reach</value>
+  </data>
+  <data name="Suggest_ReachableEmpty.Text" xml:space="preserve">
+    <value>No games with only a few achievements left.</value>
+  </data>
+  <data name="Suggest_ReachableList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Perfect games within reach</value>
+  </data>
+  <data name="Suggest_HiddenDescription" xml:space="preserve">
+    <value>Hidden achievement (spoiler protection is on)</value>
+  </data>
+  <data name="Suggest_PercentToolTip" xml:space="preserve">
+    <value>{0} of players have it</value>
+  </data>
+  <data name="Suggest_AchievementAutomation" xml:space="preserve">
+    <value>{0}, {1}, {2} of players have it</value>
+  </data>
+  <data name="Suggest_ReachUnlockedOf_One" xml:space="preserve">
+    <value>{1} of {0} unlocked</value>
+  </data>
+  <data name="Suggest_ReachUnlockedOf_Other" xml:space="preserve">
+    <value>{1} of {0} unlocked</value>
+  </data>
+  <data name="Suggest_ReachLastOne" xml:space="preserve">
+    <value>{0} of players have it</value>
+  </data>
+  <data name="Suggest_ReachHardest" xml:space="preserve">
+    <value>Hardest left: {0} of players have it</value>
+  </data>
+  <data name="Suggest_ReachCompletion" xml:space="preserve">
+    <value>{0} of {1} unlocked ({2})</value>
+  </data>
+  <data name="Suggest_NotLoaded_One" xml:space="preserve">
+    <value>{0} game isn't included: its achievement data isn't on this PC yet. Use Load missing achievement data in the library's … menu to add it.</value>
+  </data>
+  <data name="Suggest_NotLoaded_Other" xml:space="preserve">
+    <value>{0} games aren't included: their achievement data isn't on this PC yet. Use Load missing achievement data in the library's … menu to add them.</value>
+  </data>
+  <data name="Suggest_Reading" xml:space="preserve">
+    <value>Reading your achievements…</value>
+  </data>
+  <data name="Suggest_Calculating" xml:space="preserve">
+    <value>Calculating… {0} of {1} games</value>
+  </data>
+  <data name="Suggest_From_One" xml:space="preserve">
+    <value>From {0} unfinished game</value>
+  </data>
+  <data name="Suggest_From_Other" xml:space="preserve">
+    <value>From {0} unfinished games</value>
+  </data>
+  <data name="Suggest_SmartEasyWins" xml:space="preserve">
+    <value>Easy wins</value>
+  </data>
+  <data name="Suggest_SmartEasyWinsHint" xml:space="preserve">
+    <value>Ordered by your easiest missing achievement (the one most players have)</value>
+  </data>
+  <data name="Suggest_SmartBadgeEasiest" xml:space="preserve">
+    <value>Easiest left: {0}</value>
+  </data>
+  <data name="Suggest_EasyWinsLoadFailed" xml:space="preserve">
+    <value>Easy wins needs your achievements from Steam's local stats cache, which couldn't be read.</value>
+  </data>
 </root>

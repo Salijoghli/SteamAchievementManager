@@ -6,7 +6,7 @@ using SAM.App.ViewModels.Pages;
 
 namespace SAM.App.Views.Pages;
 
-/// <summary>Library-wide statistics: unlocks per month, rarest unlocks, completion over time, hunter score.</summary>
+/// <summary>Library-wide statistics: unlocks per month, rarest unlocks, completion over time, hunter score, what to unlock next.</summary>
 public sealed partial class StatsPage : UserControl
 {
     /// <param name="library">The library's view model, for its game list, progress and playtime.</param>
@@ -29,6 +29,7 @@ public sealed partial class StatsPage : UserControl
         PageLayout.Reflow(this.Charts, width >= 1000 ? 2 : 1);
         PageLayout.Reflow(this.SkeletonCharts, width >= 1000 ? 2 : 1);
         PageLayout.Reflow(this.Lists, width >= 1150 ? 3 : 1);
+        PageLayout.Reflow(this.UpNext, width >= 1000 ? 2 : 1);
     }
 }
 

@@ -6,7 +6,7 @@ using SAM.App.Services;
 
 namespace SAM.App.ViewModels;
 
-// Smart lists ("Almost perfect", "Never started", "Rarest owned") and list view column sorting.
+// Smart lists ("Almost perfect", "Never started", "Rarest owned", "Easy wins") and list view column sorting.
 public sealed partial class LibraryViewModel
 {
     private const double AlmostPerfectThreshold = 0.8;
@@ -20,6 +20,11 @@ public sealed partial class LibraryViewModel
     private bool _isRarestLoading;
     private bool _isRarestLoaded;
 
+    // Easiest locked achievement's global percent by app; null when unknown. Absent: not loaded yet.
+    private readonly Dictionary<uint, double?> _easiest = [];
+    private bool _isEasiestLoading;
+    private bool _isEasiestLoaded;
+
     // Set when the list view is sorted by a column the Sort box doesn't offer (Installed, Favorite).
     private string? _columnSort;
 
@@ -29,6 +34,7 @@ public sealed partial class LibraryViewModel
         AlmostPerfectList => card.Progress is { Total: > 0 } p && p.Fraction >= AlmostPerfectThreshold && p.Unlocked < p.Total,
         NeverStartedList => card.Progress is { Total: > 0, Unlocked: 0 },
         RarestOwnedList => card.Progress is { Total: > 0, Unlocked: > 0 },
+        EasyWinsList => card.Progress is { Total: > 0 } p && p.Unlocked < p.Total,
         _ => true,
     };
 
@@ -47,13 +53,40 @@ public sealed partial class LibraryViewModel
 
                 return this._isRarestLoading ? "" : null;
 
+            case EasyWinsList when card.Progress is { Total: > 0 } p && p.Unlocked < p.Total:
+                if (this._easiest.TryGetValue(card.AppId, out var easiest))
+                {
+                    return easiest is { } percent ? Strings.Format("Suggest_SmartBadgeEasiest", FormatPercent(percent)) : Strings.Get("Library_SmartBadgeNoRarity");
+                }
+
+                return this._isEasiestLoading ? "" : null;
+
             default:
                 return null;
         }
     }
 
-    private bool IsRarestPending(GameCardViewModel card) =>
-        this._isRarestLoading && card.Progress is { Unlocked: > 0 } && this._rarest.ContainsKey(card.AppId) == false;
+    /// <summary>True while a smart list's badge for <paramref name="card"/> is still loading (skeleton).</summary>
+    private bool IsSmartBadgePending(GameCardViewModel card, string? smartList) => smartList switch
+    {
+        RarestOwnedList => this._isRarestLoading && card.Progress is { Unlocked: > 0 } && this._rarest.ContainsKey(card.AppId) == false,
+        EasyWinsList => this._isEasiestLoading && card.Progress is { Total: > 0 } p && p.Unlocked < p.Total && this._easiest.ContainsKey(card.AppId) == false,
+        _ => false,
+    };
+
+    /// <summary>Starts loading the data a smart list sorts by, if it needs any.</summary>
+    private void StartSmartListLoad(string? smartList)
+    {
+        switch (smartList)
+        {
+            case RarestOwnedList:
+                this.StartRarestLoad();
+                break;
+            case EasyWinsList:
+                this.StartEasiestLoad();
+                break;
+        }
+    }
 
     private static string FormatPercent(double percent) =>
         (percent < 1 ? percent.ToString("0.##", CultureInfo.CurrentCulture) : percent.ToString("0.#", CultureInfo.CurrentCulture)) + "%";
@@ -68,6 +101,7 @@ public sealed partial class LibraryViewModel
                 : b.CompletionSortKey.CompareTo(a.CompletionSortKey),
             NeverStartedList => b.PlaytimeSpan.CompareTo(a.PlaytimeSpan),
             RarestOwnedList => this.RarestKey(a).CompareTo(this.RarestKey(b)),
+            EasyWinsList => this.EasiestKey(b).CompareTo(this.EasiestKey(a)),
             _ => 0,
         };
 
@@ -83,6 +117,10 @@ public sealed partial class LibraryViewModel
 
     private double RarestKey(GameCardViewModel card) =>
         this._rarest.TryGetValue(card.AppId, out var value) && value is { } percent ? percent : double.MaxValue;
+
+    /// <summary>Easiest locked achievement's percent; unknown sorts after every known one.</summary>
+    private double EasiestKey(GameCardViewModel card) =>
+        this._easiest.TryGetValue(card.AppId, out var value) && value is { } percent ? percent : -1;
 
     /// <summary>
     /// Loads, once per session, each game's rarest unlocked achievement: unlocks from Steam's local
@@ -187,6 +225,106 @@ public sealed partial class LibraryViewModel
 
         this._isRarestLoading = false;
         this._isRarestLoaded = true;
+        this.ApplyFilter();
+    }
+
+    /// <summary>
+    /// Loads, once per session, each unfinished game's easiest locked achievement: locked state
+    /// from Steam's local stats cache, then global percentages (shared with "Rarest owned" and
+    /// cached on disk for a day) a few games at a time. Same skeleton/re-sort pattern as
+    /// <see cref="StartRarestLoad"/>.
+    /// </summary>
+    private async void StartEasiestLoad()
+    {
+        if (this._isEasiestLoading || this._isEasiestLoaded || this._isShutDown)
+        {
+            return;
+        }
+
+        this._isEasiestLoading = true;
+        this.ApplyFilter();
+
+        var token = this._lifetime.Token;
+        var entries = this._master.Values
+            .Where(c => c.Progress is { Total: > 0 } p && p.Unlocked < p.Total)
+            .Select(c => new GameEntry(c.AppId, c.Name, c.Type))
+            .ToList();
+        var rows = await Task.Run(() =>
+        {
+            try
+            {
+                return this._services.Timeline.LoadAllAchievements(entries);
+            }
+            catch (Exception e)
+            {
+                this.LogOnce("Timeline", e);
+                return null;
+            }
+        });
+
+        if (token.IsCancellationRequested)
+        {
+            return;
+        }
+
+        if (rows == null)
+        {
+            this._isEasiestLoading = false;
+            this._isEasiestLoaded = true;
+            this.ShowNotice(
+                Strings.Get("Library_RarestLoadFailedTitle"),
+                Strings.Get("Suggest_EasyWinsLoadFailed"),
+                InfoBarSeverity.Warning);
+            this.ApplyFilter();
+            return;
+        }
+
+        var lockedByApp = rows
+            .Where(r => r.Unlocked == false)
+            .GroupBy(r => r.AppId)
+            .ToDictionary(g => g.Key, g => g.Select(r => r.AchievementId).ToList());
+
+        var refresh = this._dispatcher.CreateTimer();
+        refresh.Interval = TimeSpan.FromMilliseconds(400);
+        var dirty = false;
+        refresh.Tick += (_, _) =>
+        {
+            if (dirty && this.SmartList == EasyWinsList)
+            {
+                dirty = false;
+                this.ApplyFilter();
+            }
+        };
+        refresh.Start();
+
+        try
+        {
+            await this.FetchPercentsAsync(lockedByApp.Keys.ToList(), token, appId =>
+            {
+                this._easiest[appId] = this._percents.TryGetValue(appId, out var percents) && percents != null
+                    ? Suggestions.EasiestPercent(lockedByApp[appId], percents)
+                    : null;
+                dirty = true;
+            });
+        }
+        finally
+        {
+            refresh.Stop();
+        }
+
+        if (token.IsCancellationRequested)
+        {
+            return;
+        }
+
+        // Games whose stats changed since their card was read (none locked any more) have no badge value.
+        foreach (var card in this._master.Values)
+        {
+            this._easiest.TryAdd(card.AppId, null);
+        }
+
+        this._isEasiestLoading = false;
+        this._isEasiestLoaded = true;
         this.ApplyFilter();
     }
 

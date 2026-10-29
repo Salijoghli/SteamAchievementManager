@@ -3376,4 +3376,106 @@
   <data name="Library_LoadAchievementsFailed" xml:space="preserve">
     <value>Steam-მა ამ თამაშის მიღწევების მონაცემები არ გამოგზავნა. ზოგი თამაში ამას მხოლოდ ერთხელ გაშვების შემდეგ აკეთებს, ზოგი კი (მაგ. Team Fortress 2) საერთოდ არა. დარწმუნდით, რომ Steam ონლაინაა, ან მოკლედ ითამაშეთ — ბარათი თავად განახლდება.</value>
   </data>
+  <data name="Suggest_Panel.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>შემდეგი</value>
+  </data>
+  <data name="Suggest_Title.Text" xml:space="preserve">
+    <value>შემდეგი</value>
+  </data>
+  <data name="Suggest_Subtitle.Text" xml:space="preserve">
+    <value>მიღწევები, რომლებიც მოთამაშეთა უმეტესობას აქვს, თქვენ კი არა, და 100%-თან ახლოს მყოფი თამაშები</value>
+  </data>
+  <data name="Suggest_Explanation" xml:space="preserve">
+    <value>დალაგებულია გლობალური განბლოკვის მაჩვენებლით: რაც მეტ მოთამაშეს აქვს მიღწევა, მით უფრო მარტივი უნდა იყოს. გამოიყენება ამ კომპიუტერზე არსებული მიღწევების მონაცემები და Steam-ის გლობალური პროცენტები (ქეშირდება ერთი დღით). დამალული თამაშები არ ითვლება.</value>
+  </data>
+  <data name="Suggest_Progress.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>შეთავაზებების პროგრესი</value>
+  </data>
+  <data name="Suggest_InstalledOnly.Content" xml:space="preserve">
+    <value>მხოლოდ დაინსტალირებული თამაშები</value>
+  </data>
+  <data name="Suggest_HideRare.Content" xml:space="preserve">
+    <value>დამალე თამაშები, სადაც მხოლოდ იშვიათი მიღწევები დარჩა</value>
+  </data>
+  <data name="Suggest_HideRare.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>გამოტოვებს თამაშებს, სადაც ყველა დარჩენილი მიღწევა მოთამაშეთა 5%-ზე ნაკლებს აქვს</value>
+  </data>
+  <data name="Suggest_EasiestTitle.Text" xml:space="preserve">
+    <value>ყველაზე მარტივი მიღწევები, რომლებიც გაკლიათ</value>
+  </data>
+  <data name="Suggest_EasiestLoading.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>შეთავაზებები იტვირთება</value>
+  </data>
+  <data name="Suggest_EasiestEmpty.Text" xml:space="preserve">
+    <value>შესათავაზებელი არაფერია. მიღწევები აქ გამოჩნდება, როცა მათი გლობალური განბლოკვის მაჩვენებელი ცნობილი იქნება.</value>
+  </data>
+  <data name="Suggest_EasiestList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ყველაზე მარტივი მიღწევები, რომლებიც გაკლიათ</value>
+  </data>
+  <data name="Suggest_ReachableTitle.Text" xml:space="preserve">
+    <value>100%-თან ახლოს მყოფი თამაშები</value>
+  </data>
+  <data name="Suggest_ReachableLoading.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>იტვირთება 100%-თან ახლოს მყოფი თამაშები</value>
+  </data>
+  <data name="Suggest_ReachableEmpty.Text" xml:space="preserve">
+    <value>არ არის თამაში, სადაც მხოლოდ რამდენიმე მიღწევა დარჩა.</value>
+  </data>
+  <data name="Suggest_ReachableList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>100%-თან ახლოს მყოფი თამაშები</value>
+  </data>
+  <data name="Suggest_HiddenDescription" xml:space="preserve">
+    <value>ფარული მიღწევა (სპოილერებისგან დაცვა ჩართულია)</value>
+  </data>
+  <data name="Suggest_PercentToolTip" xml:space="preserve">
+    <value>{0} მოთამაშეს აქვს</value>
+  </data>
+  <data name="Suggest_AchievementAutomation" xml:space="preserve">
+    <value>{0}, {1}, {2} მოთამაშეს აქვს</value>
+  </data>
+  <data name="Suggest_ReachUnlockedOf_One" xml:space="preserve">
+    <value>განბლოკილია {1} / {0}</value>
+  </data>
+  <data name="Suggest_ReachUnlockedOf_Other" xml:space="preserve">
+    <value>განბლოკილია {1} / {0}</value>
+  </data>
+  <data name="Suggest_ReachLastOne" xml:space="preserve">
+    <value>{0} მოთამაშეს აქვს</value>
+  </data>
+  <data name="Suggest_ReachHardest" xml:space="preserve">
+    <value>ყველაზე რთული დარჩენილი: {0} მოთამაშეს აქვს</value>
+  </data>
+  <data name="Suggest_ReachCompletion" xml:space="preserve">
+    <value>განბლოკილია {0} / {1} ({2})</value>
+  </data>
+  <data name="Suggest_NotLoaded_One" xml:space="preserve">
+    <value>{0} თამაში არ ითვლება: მისი მიღწევების მონაცემები ჯერ ამ კომპიუტერზე არ არის. დასამატებლად გამოიყენეთ „მიღწევების მონაცემების ჩატვირთვა…“ ბიბლიოთეკის … მენიუში.</value>
+  </data>
+  <data name="Suggest_NotLoaded_Other" xml:space="preserve">
+    <value>{0} თამაში არ ითვლება: მათი მიღწევების მონაცემები ჯერ ამ კომპიუტერზე არ არის. დასამატებლად გამოიყენეთ „მიღწევების მონაცემების ჩატვირთვა…“ ბიბლიოთეკის … მენიუში.</value>
+  </data>
+  <data name="Suggest_Reading" xml:space="preserve">
+    <value>იკითხება თქვენი მიღწევები…</value>
+  </data>
+  <data name="Suggest_Calculating" xml:space="preserve">
+    <value>გამოითვლება… {0} / {1} თამაში</value>
+  </data>
+  <data name="Suggest_From_One" xml:space="preserve">
+    <value>{0} დაუსრულებელი თამაშიდან</value>
+  </data>
+  <data name="Suggest_From_Other" xml:space="preserve">
+    <value>{0} დაუსრულებელი თამაშიდან</value>
+  </data>
+  <data name="Suggest_SmartEasyWins" xml:space="preserve">
+    <value>იოლი გამარჯვებები</value>
+  </data>
+  <data name="Suggest_SmartEasyWinsHint" xml:space="preserve">
+    <value>დალაგებულია თქვენთვის ყველაზე მარტივი დარჩენილი მიღწევის მიხედვით (რომელიც მოთამაშეთა უმეტესობას აქვს)</value>
+  </data>
+  <data name="Suggest_SmartBadgeEasiest" xml:space="preserve">
+    <value>ყველაზე მარტივი: {0}</value>
+  </data>
+  <data name="Suggest_EasyWinsLoadFailed" xml:space="preserve">
+    <value>„იოლ გამარჯვებებს“ სჭირდება თქვენი მიღწევები Steam-ის სტატისტიკის ლოკალური ქეშიდან, რომლის წაკითხვაც ვერ მოხერხდა.</value>
+  </data>
 </root>
