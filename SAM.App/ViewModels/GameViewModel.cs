@@ -483,6 +483,7 @@ public sealed partial class GameViewModel : ObservableObject
         var state = (AchievementStateFilter)this.StateFilterIndex;
         var dateRange = this.GetDateRange();
         var rarity = (AchievementRarity)this.RarityFilterIndex; // 0 = All (Unknown), then Common…Legendary.
+        var compare = this.IsComparisonReady ? (FriendCompareFilter)this.CompareFilterIndex : FriendCompareFilter.All;
 
         IEnumerable<AchievementViewModel> items = this._achievements.Where(a =>
             (query.Length == 0 || a.Matches(query)) &&
@@ -495,7 +496,8 @@ public sealed partial class GameViewModel : ObservableObject
                 _ => true,
             } &&
             (dateRange == null || (a.IsAchieved && dateRange.Value.Contains(a.UnlockTime))) &&
-            (rarity == AchievementRarity.Unknown || a.Rarity == rarity));
+            (rarity == AchievementRarity.Unknown || a.Rarity == rarity) &&
+            (compare == FriendCompareFilter.All || FriendComparison.Matches(compare, a.IsAchieved, a.FriendHasIt)));
 
         items = (AchievementSort)this.SortIndex switch
         {
@@ -751,10 +753,33 @@ public sealed partial class GameViewModel : ObservableObject
             this._suspendPendingUpdates = false;
         }
 
+        this.ApplyProgress();
         this.UnlockedCount = this._achievements.Count(a => a.IsAchieved);
         this.TotalCount = this._achievements.Count;
         this.HasNoStats = this.Stats.Count == 0;
+        this.UpdateTimeline();
+        this.ApplyComparison();
         this.UpdatePending();
+    }
+
+    /// <summary>
+    /// Gives each achievement with a progress stat its progress, from the stat values Steam
+    /// reported in this load (not pending stat edits). Achievements whose stat is missing get none.
+    /// </summary>
+    private void ApplyProgress()
+    {
+        var stats = new Dictionary<string, StatViewModel>(StringComparer.OrdinalIgnoreCase);
+        foreach (var stat in this.Stats)
+        {
+            stats.TryAdd(stat.Id, stat);
+        }
+
+        foreach (var achievement in this._achievements)
+        {
+            achievement.Progress = achievement.Definition.ProgressStatId is { } statId && stats.TryGetValue(statId, out var stat)
+                ? GameAchievementProgress.Compute(achievement.Definition, stat.OriginalValue, stat.IsInteger)
+                : null;
+        }
     }
 
     private void OnAchievementChanged() => this.UpdatePending();

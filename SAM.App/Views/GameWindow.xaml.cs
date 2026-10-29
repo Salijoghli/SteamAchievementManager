@@ -204,8 +204,10 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
     {
         var loaded = this.ViewModel.IsLoaded;
         var stats = this.Tabs.SelectedItem == this.StatisticsTab;
-        this.AchievementsPanel.Visibility = loaded && stats == false ? Visibility.Visible : Visibility.Collapsed;
+        var timeline = this.Tabs.SelectedItem == this.TimelineTab;
+        this.AchievementsPanel.Visibility = loaded && stats == false && timeline == false ? Visibility.Visible : Visibility.Collapsed;
         this.StatisticsPanel.Visibility = loaded && stats ? Visibility.Visible : Visibility.Collapsed;
+        this.TimelinePanel.Visibility = loaded && timeline ? Visibility.Visible : Visibility.Collapsed;
     }
     #endregion
 
@@ -811,6 +813,42 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
     {
         this.ViewModel.DiscardChanges();
         this.ViewModel.IsStatEditingEnabled = wasStatEditingEnabled;
+    }
+    #endregion
+
+    #region Compare with friend
+    /// <summary>Picks a friend and compares this game's achievements with theirs (read-only).</summary>
+    private async void OnCompareClick(object sender, RoutedEventArgs e)
+    {
+        if (this.ViewModel.IsLoaded == false)
+        {
+            return;
+        }
+
+        IReadOnlyList<SteamFriend>? friends = null;
+        string? error = null;
+        try
+        {
+            friends = this.ViewModel.GetFriends();
+        }
+        catch (NotImplementedException)
+        {
+            error = Strings.Get("Game_CompareUnavailable");
+        }
+        catch (Exception ex)
+        {
+            Diagnostics.Log("Couldn't read the friends list", ex);
+            error = Strings.Get("Game_FriendsLoadFailed");
+        }
+
+        var dialog = new FriendPickerDialog(friends, error, this.ViewModel.Images);
+        await this.ShowDialogAsync(dialog);
+        if (dialog.SelectedFriend is { } friend)
+        {
+            // Show the result where it appears: the achievements list.
+            this.Tabs.SelectedItem = this.AchievementsTab;
+            await this.ViewModel.CompareWithAsync(friend);
+        }
     }
     #endregion
 

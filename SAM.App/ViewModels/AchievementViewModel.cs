@@ -59,7 +59,16 @@ public sealed partial class AchievementViewModel : ObservableObject
     public string Name => string.IsNullOrWhiteSpace(this.Definition.Name) ? this.Definition.Id : this.Definition.Name;
 
     /// <summary>Screen readers announce list rows by their item's ToString.</summary>
-    public override string ToString() => Strings.Format(this.IsChecked ? "Achievement_A11yUnlocked" : "Achievement_A11yLocked", this.Name);
+    public override string ToString()
+    {
+        var text = Strings.Format(this.IsChecked ? "Achievement_A11yUnlocked" : "Achievement_A11yLocked", this.Name);
+        if (this.ShowsProgress)
+        {
+            text += ". " + this.ProgressAccessibleText;
+        }
+
+        return this.ShowsFriendBadge ? text + ". " + this.FriendBadgeText : text;
+    }
 
     public string Description => this.Definition.Description;
 
@@ -114,7 +123,75 @@ public sealed partial class AchievementViewModel : ObservableObject
         this.OnPropertyChanged(nameof(this.IsAchieved));
         this.OnPropertyChanged(nameof(this.IsPending));
         this.OnPropertyChanged(nameof(this.PendingText));
+        this.OnPropertyChanged(nameof(this.ShowsProgress));
     }
+
+    #region Progress
+    /// <summary>
+    /// Progress toward this achievement from its progress stat (as Steam last reported it), or
+    /// null when it has none or the stat couldn't be read. Set by the game window on each load.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowsProgress))]
+    [NotifyPropertyChangedFor(nameof(ProgressPercent))]
+    [NotifyPropertyChangedFor(nameof(ProgressText))]
+    [NotifyPropertyChangedFor(nameof(ProgressAccessibleText))]
+    private AchievementProgressInfo? _progress;
+
+    /// <summary>Locked achievements with a progress stat show a bar and "340 / 1,000".</summary>
+    public bool ShowsProgress => this.Progress != null && this.IsAchieved == false;
+
+    public double ProgressPercent => this.Progress?.Percent ?? 0;
+
+    public string ProgressText => this.Progress?.Text ?? "";
+
+    public string ProgressAccessibleText => this.Progress?.AccessibleText ?? "";
+    #endregion
+
+    #region Friend comparison
+    /// <summary>True while a friend's achievements are being compared and were read successfully.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowsFriendBadge))]
+    private bool _isCompared;
+
+    /// <summary>The compared friend has this achievement.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowsFriendBadge))]
+    private bool _friendHasIt;
+
+    /// <summary>"Alex has it · 3 Jan 2024".</summary>
+    [ObservableProperty]
+    private string _friendBadgeText = "";
+
+    /// <summary>The compared friend's avatar (null shows their initials).</summary>
+    [ObservableProperty]
+    private ImageSource? _friendAvatar;
+
+    [ObservableProperty]
+    private string _friendName = "";
+
+    public bool ShowsFriendBadge => this.IsCompared && this.FriendHasIt;
+
+    /// <summary>Shows the compared friend's state for this achievement (null <paramref name="friendName"/> clears it).</summary>
+    public void SetFriendState(string? friendName, bool hasIt, DateTimeOffset? unlockTime, ImageSource? avatar)
+    {
+        if (friendName == null)
+        {
+            this.IsCompared = false;
+            this.FriendHasIt = false;
+            this.FriendBadgeText = "";
+            this.FriendAvatar = null;
+            this.FriendName = "";
+            return;
+        }
+
+        this.FriendName = friendName;
+        this.FriendAvatar = avatar;
+        this.FriendHasIt = hasIt;
+        this.FriendBadgeText = hasIt ? FriendComparison.Badge(friendName, unlockTime) : "";
+        this.IsCompared = true;
+    }
+    #endregion
 
     #region Hidden description
     [ObservableProperty]

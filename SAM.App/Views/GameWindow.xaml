@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:SAM.App.Controls"
+    xmlns:charts="using:SAM.App.Controls.Charts"
     xmlns:game="using:SAM.App.Views.Game"
     xmlns:vm="using:SAM.App.ViewModels">
 
@@ -205,6 +206,11 @@
                             <FontIcon Glyph="&#xE9D2;" />
                         </SelectorBarItem.Icon>
                     </SelectorBarItem>
+                    <SelectorBarItem x:Name="TimelineTab" x:Uid="Game_TimelineTab">
+                        <SelectorBarItem.Icon>
+                            <FontIcon Glyph="&#xE81C;" />
+                        </SelectorBarItem.Icon>
+                    </SelectorBarItem>
                 </SelectorBar>
 
                 <CommandBar
@@ -237,7 +243,7 @@
                     </AppBarElementContainer>
                     <AppBarButton
                         x:Uid="Game_InvertButton"
-                        DynamicOverflowOrder="1"
+                        DynamicOverflowOrder="2"
                         Command="{x:Bind ViewModel.InvertCommand}">
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xE8AB;" />
@@ -246,16 +252,26 @@
                     <AppBarButton
                         Icon="Refresh"
                         x:Uid="Game_ReloadButton"
-                        DynamicOverflowOrder="2"
+                        DynamicOverflowOrder="3"
                         Click="OnReloadClick"
                         IsEnabled="{x:Bind game:GameFormat.Not(ViewModel.IsBusy), Mode=OneWay}" />
                     <AppBarButton
                         x:Uid="Game_BackupsButton"
-                        DynamicOverflowOrder="3"
+                        DynamicOverflowOrder="4"
                         Click="OnBackupsClick"
                         IsEnabled="{x:Bind game:GameFormat.IsIdle(ViewModel.IsLoaded, ViewModel.IsBusy), Mode=OneWay}">
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xE78C;" />
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                    <!-- Read-only, so it's the first to move into the overflow menu. -->
+                    <AppBarButton
+                        x:Uid="Game_CompareButton"
+                        DynamicOverflowOrder="1"
+                        Click="OnCompareClick"
+                        IsEnabled="{x:Bind ViewModel.IsLoaded, Mode=OneWay}">
+                        <AppBarButton.Icon>
+                            <FontIcon Glyph="&#xE716;" />
                         </AppBarButton.Icon>
                     </AppBarButton>
                     <CommandBar.SecondaryCommands>
@@ -337,6 +353,7 @@
                         <ScalarTransition Duration="0:0:0.3" />
                     </Grid.OpacityTransition>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
@@ -428,8 +445,88 @@
                             Style="{StaticResource CaptionSecondaryStyle}" />
                     </Grid>
 
-                    <TextBlock
+                    <!-- Compare with friend (read-only). -->
+                    <Border
                         Grid.Row="2"
+                        Style="{StaticResource CardStyle}"
+                        Padding="12,8"
+                        Visibility="{x:Bind ViewModel.IsComparing, Mode=OneWay}">
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <PersonPicture
+                                Width="32"
+                                Height="32"
+                                VerticalAlignment="Center"
+                                DisplayName="{x:Bind ViewModel.ComparedFriendName, Mode=OneWay}"
+                                ProfilePicture="{x:Bind ViewModel.ComparedFriendAvatar, Mode=OneWay}"
+                                AutomationProperties.AccessibilityView="Raw" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock
+                                    Text="{x:Bind ViewModel.ComparisonTitle, Mode=OneWay}"
+                                    Style="{StaticResource BodyStrongTextBlockStyle}"
+                                    TextTrimming="CharacterEllipsis" />
+                                <Grid ColumnSpacing="6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <ProgressRing
+                                        Width="12"
+                                        Height="12"
+                                        IsActive="{x:Bind ViewModel.IsComparisonLoading, Mode=OneWay}"
+                                        Visibility="{x:Bind ViewModel.IsComparisonLoading, Mode=OneWay}" />
+                                    <FontIcon
+                                        Glyph="&#xE7BA;"
+                                        FontSize="12"
+                                        Foreground="{ThemeResource SystemFillColorCautionBrush}"
+                                        Visibility="{x:Bind ViewModel.HasComparisonError, Mode=OneWay}" />
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Text="{x:Bind ViewModel.ComparisonStatusText, Mode=OneWay}"
+                                        Style="{StaticResource CaptionSecondaryStyle}"
+                                        TextWrapping="Wrap"
+                                        AutomationProperties.LiveSetting="Polite" />
+                                </Grid>
+                            </StackPanel>
+                            <ComboBox
+                                Grid.Column="2"
+                                MinWidth="190"
+                                VerticalAlignment="Center"
+                                x:Uid="Game_CompareFilter"
+                                IsEnabled="{x:Bind ViewModel.IsComparisonReady, Mode=OneWay}"
+                                SelectedIndex="{x:Bind ViewModel.CompareFilterIndex, Mode=TwoWay}">
+                                <ComboBoxItem x:Uid="Game_CompareFilterAll" />
+                                <ComboBoxItem x:Uid="Game_CompareFilterOnlyFriend" />
+                                <ComboBoxItem x:Uid="Game_CompareFilterOnlyMe" />
+                                <ComboBoxItem x:Uid="Game_CompareFilterBoth" />
+                                <ComboBoxItem x:Uid="Game_CompareFilterNeither" />
+                            </ComboBox>
+                            <Button
+                                Grid.Column="3"
+                                VerticalAlignment="Center"
+                                x:Uid="Game_CompareRetry"
+                                Command="{x:Bind ViewModel.RetryComparisonCommand}"
+                                Visibility="{x:Bind ViewModel.CanRetryComparison, Mode=OneWay}" />
+                            <Button
+                                Grid.Column="4"
+                                VerticalAlignment="Center"
+                                Style="{StaticResource SubtleButtonStyle}"
+                                Padding="8"
+                                x:Uid="Game_CompareClear"
+                                Command="{x:Bind ViewModel.ClearComparisonCommand}">
+                                <FontIcon Glyph="&#xE711;" FontSize="14" />
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <TextBlock
+                        Grid.Row="3"
                         Margin="0,24"
                         HorizontalAlignment="Center"
                         x:Uid="Game_NoMatches"
@@ -439,7 +536,7 @@
 
                     <ListView
                         x:Name="AchievementList"
-                        Grid.Row="2"
+                        Grid.Row="3"
                         Margin="-4,0,-16,0"
                         Padding="0,0,12,16"
                         ItemsSource="{x:Bind ViewModel.VisibleAchievements}"
@@ -575,6 +672,47 @@
                                                 Style="{StaticResource CaptionTextBlockStyle}"
                                                 Foreground="{ThemeResource TextFillColorTertiaryBrush}"
                                                 Visibility="{x:Bind HasUnlockTimeText}" />
+                                            <!-- Counter achievements: progress toward the target (read-only). -->
+                                            <StackPanel
+                                                Orientation="Horizontal"
+                                                Spacing="8"
+                                                Margin="0,2,0,0"
+                                                Visibility="{x:Bind ShowsProgress, Mode=OneWay}"
+                                                ToolTipService.ToolTip="{x:Bind ProgressAccessibleText, Mode=OneWay}">
+                                                <ProgressBar
+                                                    Width="160"
+                                                    VerticalAlignment="Center"
+                                                    Maximum="100"
+                                                    Value="{x:Bind ProgressPercent, Mode=OneWay}"
+                                                    AutomationProperties.Name="{x:Bind ProgressAccessibleText, Mode=OneWay}" />
+                                                <TextBlock
+                                                    Text="{x:Bind ProgressText, Mode=OneWay}"
+                                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    AutomationProperties.AccessibilityView="Raw" />
+                                            </StackPanel>
+                                            <!-- The compared friend has it. -->
+                                            <StackPanel
+                                                Orientation="Horizontal"
+                                                Spacing="6"
+                                                Margin="0,2,0,0"
+                                                Visibility="{x:Bind ShowsFriendBadge, Mode=OneWay}">
+                                                <PersonPicture
+                                                    Width="18"
+                                                    Height="18"
+                                                    DisplayName="{x:Bind FriendName, Mode=OneWay}"
+                                                    ProfilePicture="{x:Bind FriendAvatar, Mode=OneWay}"
+                                                    AutomationProperties.AccessibilityView="Raw" />
+                                                <FontIcon
+                                                    Glyph="&#xE73E;"
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource SystemFillColorSuccessBrush}"
+                                                    AutomationProperties.AccessibilityView="Raw" />
+                                                <TextBlock
+                                                    Text="{x:Bind FriendBadgeText, Mode=OneWay}"
+                                                    Style="{StaticResource CaptionTextBlockStyle}"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            </StackPanel>
                                         </StackPanel>
 
                                         <!-- Row actions: guides (on hover) and the note button (on hover, or
@@ -804,6 +942,101 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
+                </Grid>
+
+                <!-- Timeline tab: this game's unlocks over time. -->
+                <Grid
+                    x:Name="TimelinePanel"
+                    Visibility="Collapsed"
+                    Opacity="{x:Bind game:GameFormat.Opacity(ViewModel.IsLoaded), Mode=OneWay}">
+                    <Grid.OpacityTransition>
+                        <ScalarTransition Duration="0:0:0.3" />
+                    </Grid.OpacityTransition>
+                    <Border Style="{StaticResource CardStyle}" Padding="16" VerticalAlignment="Top">
+                        <Grid RowSpacing="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="280" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Uid="Game_TimelineTitle" Style="{StaticResource BodyStrongTextBlockStyle}" />
+                            <TextBlock
+                                Grid.Row="1"
+                                Text="{x:Bind ViewModel.TimelineCountText, Mode=OneWay}"
+                                Style="{StaticResource CaptionSecondaryStyle}" />
+                            <TextBlock
+                                Grid.Row="2"
+                                Text="{x:Bind ViewModel.TimelineRangeText, Mode=OneWay}"
+                                Style="{StaticResource CaptionSecondaryStyle}"
+                                TextWrapping="Wrap"
+                                Visibility="{x:Bind ViewModel.HasTimeline, Mode=OneWay}" />
+                            <ToggleButton
+                                x:Name="TimelineTableToggle"
+                                Grid.RowSpan="3"
+                                Grid.Column="1"
+                                Padding="8,3,8,4"
+                                FontSize="12"
+                                VerticalAlignment="Top"
+                                x:Uid="Game_TimelineTableToggle"
+                                IsEnabled="{x:Bind ViewModel.HasTimeline, Mode=OneWay}" />
+
+                            <charts:AreaChart
+                                Grid.Row="3"
+                                Grid.ColumnSpan="2"
+                                Margin="0,12,0,0"
+                                Points="{x:Bind ViewModel.TimelinePoints, Mode=OneWay}"
+                                SeriesBrush="{ThemeResource ChartSeriesBrush}"
+                                GridBrush="{ThemeResource ChartGridBrush}"
+                                BaselineBrush="{ThemeResource ChartBaselineBrush}"
+                                SurfaceBrush="{ThemeResource ChartSurfaceBrush}"
+                                HoverBrush="{ThemeResource ChartHoverBrush}"
+                                AxisLabelBrush="{ThemeResource TextFillColorTertiaryBrush}"
+                                Visibility="{x:Bind game:GameFormat.ChartVisible(ViewModel.HasTimeline, TimelineTableToggle.IsChecked), Mode=OneWay}"
+                                x:Uid="Game_TimelineChart" />
+                            <ScrollViewer
+                                Grid.Row="3"
+                                Grid.ColumnSpan="2"
+                                Margin="0,12,0,0"
+                                Visibility="{x:Bind game:GameFormat.TableVisible(ViewModel.HasTimeline, TimelineTableToggle.IsChecked), Mode=OneWay}">
+                                <ItemsRepeater
+                                    ItemsSource="{x:Bind ViewModel.TimelinePoints, Mode=OneWay}"
+                                    Margin="0,0,12,0"
+                                    x:Uid="Game_TimelineTable">
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate x:DataType="charts:ChartPoint">
+                                            <Grid Padding="0,3" ColumnSpacing="12" AutomationProperties.Name="{x:Bind Description}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{x:Bind Label}" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock Grid.Column="1" Text="{x:Bind ValueText}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+                            </ScrollViewer>
+                            <StackPanel
+                                Grid.Row="3"
+                                Grid.ColumnSpan="2"
+                                Spacing="8"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Visibility="{x:Bind ViewModel.HasNoTimeline, Mode=OneWay}">
+                                <FontIcon Glyph="&#xE81C;" FontSize="28" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                <TextBlock
+                                    Text="{x:Bind ViewModel.TimelineEmptyText, Mode=OneWay}"
+                                    TextAlignment="Center"
+                                    TextWrapping="Wrap"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
                 </Grid>
             </Grid>
         </Grid>

@@ -16,6 +16,14 @@ public static class GameFormat
 
     public static bool Not(bool value) => !value;
 
+    /// <summary>The chart shows when there's data and the table toggle is off.</summary>
+    public static Visibility ChartVisible(bool hasData, bool? showTable) =>
+        hasData && showTable != true ? Visibility.Visible : Visibility.Collapsed;
+
+    /// <summary>The table shows when there's data and the table toggle is on.</summary>
+    public static Visibility TableVisible(bool hasData, bool? showTable) =>
+        hasData && showTable == true ? Visibility.Visible : Visibility.Collapsed;
+
     public static double Opacity(bool visible) => visible ? 1.0 : 0.0;
 
     public static string ProtectedTooltip(bool isProtected) =>
