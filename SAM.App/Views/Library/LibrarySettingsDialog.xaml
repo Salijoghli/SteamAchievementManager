@@ -109,6 +109,16 @@
                     x:Uid="Settings_ShowNotifications"
                     IsOn="{x:Bind ViewModel.ShowNotifications, Mode=TwoWay}" />
                 <ToggleSwitch
+                    x:Uid="Notify_OnUnlockSetting"
+                    IsOn="{x:Bind ViewModel.NotifyOnUnlock, Mode=TwoWay}"
+                    IsEnabled="{x:Bind ViewModel.ShowNotifications, Mode=OneWay}" />
+                <TextBlock
+                    x:Uid="Notify_OnUnlockSettingHint"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextWrapping="Wrap"
+                    Margin="0,-8,0,0" />
+                <ToggleSwitch
                     x:Uid="Settings_CheckForUpdates"
                     IsOn="{x:Bind ViewModel.CheckForUpdates, Mode=TwoWay}" />
                 <Grid ColumnSpacing="12">

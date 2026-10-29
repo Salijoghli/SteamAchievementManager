@@ -41,6 +41,9 @@ public partial class App : Application
     /// <summary>The library's Autopilot engine (null in game windows, workers and command-line runs).</summary>
     private AutopilotEngine? _autopilot;
 
+    /// <summary>Notifies about achievements unlocked by playing (library process only).</summary>
+    private UnlockNotifier? _unlockNotifier;
+
     public App()
     {
         this._settings = AppSettings.Load();
@@ -202,9 +205,16 @@ public partial class App : Application
         // pre-set; the user still confirms before anything is committed.
         if (appId == 0)
         {
+            // After "Update now": the previous exe (SAM.exe.old) has exited by now.
+            if (Environment.ProcessPath is { } exePath)
+            {
+                Task.Run(() => SelfUpdater.CleanUp(exePath));
+            }
+
             var library = new LibraryWindow(Services);
             this.SetUpTray(library);
             this.SetUpAutopilot(command.StartAutopilot);
+            this.SetUpUnlockNotifications(Services);
 
             // "--autopilot" (Start with Windows): stay in the tray; the window opens from the icon.
             this.Show(library, activate: command.StartAutopilot == false || this.HideToTrayAtStart() == false);
@@ -220,11 +230,38 @@ public partial class App : Application
     /// new process waits for this one to exit (<see cref="CommandLine.RestartAfterOption"/>) so the
     /// single-instance check doesn't hand the launch back to us. Call on the UI thread.
     /// </summary>
-    public static void Restart()
+    public static void Restart() => CurrentApp?.RestartCore();
+
+    /// <summary>
+    /// After "Update now" replaced SAM.exe: stops Autopilot's workers (keeping "was running", so
+    /// the new version resumes it when "Resume on startup" is on), then restarts into the new exe.
+    /// False if the new process couldn't be started; this one keeps running. Call on the UI thread.
+    /// </summary>
+    public static bool RestartForUpdate()
     {
-        if (CurrentApp is not { } app || Environment.ProcessPath is not { } path)
+        if (CurrentApp is not { } app)
         {
-            return;
+            return false;
+        }
+
+        try
+        {
+            app._autopilot?.Dispose();
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log("Couldn't stop Autopilot before updating", e);
+        }
+
+        app._autopilot = null;
+        return app.RestartCore();
+    }
+
+    private bool RestartCore()
+    {
+        if (Environment.ProcessPath is not { } path)
+        {
+            return false;
         }
 
         try
@@ -235,12 +272,13 @@ public partial class App : Application
         catch (Exception e)
         {
             Diagnostics.Log("Couldn't restart SAM", e);
-            return;
+            return false;
         }
 
-        app._exiting = true;
-        app._window?.Close();
-        app.Exit();
+        this._exiting = true;
+        this._window?.Close();
+        this.Exit();
+        return true;
     }
 
     /// <summary>Waits (up to 15 seconds) for the process <paramref name="processId"/> to exit.</summary>
@@ -408,6 +446,8 @@ public partial class App : Application
             // Stops the workers (Autopilot resumes next time if "Resume on startup" is on).
             this._autopilot?.Dispose();
             this._autopilot = null;
+            this._unlockNotifier?.Dispose();
+            this._unlockNotifier = null;
             Tray?.Dispose();
             Tray = null;
             NotificationService.Unregister();
@@ -561,6 +601,19 @@ public partial class App : Application
         if (start)
         {
             this.StartAutopilot(engine);
+        }
+    }
+
+    /// <summary>Starts watching for achievements the user unlocks by playing (see <see cref="UnlockNotifier"/>).</summary>
+    private void SetUpUnlockNotifications(AppServices services)
+    {
+        try
+        {
+            this._unlockNotifier = new UnlockNotifier(services);
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log("Couldn't start unlock notifications", e);
         }
     }
 

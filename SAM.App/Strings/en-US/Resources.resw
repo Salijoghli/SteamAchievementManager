@@ -378,7 +378,7 @@ If you have this game through Family Sharing, it may be locked while the owner i
     <value>Search games or App ID</value>
   </data>
   <data name="Library_SearchBox.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>Search games or App ID (Ctrl+F)</value>
+    <value>Search games or App ID (Ctrl+F) · Quick switcher (Ctrl+K)</value>
   </data>
   <data name="Library_CollectionPicker.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Collection</value>
@@ -1106,6 +1106,81 @@ Installed · {2}</value>
   </data>
   <data name="Update_YouHaveWithTitle" xml:space="preserve">
     <value>{0}. You have version {1}.</value>
+  </data>
+  <data name="Update_UpdateNow" xml:space="preserve">
+    <value>Update now</value>
+  </data>
+  <data name="Update_Download" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="Update_Downloading" xml:space="preserve">
+    <value>Downloading version {0}… {1:0}%</value>
+  </data>
+  <data name="Update_Verifying" xml:space="preserve">
+    <value>Checking the download…</value>
+  </data>
+  <data name="Update_Installing" xml:space="preserve">
+    <value>Installing the update. SAM will restart…</value>
+  </data>
+  <data name="Update_ErrorIncomplete" xml:space="preserve">
+    <value>The download is incomplete.</value>
+  </data>
+  <data name="Update_ErrorNotExecutable" xml:space="preserve">
+    <value>The downloaded file isn't a Windows program.</value>
+  </data>
+  <data name="Update_ErrorWrongVersion" xml:space="preserve">
+    <value>The downloaded file isn't version {0}.</value>
+  </data>
+  <data name="Update_FailedTitle" xml:space="preserve">
+    <value>Couldn't update automatically</value>
+  </data>
+  <data name="Update_FailedMessage" xml:space="preserve">
+    <value>{0} The download page was opened instead.</value>
+  </data>
+  <data name="Update_InstalledTitle" xml:space="preserve">
+    <value>Update installed</value>
+  </data>
+  <data name="Update_RestartManually" xml:space="preserve">
+    <value>Version {0} is installed. Start SAM again to use it.</value>
+  </data>
+  <data name="Notify_UnlockTitle" xml:space="preserve">
+    <value>{0} — {1}</value>
+  </data>
+  <data name="Notify_UnlockRarity" xml:space="preserve">
+    <value>{0} · {1:0.#}% of players</value>
+  </data>
+  <data name="Notify_UnlockNoRarity" xml:space="preserve">
+    <value>Achievement unlocked</value>
+  </data>
+  <data name="Notify_UnlockBatch_One" xml:space="preserve">
+    <value>{0} achievement unlocked in {1}</value>
+  </data>
+  <data name="Notify_UnlockBatch_Other" xml:space="preserve">
+    <value>{0} achievements unlocked in {1}</value>
+  </data>
+  <data name="Notify_UnlockBatchMore" xml:space="preserve">
+    <value>{0} and {1} more</value>
+  </data>
+  <data name="Notify_UnknownGame" xml:space="preserve">
+    <value>App {0}</value>
+  </data>
+  <data name="Notify_OnUnlockSetting.Header" xml:space="preserve">
+    <value>Notify when I unlock achievements in games</value>
+  </data>
+  <data name="Notify_OnUnlockSettingHint.Text" xml:space="preserve">
+    <value>While the library or its tray icon is running. Unlocks made with SAM aren't included.</value>
+  </data>
+  <data name="Switcher_QueryBox.PlaceholderText" xml:space="preserve">
+    <value>Jump to a game by name or App ID</value>
+  </data>
+  <data name="Switcher_QueryBox.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Quick switcher</value>
+  </data>
+  <data name="Switcher_NoMatches.Text" xml:space="preserve">
+    <value>No games match</value>
+  </data>
+  <data name="Switcher_Hint.Text" xml:space="preserve">
+    <value>↑↓ to choose · Enter to open · Esc to close</value>
   </data>
   <data name="Game_TitleSuffix.Text" xml:space="preserve">
     <value>  ·  Steam Achievement Manager</value>

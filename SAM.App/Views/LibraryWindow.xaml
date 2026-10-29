@@ -12,6 +12,7 @@
         KeyboardAcceleratorPlacementMode="Hidden">
         <Grid.KeyboardAccelerators>
             <KeyboardAccelerator Key="F" Modifiers="Control" Invoked="OnFocusSearchAccelerator" />
+            <KeyboardAccelerator Key="K" Modifiers="Control" Invoked="OnQuickSwitcherAccelerator" />
             <KeyboardAccelerator Key="F5" Invoked="OnRefreshAccelerator" />
         </Grid.KeyboardAccelerators>
 
@@ -486,12 +487,19 @@
                 Message="{x:Bind ViewModel.UpdateMessage, Mode=OneWay}"
                 Severity="Informational"
                 IsOpen="{x:Bind ViewModel.IsUpdateOpen, Mode=TwoWay}"
+                IsClosable="{x:Bind ViewModel.IsUpdateIdle, Mode=OneWay}"
                 Visibility="{x:Bind ViewModel.IsUpdateOpen, Mode=OneWay}">
                 <InfoBar.ActionButton>
-                    <Button x:Uid="Library_UpdateDownload" Style="{StaticResource AccentButtonStyle}" Command="{x:Bind ViewModel.DownloadUpdateCommand}" />
+                    <Button
+                        Content="{x:Bind ViewModel.UpdateActionText, Mode=OneWay}"
+                        Style="{StaticResource AccentButtonStyle}"
+                        Command="{x:Bind ViewModel.DownloadUpdateCommand}" />
                 </InfoBar.ActionButton>
                 <InfoBar.Content>
-                    <Button x:Uid="Library_UpdateSkip" Margin="0,0,0,12" Command="{x:Bind ViewModel.SkipUpdateCommand}" />
+                    <StackPanel Margin="0,0,0,12" Spacing="8">
+                        <ProgressBar IsIndeterminate="True" Visibility="{x:Bind ViewModel.IsUpdating, Mode=OneWay}" />
+                        <Button x:Uid="Library_UpdateSkip" Visibility="{x:Bind ViewModel.IsUpdateIdle, Mode=OneWay}" Command="{x:Bind ViewModel.SkipUpdateCommand}" />
+                    </StackPanel>
                 </InfoBar.Content>
             </InfoBar>
             <InfoBar
