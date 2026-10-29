@@ -1268,6 +1268,159 @@ Installed · {2}</value>
   <data name="Game_SortNewest.Content" xml:space="preserve">
     <value>Sort: Newest unlock first</value>
   </data>
+  <data name="Game_ProgressText" xml:space="preserve">
+    <value>{0} / {1}</value>
+  </data>
+  <data name="Game_ProgressA11y" xml:space="preserve">
+    <value>Progress: {0} of {1}</value>
+  </data>
+  <data name="Game_TimelineTab.Text" xml:space="preserve">
+    <value>Timeline</value>
+  </data>
+  <data name="Game_TimelineTitle.Text" xml:space="preserve">
+    <value>Unlocks over time</value>
+  </data>
+  <data name="Game_TimelineCount" xml:space="preserve">
+    <value>{0} of {1} unlocked</value>
+  </data>
+  <data name="Game_TimelineRange" xml:space="preserve">
+    <value>First unlock {0} · latest {1}</value>
+  </data>
+  <data name="Game_TimelineUndated_One" xml:space="preserve">
+    <value>{0} without a date</value>
+  </data>
+  <data name="Game_TimelineUndated_Other" xml:space="preserve">
+    <value>{0} without a date</value>
+  </data>
+  <data name="Game_TimelineEmpty" xml:space="preserve">
+    <value>Nothing unlocked yet. Your unlocks will show up here over time.</value>
+  </data>
+  <data name="Game_TimelineNoDates" xml:space="preserve">
+    <value>Steam didn't record when these achievements were unlocked, so there's nothing to chart.</value>
+  </data>
+  <data name="Game_TimelinePoint" xml:space="preserve">
+    <value>{0}: {1} unlocked in total</value>
+  </data>
+  <data name="Game_TimelinePointNew" xml:space="preserve">
+    <value>{0}: {1} unlocked in total (+{2})</value>
+  </data>
+  <data name="Game_TimelineTableToggle.Content" xml:space="preserve">
+    <value>Table</value>
+  </data>
+  <data name="Game_TimelineTableToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Show the numbers as a table</value>
+  </data>
+  <data name="Game_TimelineTableToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Show unlocks over time as a table</value>
+  </data>
+  <data name="Game_TimelineChart.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Achievements unlocked in this game over time</value>
+  </data>
+  <data name="Game_TimelineChart.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
+    <value>Use the left and right arrow keys to read each point, or switch to the table.</value>
+  </data>
+  <data name="Game_TimelineTable.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Achievements unlocked over time</value>
+  </data>
+  <data name="Game_CompareButton.Label" xml:space="preserve">
+    <value>Compare with friend</value>
+  </data>
+  <data name="Game_CompareButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Compare your achievements in this game with a friend's (read-only)</value>
+  </data>
+  <data name="Game_FriendPicker.Title" xml:space="preserve">
+    <value>Compare with a friend</value>
+  </data>
+  <data name="Game_FriendPicker.PrimaryButtonText" xml:space="preserve">
+    <value>Compare</value>
+  </data>
+  <data name="Game_FriendPicker.CloseButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Game_FriendSearch.PlaceholderText" xml:space="preserve">
+    <value>Search friends</value>
+  </data>
+  <data name="Game_FriendSearch.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Search friends</value>
+  </data>
+  <data name="Game_FriendList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Friends</value>
+  </data>
+  <data name="Game_FriendOnline" xml:space="preserve">
+    <value>Online</value>
+  </data>
+  <data name="Game_FriendOffline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="Game_FriendA11y" xml:space="preserve">
+    <value>{0}, {1}</value>
+  </data>
+  <data name="Game_FriendsLoadFailed" xml:space="preserve">
+    <value>Couldn't read your friends list from Steam. Make sure Steam is running and try again.</value>
+  </data>
+  <data name="Game_FriendsNone" xml:space="preserve">
+    <value>Your Steam friends list is empty.</value>
+  </data>
+  <data name="Game_FriendsNoMatch" xml:space="preserve">
+    <value>No friends match your search.</value>
+  </data>
+  <data name="Game_CompareUnavailable" xml:space="preserve">
+    <value>Comparing with friends isn't available in this version yet.</value>
+  </data>
+  <data name="Game_CompareWith" xml:space="preserve">
+    <value>Comparing with {0}</value>
+  </data>
+  <data name="Game_CompareLoading" xml:space="preserve">
+    <value>Loading {0}'s achievements…</value>
+  </data>
+  <data name="Game_CompareSummary" xml:space="preserve">
+    <value>You {0}/{1} · {2} {3}/{1}</value>
+  </data>
+  <data name="Game_CompareFriendHasIt" xml:space="preserve">
+    <value>{0} has it</value>
+  </data>
+  <data name="Game_CompareFriendHasItOn" xml:space="preserve">
+    <value>{0} has it · {1}</value>
+  </data>
+  <data name="Game_ComparePrivate" xml:space="preserve">
+    <value>{0}'s game details are private</value>
+  </data>
+  <data name="Game_CompareNotOwned" xml:space="preserve">
+    <value>{0} doesn't own this game</value>
+  </data>
+  <data name="Game_CompareFailed" xml:space="preserve">
+    <value>Couldn't load {0}'s achievements. Check your connection and try again.</value>
+  </data>
+  <data name="Game_CompareFilter.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Show achievements by who has them</value>
+  </data>
+  <data name="Game_CompareFilter.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Comparison filter</value>
+  </data>
+  <data name="Game_CompareFilterAll.Content" xml:space="preserve">
+    <value>Compare: All</value>
+  </data>
+  <data name="Game_CompareFilterOnlyFriend.Content" xml:space="preserve">
+    <value>Only friend has</value>
+  </data>
+  <data name="Game_CompareFilterOnlyMe.Content" xml:space="preserve">
+    <value>Only I have</value>
+  </data>
+  <data name="Game_CompareFilterBoth.Content" xml:space="preserve">
+    <value>Both have</value>
+  </data>
+  <data name="Game_CompareFilterNeither.Content" xml:space="preserve">
+    <value>Neither has</value>
+  </data>
+  <data name="Game_CompareRetry.Content" xml:space="preserve">
+    <value>Retry</value>
+  </data>
+  <data name="Game_CompareClear.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Stop comparing</value>
+  </data>
+  <data name="Game_CompareClear.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Stop comparing</value>
+  </data>
   <data name="Game_DateFilter.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Filter unlocked achievements by unlock date</value>
   </data>

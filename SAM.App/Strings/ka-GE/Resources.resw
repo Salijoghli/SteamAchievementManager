@@ -1254,6 +1254,159 @@
   <data name="Game_SortNewest.Content" xml:space="preserve">
     <value>დალაგება: ჯერ ბოლოს განბლოკილი</value>
   </data>
+  <data name="Game_ProgressText" xml:space="preserve">
+    <value>{0} / {1}</value>
+  </data>
+  <data name="Game_ProgressA11y" xml:space="preserve">
+    <value>პროგრესი: {0} / {1}</value>
+  </data>
+  <data name="Game_TimelineTab.Text" xml:space="preserve">
+    <value>ქრონოლოგია</value>
+  </data>
+  <data name="Game_TimelineTitle.Text" xml:space="preserve">
+    <value>განბლოკვები დროის მიხედვით</value>
+  </data>
+  <data name="Game_TimelineCount" xml:space="preserve">
+    <value>განბლოკილია {0} / {1}</value>
+  </data>
+  <data name="Game_TimelineRange" xml:space="preserve">
+    <value>პირველი განბლოკვა {0} · ბოლო {1}</value>
+  </data>
+  <data name="Game_TimelineUndated_One" xml:space="preserve">
+    <value>{0} თარიღის გარეშე</value>
+  </data>
+  <data name="Game_TimelineUndated_Other" xml:space="preserve">
+    <value>{0} თარიღის გარეშე</value>
+  </data>
+  <data name="Game_TimelineEmpty" xml:space="preserve">
+    <value>ჯერ არაფერია განბლოკილი. აქ დროთა განმავლობაში შენი განბლოკვები გამოჩნდება.</value>
+  </data>
+  <data name="Game_TimelineNoDates" xml:space="preserve">
+    <value>Steam-მა არ შეინახა, როდის განიბლოკა ეს მიღწევები, ამიტომ გრაფიკის აგება შეუძლებელია.</value>
+  </data>
+  <data name="Game_TimelinePoint" xml:space="preserve">
+    <value>{0}: სულ განბლოკილია {1}</value>
+  </data>
+  <data name="Game_TimelinePointNew" xml:space="preserve">
+    <value>{0}: სულ განბლოკილია {1} (+{2})</value>
+  </data>
+  <data name="Game_TimelineTableToggle.Content" xml:space="preserve">
+    <value>ცხრილი</value>
+  </data>
+  <data name="Game_TimelineTableToggle.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>რიცხვების ცხრილად ჩვენება</value>
+  </data>
+  <data name="Game_TimelineTableToggle.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>განბლოკვების დინამიკის ცხრილად ჩვენება</value>
+  </data>
+  <data name="Game_TimelineChart.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ამ თამაშში განბლოკილი მიღწევები დროის მიხედვით</value>
+  </data>
+  <data name="Game_TimelineChart.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.HelpText" xml:space="preserve">
+    <value>თითოეული წერტილის წასაკითხად გამოიყენე მარცხენა და მარჯვენა ისრები, ან გადართე ცხრილზე.</value>
+  </data>
+  <data name="Game_TimelineTable.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>განბლოკილი მიღწევები დროის მიხედვით</value>
+  </data>
+  <data name="Game_CompareButton.Label" xml:space="preserve">
+    <value>მეგობართან შედარება</value>
+  </data>
+  <data name="Game_CompareButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>ამ თამაშში შენი მიღწევების შედარება მეგობრისას (მხოლოდ ნახვა)</value>
+  </data>
+  <data name="Game_FriendPicker.Title" xml:space="preserve">
+    <value>მეგობართან შედარება</value>
+  </data>
+  <data name="Game_FriendPicker.PrimaryButtonText" xml:space="preserve">
+    <value>შედარება</value>
+  </data>
+  <data name="Game_FriendPicker.CloseButtonText" xml:space="preserve">
+    <value>გაუქმება</value>
+  </data>
+  <data name="Game_FriendSearch.PlaceholderText" xml:space="preserve">
+    <value>მეგობრების ძებნა</value>
+  </data>
+  <data name="Game_FriendSearch.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>მეგობრების ძებნა</value>
+  </data>
+  <data name="Game_FriendList.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>მეგობრები</value>
+  </data>
+  <data name="Game_FriendOnline" xml:space="preserve">
+    <value>ონლაინ</value>
+  </data>
+  <data name="Game_FriendOffline" xml:space="preserve">
+    <value>ოფლაინ</value>
+  </data>
+  <data name="Game_FriendA11y" xml:space="preserve">
+    <value>{0}, {1}</value>
+  </data>
+  <data name="Game_FriendsLoadFailed" xml:space="preserve">
+    <value>Steam-დან მეგობრების სიის წაკითხვა ვერ მოხერხდა. დარწმუნდი, რომ Steam გაშვებულია, და სცადე ხელახლა.</value>
+  </data>
+  <data name="Game_FriendsNone" xml:space="preserve">
+    <value>შენი Steam-ის მეგობრების სია ცარიელია.</value>
+  </data>
+  <data name="Game_FriendsNoMatch" xml:space="preserve">
+    <value>ძიებას არცერთი მეგობარი არ შეესაბამება.</value>
+  </data>
+  <data name="Game_CompareUnavailable" xml:space="preserve">
+    <value>მეგობრებთან შედარება ამ ვერსიაში ჯერ მიუწვდომელია.</value>
+  </data>
+  <data name="Game_CompareWith" xml:space="preserve">
+    <value>შედარება: {0}</value>
+  </data>
+  <data name="Game_CompareLoading" xml:space="preserve">
+    <value>იტვირთება {0}-ის მიღწევები…</value>
+  </data>
+  <data name="Game_CompareSummary" xml:space="preserve">
+    <value>შენ {0}/{1} · {2} {3}/{1}</value>
+  </data>
+  <data name="Game_CompareFriendHasIt" xml:space="preserve">
+    <value>{0}-ს აქვს</value>
+  </data>
+  <data name="Game_CompareFriendHasItOn" xml:space="preserve">
+    <value>{0}-ს აქვს · {1}</value>
+  </data>
+  <data name="Game_ComparePrivate" xml:space="preserve">
+    <value>{0}-ის თამაშის დეტალები დახურულია</value>
+  </data>
+  <data name="Game_CompareNotOwned" xml:space="preserve">
+    <value>{0}-ს ეს თამაში არ აქვს</value>
+  </data>
+  <data name="Game_CompareFailed" xml:space="preserve">
+    <value>{0}-ის მიღწევების ჩატვირთვა ვერ მოხერხდა. შეამოწმე კავშირი და სცადე ხელახლა.</value>
+  </data>
+  <data name="Game_CompareFilter.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>მიღწევების ჩვენება იმის მიხედვით, ვის აქვს</value>
+  </data>
+  <data name="Game_CompareFilter.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>შედარების ფილტრი</value>
+  </data>
+  <data name="Game_CompareFilterAll.Content" xml:space="preserve">
+    <value>შედარება: ყველა</value>
+  </data>
+  <data name="Game_CompareFilterOnlyFriend.Content" xml:space="preserve">
+    <value>მხოლოდ მეგობარს აქვს</value>
+  </data>
+  <data name="Game_CompareFilterOnlyMe.Content" xml:space="preserve">
+    <value>მხოლოდ მე მაქვს</value>
+  </data>
+  <data name="Game_CompareFilterBoth.Content" xml:space="preserve">
+    <value>ორივეს გვაქვს</value>
+  </data>
+  <data name="Game_CompareFilterNeither.Content" xml:space="preserve">
+    <value>არცერთს არ გვაქვს</value>
+  </data>
+  <data name="Game_CompareRetry.Content" xml:space="preserve">
+    <value>ხელახლა ცდა</value>
+  </data>
+  <data name="Game_CompareClear.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>შედარების შეწყვეტა</value>
+  </data>
+  <data name="Game_CompareClear.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>შედარების შეწყვეტა</value>
+  </data>
   <data name="Game_DateFilter.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>განბლოკილი მიღწევების ფილტრი განბლოკვის თარიღით</value>
   </data>
