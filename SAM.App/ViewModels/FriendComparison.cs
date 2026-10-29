@@ -73,6 +73,19 @@ public static class FriendComparison
     };
 
     /// <summary>
+    /// The friends the picker lists: with <paramref name="showAll"/> off, only those known to own
+    /// the game (at least one achievement in it on their public stats page). Steam shows "doesn't
+    /// own it" and "owns it but has nothing unlocked" the same way, and a private profile can't be
+    /// checked, so neither counts as an owner.
+    /// </summary>
+    public static IEnumerable<SteamFriend> Owners(
+        IEnumerable<SteamFriend> friends,
+        IReadOnlyDictionary<ulong, FriendAchievementsStatus> statuses,
+        bool showAll) => showAll
+        ? friends
+        : friends.Where(f => statuses.TryGetValue(f.SteamId, out var status) && status == FriendAchievementsStatus.Ok);
+
+    /// <summary>
     /// Friends whose name contains <paramref name="query"/> (any case), online first, then by
     /// name. An empty query keeps everyone.
     /// </summary>

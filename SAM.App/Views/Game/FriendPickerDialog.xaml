@@ -11,6 +11,7 @@
     <Grid Width="420" RowSpacing="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
@@ -20,7 +21,31 @@
             QueryIcon="Find"
             TextChanged="OnSearchTextChanged" />
 
-        <Grid Grid.Row="1" MinHeight="200">
+        <!-- Which friends own the game: checked when the dialog opens; only owners are listed unless "Show all". -->
+        <Grid Grid.Row="1" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <ProgressRing x:Name="CheckingRing" Width="16" Height="16" IsActive="False" Visibility="Collapsed" />
+                <TextBlock
+                    x:Name="OwnershipText"
+                    Style="{StaticResource CaptionTextBlockStyle}"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextWrapping="Wrap"
+                    AutomationProperties.LiveSetting="Polite" />
+            </StackPanel>
+            <CheckBox
+                x:Name="ShowAllBox"
+                x:Uid="Game_FriendShowAll"
+                Grid.Column="1"
+                MinWidth="0"
+                Checked="OnShowAllChanged"
+                Unchecked="OnShowAllChanged" />
+        </Grid>
+
+        <Grid Grid.Row="2" MinHeight="200">
             <!-- No friends, no matches, or Steam couldn't be asked. -->
             <StackPanel
                 x:Name="EmptyState"
@@ -76,7 +101,7 @@
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyStrongTextBlockStyle}" TextTrimming="CharacterEllipsis" />
                                 <TextBlock
-                                    Text="{x:Bind StatusText}"
+                                    Text="{x:Bind StatusText, Mode=OneWay}"
                                     Style="{StaticResource CaptionTextBlockStyle}"
                                     Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                             </StackPanel>

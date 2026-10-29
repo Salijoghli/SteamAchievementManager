@@ -82,4 +82,27 @@ public sealed class FriendComparisonTests
         Assert.Equal(["Bea"], FriendComparison.FilterFriends(friends, "BE").Select(f => f.Name));
         Assert.Empty(FriendComparison.FilterFriends(friends, "nobody"));
     }
+
+    [Fact]
+    public void OwnersAreFriendsWithAchievementsInTheGame()
+    {
+        SteamFriend[] friends =
+        [
+            new(1, "Owner", null, true),
+            new(2, "Private", null, true),
+            new(3, "None", null, false),
+            new(4, "Failed", null, false),
+            new(5, "Unchecked", null, false),
+        ];
+        var statuses = new Dictionary<ulong, FriendAchievementsStatus>
+        {
+            [1] = FriendAchievementsStatus.Ok,
+            [2] = FriendAchievementsStatus.Private,
+            [3] = FriendAchievementsStatus.NotOwned,
+            [4] = FriendAchievementsStatus.Failed,
+        };
+
+        Assert.Equal(["Owner"], FriendComparison.Owners(friends, statuses, showAll: false).Select(f => f.Name));
+        Assert.Equal(5, FriendComparison.Owners(friends, statuses, showAll: true).Count());
+    }
 }

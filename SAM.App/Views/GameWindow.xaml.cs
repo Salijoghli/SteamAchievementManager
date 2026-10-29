@@ -841,7 +841,7 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
             error = Strings.Get("Game_FriendsLoadFailed");
         }
 
-        var dialog = new FriendPickerDialog(friends, error, this.ViewModel.Images);
+        var dialog = new FriendPickerDialog(friends, error, this.ViewModel.Images, this.ViewModel.GetFriendAchievementsAsync);
         await this.ShowDialogAsync(dialog);
         if (dialog.SelectedFriend is { } friend)
         {

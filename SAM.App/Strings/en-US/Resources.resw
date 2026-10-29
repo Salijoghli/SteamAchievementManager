@@ -1439,6 +1439,27 @@ Installed · {2}</value>
   <data name="Game_FriendsNoMatch" xml:space="preserve">
     <value>No friends match your search.</value>
   </data>
+  <data name="Game_FriendShowAll.Content" xml:space="preserve">
+    <value>Show all friends</value>
+  </data>
+  <data name="Game_FriendsChecking" xml:space="preserve">
+    <value>Checking which friends own this game… {0} of {1}</value>
+  </data>
+  <data name="Game_FriendsOwnersCount" xml:space="preserve">
+    <value>{0} of {1} friends own this game</value>
+  </data>
+  <data name="Game_FriendsNoOwners" xml:space="preserve">
+    <value>None of your friends have achievements in this game, or their game details are private. Tick “Show all friends” to pick anyone.</value>
+  </data>
+  <data name="Game_FriendOwnsStatus" xml:space="preserve">
+    <value>{0} · {1} achievements</value>
+  </data>
+  <data name="Game_FriendPrivateStatus" xml:space="preserve">
+    <value>{0} · Game details private</value>
+  </data>
+  <data name="Game_FriendNoAchievementsStatus" xml:space="preserve">
+    <value>{0} · Doesn't own it or has no achievements</value>
+  </data>
   <data name="Game_CompareUnavailable" xml:space="preserve">
     <value>Comparing with friends isn't available in this version yet.</value>
   </data>

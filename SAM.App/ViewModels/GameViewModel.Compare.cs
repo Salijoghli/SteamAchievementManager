@@ -79,6 +79,10 @@ public sealed partial class GameViewModel
 
     public ImageCache Images => this._services.Images;
 
+    /// <summary>A friend's achievements in this game (cached for 30 minutes, so comparing afterwards is instant).</summary>
+    public Task<FriendAchievements> GetFriendAchievementsAsync(ulong friendSteamId, CancellationToken cancellationToken) =>
+        this._services.Friends.GetAchievementsAsync(friendSteamId, this.AppId, cancellationToken);
+
     /// <summary>
     /// Compares this game's achievements with <paramref name="friend"/>'s. Replaces any earlier
     /// comparison. Never throws; failures show as <see cref="ComparisonError"/>.

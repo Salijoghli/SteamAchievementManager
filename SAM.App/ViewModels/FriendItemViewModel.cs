@@ -20,7 +20,26 @@ public sealed partial class FriendItemViewModel(SteamFriend friend, ImageCache i
 
     public bool IsOnline => this.Friend.IsOnline;
 
-    public string StatusText => Strings.Get(this.Friend.IsOnline ? "Game_FriendOnline" : "Game_FriendOffline");
+    /// <summary>"Online", plus what the ownership check found once it's done: "Online · 12 achievements".</summary>
+    public string StatusText
+    {
+        get
+        {
+            var presence = Strings.Get(this.Friend.IsOnline ? "Game_FriendOnline" : "Game_FriendOffline");
+            return this.Ownership?.Status switch
+            {
+                FriendAchievementsStatus.Ok => Strings.Format("Game_FriendOwnsStatus", presence, this.Ownership.Unlocked.Count),
+                FriendAchievementsStatus.Private => Strings.Format("Game_FriendPrivateStatus", presence),
+                FriendAchievementsStatus.NotOwned => Strings.Format("Game_FriendNoAchievementsStatus", presence),
+                _ => presence,
+            };
+        }
+    }
+
+    /// <summary>The friend's achievements in this game, once checked.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StatusText))]
+    private FriendAchievements? _ownership;
 
     /// <summary>The avatar once downloaded; until then (or without one) the picture shows initials.</summary>
     [ObservableProperty]
