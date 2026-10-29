@@ -15,12 +15,23 @@
                     <Color x:Key="SkeletonHighlightColor">#3DFFFFFF</Color>
                     <SolidColorBrush x:Key="CardBackgroundBrush" Color="#0DFFFFFF" />
                     <SolidColorBrush x:Key="CardBorderBrush" Color="#19000000" />
+                    <!-- Chart colours (Stats, Autopilot, game timeline): one validated blue series, recessive gridlines. -->
+                    <SolidColorBrush x:Key="ChartSeriesBrush" Color="#3987E5" />
+                    <SolidColorBrush x:Key="ChartGridBrush" Color="#17FFFFFF" />
+                    <SolidColorBrush x:Key="ChartBaselineBrush" Color="#40FFFFFF" />
+                    <SolidColorBrush x:Key="ChartSurfaceBrush" Color="#2C2C2C" />
+                    <SolidColorBrush x:Key="ChartHoverBrush" Color="#0FFFFFFF" />
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Light">
                     <Color x:Key="SkeletonBaseColor">#14000000</Color>
                     <Color x:Key="SkeletonHighlightColor">#29000000</Color>
                     <SolidColorBrush x:Key="CardBackgroundBrush" Color="#B3FFFFFF" />
                     <SolidColorBrush x:Key="CardBorderBrush" Color="#0F000000" />
+                    <SolidColorBrush x:Key="ChartSeriesBrush" Color="#2A78D6" />
+                    <SolidColorBrush x:Key="ChartGridBrush" Color="#14000000" />
+                    <SolidColorBrush x:Key="ChartBaselineBrush" Color="#40000000" />
+                    <SolidColorBrush x:Key="ChartSurfaceBrush" Color="#FCFCFC" />
+                    <SolidColorBrush x:Key="ChartHoverBrush" Color="#0A000000" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 

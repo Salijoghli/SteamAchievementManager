@@ -82,6 +82,14 @@ public sealed class GameAchievementProgressTests
     }
 
     [Fact]
+    public void NothingForAnIntegerDoneFlag()
+    {
+        Assert.Null(GameAchievementProgress.Compute(Counter(1), 0, isIntegerStat: true, English));
+        Assert.Null(GameAchievementProgress.Compute(Counter(6, min: 5), 5, isIntegerStat: true, English));
+        Assert.NotNull(GameAchievementProgress.Compute(Counter(2), 1, isIntegerStat: true, English));
+    }
+
+    [Fact]
     public void MissingMinimumCountsFromZero()
     {
         var progress = GameAchievementProgress.Compute(Counter(10, min: null), 5, true, English)!;

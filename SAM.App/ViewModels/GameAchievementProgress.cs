@@ -37,7 +37,9 @@ public static class GameAchievementProgress
         }
 
         var min = definition.ProgressMin is { } m && double.IsFinite(m) ? m : 0;
-        if (max <= min)
+
+        // An integer 0–1 range is a done/not-done flag (Battlefield 2042 has one per achievement): "0 / 1" says nothing.
+        if (max <= min || (isIntegerStat && max - min <= 1))
         {
             return null;
         }

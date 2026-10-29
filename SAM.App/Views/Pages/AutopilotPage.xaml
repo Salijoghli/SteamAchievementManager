@@ -7,22 +7,6 @@
 
     <UserControl.Resources>
         <ResourceDictionary>
-            <!-- Curve chart colours: the same validated single-series blue as the Stats charts. -->
-            <ResourceDictionary.ThemeDictionaries>
-                <ResourceDictionary x:Key="Default">
-                    <SolidColorBrush x:Key="ChartSeriesBrush" Color="#3987E5" />
-                    <SolidColorBrush x:Key="ChartGridBrush" Color="#17FFFFFF" />
-                    <SolidColorBrush x:Key="ChartBaselineBrush" Color="#40FFFFFF" />
-                    <SolidColorBrush x:Key="ChartSurfaceBrush" Color="#2C2C2C" />
-                </ResourceDictionary>
-                <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="ChartSeriesBrush" Color="#2A78D6" />
-                    <SolidColorBrush x:Key="ChartGridBrush" Color="#14000000" />
-                    <SolidColorBrush x:Key="ChartBaselineBrush" Color="#40000000" />
-                    <SolidColorBrush x:Key="ChartSurfaceBrush" Color="#FCFCFC" />
-                </ResourceDictionary>
-            </ResourceDictionary.ThemeDictionaries>
-
             <Style x:Key="PanelStyle" TargetType="Border">
                 <Setter Property="Background" Value="{ThemeResource CardBackgroundBrush}" />
                 <Setter Property="BorderBrush" Value="{ThemeResource CardBorderBrush}" />

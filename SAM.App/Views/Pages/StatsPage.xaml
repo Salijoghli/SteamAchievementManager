@@ -10,28 +10,6 @@
 
     <UserControl.Resources>
         <ResourceDictionary>
-            <!--
-                Chart colours. One series, so one hue: the reference palette's blue, stepped per
-                theme (validated ≥ 3:1 against the light and dark card surfaces). Gridlines are
-                recessive hairlines; the baseline is one step firmer.
-            -->
-            <ResourceDictionary.ThemeDictionaries>
-                <ResourceDictionary x:Key="Default">
-                    <SolidColorBrush x:Key="ChartSeriesBrush" Color="#3987E5" />
-                    <SolidColorBrush x:Key="ChartGridBrush" Color="#17FFFFFF" />
-                    <SolidColorBrush x:Key="ChartBaselineBrush" Color="#40FFFFFF" />
-                    <SolidColorBrush x:Key="ChartSurfaceBrush" Color="#2C2C2C" />
-                    <SolidColorBrush x:Key="ChartHoverBrush" Color="#0FFFFFFF" />
-                </ResourceDictionary>
-                <ResourceDictionary x:Key="Light">
-                    <SolidColorBrush x:Key="ChartSeriesBrush" Color="#2A78D6" />
-                    <SolidColorBrush x:Key="ChartGridBrush" Color="#14000000" />
-                    <SolidColorBrush x:Key="ChartBaselineBrush" Color="#40000000" />
-                    <SolidColorBrush x:Key="ChartSurfaceBrush" Color="#FCFCFC" />
-                    <SolidColorBrush x:Key="ChartHoverBrush" Color="#0A000000" />
-                </ResourceDictionary>
-            </ResourceDictionary.ThemeDictionaries>
-
             <Style x:Key="PanelStyle" TargetType="Border">
                 <Setter Property="Background" Value="{ThemeResource CardBackgroundBrush}" />
                 <Setter Property="BorderBrush" Value="{ThemeResource CardBorderBrush}" />
