@@ -151,6 +151,48 @@ namespace SAM.API.Wrappers
         }
         #endregion
 
+        #region GetISteamFriends
+        [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
+        private delegate IntPtr NativeGetISteamFriends(IntPtr self, int user, int pipe, IntPtr version);
+
+        /// <summary>Returns null when the client doesn't export <paramref name="version"/>.</summary>
+        private TClass GetISteamFriends<TClass>(int user, int pipe, string version)
+            where TClass : class, INativeWrapper, new()
+        {
+            using (var nativeVersion = NativeStrings.StringToStringHandle(version))
+            {
+                IntPtr address = this.Call<IntPtr, NativeGetISteamFriends>(
+                    this.Functions.GetISteamFriends,
+                    this.ObjectAddress,
+                    user,
+                    pipe,
+                    nativeVersion.Handle);
+                if (address == IntPtr.Zero)
+                {
+                    return null;
+                }
+
+                TClass result = new();
+                result.SetupFunctions(address);
+                return result;
+            }
+        }
+        #endregion
+
+        #region GetSteamFriends017
+        public SteamFriends017 GetSteamFriends017(int user, int pipe)
+        {
+            return this.GetISteamFriends<SteamFriends017>(user, pipe, SteamFriends017.InterfaceVersion);
+        }
+        #endregion
+
+        #region GetSteamFriends018
+        public SteamFriends018 GetSteamFriends018(int user, int pipe)
+        {
+            return this.GetISteamFriends<SteamFriends018>(user, pipe, SteamFriends018.InterfaceVersion);
+        }
+        #endregion
+
         #region GetISteamUtils
         [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
         private delegate IntPtr NativeGetISteamUtils(IntPtr self, int pipe, IntPtr version);

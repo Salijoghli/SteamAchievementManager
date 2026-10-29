@@ -125,6 +125,38 @@ public sealed class SteamSession : IDisposable
         return string.IsNullOrEmpty(value) ? null : value;
     }
 
+    /// <summary>k_EFriendFlagImmediate: regular friends (not blocked, pending or clan members).</summary>
+    private const int FriendFlagImmediate = 4;
+
+    /// <summary>
+    /// The user's regular friends as Steam knows them right now: SteamID64, persona name and whether
+    /// they're online (EPersonaState != offline). Empty if the client exposes no ISteamFriends.
+    /// Read-only; call on the thread that created the session.
+    /// </summary>
+    public IReadOnlyList<(ulong Id, string Name, bool Online)> GetFriends()
+    {
+        var friends = this._client.GetSteamFriends();
+        if (friends == null)
+        {
+            return [];
+        }
+
+        var count = friends.GetFriendCount(FriendFlagImmediate);
+        var result = new List<(ulong Id, string Name, bool Online)>(Math.Max(count, 0));
+        for (var i = 0; i < count; i++)
+        {
+            var id = friends.GetFriendByIndex(i, FriendFlagImmediate);
+            if (id == 0)
+            {
+                continue;
+            }
+
+            result.Add((id, friends.GetFriendPersonaName(id), friends.GetFriendPersonaState(id) != 0));
+        }
+
+        return result;
+    }
+
     #region Stats and achievements (only valid when AppId != 0)
     /// <summary>
     /// Asks Steam for the current user's stats for <see cref="AppId"/> and waits for the

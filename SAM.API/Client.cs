@@ -89,6 +89,25 @@ namespace SAM.API
             this.SteamApps008 = this.SteamClient.GetSteamApps008(this._User, this._Pipe);
         }
 
+        private Wrappers.ISteamFriendList _SteamFriends;
+        private bool _SteamFriendsQueried;
+
+        /// <summary>
+        /// The client's ISteamFriends (read-only friend-list calls), trying "SteamFriends017"
+        /// then "SteamFriends018". Null if the client exports neither or isn't initialized.
+        /// </summary>
+        public Wrappers.ISteamFriendList GetSteamFriends()
+        {
+            if (this._SteamFriendsQueried == false && this.SteamClient != null && this._Pipe > 0 && this._User > 0)
+            {
+                this._SteamFriendsQueried = true;
+                this._SteamFriends = (Wrappers.ISteamFriendList)this.SteamClient.GetSteamFriends017(this._User, this._Pipe)
+                    ?? this.SteamClient.GetSteamFriends018(this._User, this._Pipe);
+            }
+
+            return this._SteamFriends;
+        }
+
         ~Client()
         {
             this.Dispose(false);
