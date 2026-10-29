@@ -24,6 +24,7 @@ public sealed partial class LibraryWindow : Window
 {
     private readonly DispatcherQueueTimer _searchDebounce;
     private bool _isDialogOpen;
+    private Microsoft.UI.Xaml.Controls.Primitives.Popup? _quickSwitcher;
 
     private readonly AppServices _services;
 
@@ -140,6 +141,24 @@ public sealed partial class LibraryWindow : Window
     {
         args.Handled = true;
         this.SearchBox.Focus(FocusState.Keyboard);
+    }
+
+    /// <summary>Ctrl+K (any page): the quick switcher; pressed again while open, back to its search box.</summary>
+    private void OnQuickSwitcherAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)
+    {
+        args.Handled = true;
+        if (this._isDialogOpen)
+        {
+            return;
+        }
+
+        if (this._quickSwitcher is { IsOpen: true, Child: QuickSwitcher open })
+        {
+            open.FocusQuery();
+            return;
+        }
+
+        this._quickSwitcher = QuickSwitcher.Show(this.Root, this.ViewModel);
     }
 
     private void OnRefreshAccelerator(KeyboardAccelerator sender, KeyboardAcceleratorInvokedEventArgs args)

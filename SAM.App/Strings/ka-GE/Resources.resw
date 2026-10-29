@@ -375,7 +375,7 @@
     <value>თამაშის ან App ID-ის ძიება</value>
   </data>
   <data name="Library_SearchBox.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
-    <value>თამაშის ან App ID-ის ძიება (Ctrl+F)</value>
+    <value>თამაშის ან App ID-ის ძიება (Ctrl+F) · სწრაფი გადამრთველი (Ctrl+K)</value>
   </data>
   <data name="Library_CollectionPicker.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>კოლექცია</value>
@@ -1094,6 +1094,81 @@
   </data>
   <data name="Update_YouHaveWithTitle" xml:space="preserve">
     <value>{0}. თქვენ გაქვთ ვერსია {1}.</value>
+  </data>
+  <data name="Update_UpdateNow" xml:space="preserve">
+    <value>განახლება ახლავე</value>
+  </data>
+  <data name="Update_Download" xml:space="preserve">
+    <value>ჩამოტვირთვა</value>
+  </data>
+  <data name="Update_Downloading" xml:space="preserve">
+    <value>ვერსია {0} იტვირთება… {1:0}%</value>
+  </data>
+  <data name="Update_Verifying" xml:space="preserve">
+    <value>ჩამოტვირთული ფაილის შემოწმება…</value>
+  </data>
+  <data name="Update_Installing" xml:space="preserve">
+    <value>განახლება ინსტალირდება. SAM ხელახლა გაიშვება…</value>
+  </data>
+  <data name="Update_ErrorIncomplete" xml:space="preserve">
+    <value>ჩამოტვირთული ფაილი არასრულია.</value>
+  </data>
+  <data name="Update_ErrorNotExecutable" xml:space="preserve">
+    <value>ჩამოტვირთული ფაილი Windows-ის პროგრამა არ არის.</value>
+  </data>
+  <data name="Update_ErrorWrongVersion" xml:space="preserve">
+    <value>ჩამოტვირთული ფაილი ვერსია {0} არ არის.</value>
+  </data>
+  <data name="Update_FailedTitle" xml:space="preserve">
+    <value>ავტომატური განახლება ვერ მოხერხდა</value>
+  </data>
+  <data name="Update_FailedMessage" xml:space="preserve">
+    <value>{0} სანაცვლოდ გაიხსნა ჩამოტვირთვის გვერდი.</value>
+  </data>
+  <data name="Update_InstalledTitle" xml:space="preserve">
+    <value>განახლება დაინსტალირდა</value>
+  </data>
+  <data name="Update_RestartManually" xml:space="preserve">
+    <value>ვერსია {0} დაინსტალირებულია. გამოსაყენებლად თავიდან გაუშვით SAM.</value>
+  </data>
+  <data name="Notify_UnlockTitle" xml:space="preserve">
+    <value>{0} — {1}</value>
+  </data>
+  <data name="Notify_UnlockRarity" xml:space="preserve">
+    <value>{0} · მოთამაშეთა {1:0.#}%</value>
+  </data>
+  <data name="Notify_UnlockNoRarity" xml:space="preserve">
+    <value>მიღწევა განბლოკილია</value>
+  </data>
+  <data name="Notify_UnlockBatch_One" xml:space="preserve">
+    <value>{1}: განბლოკილია {0} მიღწევა</value>
+  </data>
+  <data name="Notify_UnlockBatch_Other" xml:space="preserve">
+    <value>{1}: განბლოკილია {0} მიღწევა</value>
+  </data>
+  <data name="Notify_UnlockBatchMore" xml:space="preserve">
+    <value>{0} და კიდევ {1}</value>
+  </data>
+  <data name="Notify_UnknownGame" xml:space="preserve">
+    <value>აპი {0}</value>
+  </data>
+  <data name="Notify_OnUnlockSetting.Header" xml:space="preserve">
+    <value>შეტყობინება, როცა თამაშში მიღწევას განვბლოკავ</value>
+  </data>
+  <data name="Notify_OnUnlockSettingHint.Text" xml:space="preserve">
+    <value>სანამ ბიბლიოთეკა ან მისი ხატულა სისტემურ არეში მუშაობს. SAM-ით განბლოკილი მიღწევები არ ითვლება.</value>
+  </data>
+  <data name="Switcher_QueryBox.PlaceholderText" xml:space="preserve">
+    <value>თამაშზე გადასვლა სახელით ან App ID-ით</value>
+  </data>
+  <data name="Switcher_QueryBox.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>სწრაფი გადამრთველი</value>
+  </data>
+  <data name="Switcher_NoMatches.Text" xml:space="preserve">
+    <value>შესაბამისი თამაში ვერ მოიძებნა</value>
+  </data>
+  <data name="Switcher_Hint.Text" xml:space="preserve">
+    <value>↑↓ არჩევა · Enter გახსნა · Esc დახურვა</value>
   </data>
   <data name="Game_TitleSuffix.Text" xml:space="preserve">
     <value>  ·  Steam Achievement Manager</value>

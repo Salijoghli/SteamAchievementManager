@@ -103,6 +103,12 @@ public sealed class AppSettings
     /// <summary>Show Windows notifications (e.g. when a background task unlocks achievements).</summary>
     public bool ShowNotifications { get; set; } = true;
 
+    /// <summary>
+    /// Notify when the library notices an achievement unlocked by playing (not by SAM). Only
+    /// applies while <see cref="ShowNotifications"/> is on.
+    /// </summary>
+    public bool NotifyOnUnlock { get; set; } = true;
+
     /// <summary>Check GitHub for a newer release on startup.</summary>
     public bool CheckForUpdates { get; set; } = true;
 

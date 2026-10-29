@@ -17,10 +17,13 @@ namespace SAM.App.Services;
 /// </remarks>
 public sealed class UpdateService(HttpClient http, AppSettings settings)
 {
+    /// <summary>The release asset that is the app itself (what build.ps1 publishes).</summary>
+    internal const string ExecutableAssetName = "SAM.exe";
+
     private const string LatestReleaseUrl = "https://api.github.com/repos/Salijoghli/SteamAchievementManager/releases/latest";
 
     private readonly object _lock = new();
-    private Task<UpdateInfo?>? _latest;
+    private Task<Release?>? _latest;
 
     /// <summary>The running app's version (from the assembly, e.g. 8.1.0.0).</summary>
     public static Version CurrentVersion =>
@@ -35,15 +38,7 @@ public sealed class UpdateService(HttpClient http, AppSettings settings)
     /// </summary>
     public async Task<UpdateInfo?> CheckAsync(CancellationToken cancellationToken)
     {
-        Task<UpdateInfo?> latest;
-        lock (this._lock)
-        {
-            // The request itself isn't tied to the caller's token, so a cancelled caller
-            // doesn't poison the cached result for everyone else.
-            latest = this._latest ??= this.FetchLatestAsync();
-        }
-
-        var info = await latest.WaitAsync(cancellationToken);
+        var info = (await this.GetLatestAsync().WaitAsync(cancellationToken))?.Info;
         if (info == null)
         {
             return null;
@@ -58,6 +53,24 @@ public sealed class UpdateService(HttpClient http, AppSettings settings)
         var skipped = ParseVersion(settings.SkippedUpdateVersion);
         return skipped != null && skipped == version ? null : info;
     }
+
+    /// <summary>
+    /// The release's <c>SAM.exe</c> download for <paramref name="info"/> (a result of
+    /// <see cref="CheckAsync"/>), or null when the release has none (then only the release page
+    /// or zip can be offered).
+    /// </summary>
+    public async Task<UpdateAsset?> GetExecutableAsync(UpdateInfo info, CancellationToken cancellationToken)
+    {
+        var release = await this.GetLatestAsync().WaitAsync(cancellationToken);
+        return release != null && release.Info.Version == info.Version ? release.Executable : null;
+    }
+
+    /// <summary>
+    /// True when <paramref name="fileVersion"/> (a FileVersionInfo string such as "8.1.5.0") is the
+    /// release <paramref name="releaseVersion"/> (such as "8.1.5" or "v8.1.5").
+    /// </summary>
+    internal static bool IsSameVersion(string? fileVersion, string? releaseVersion) =>
+        ParseVersion(fileVersion) is { } file && ParseVersion(releaseVersion) is { } release && file == release;
 
     /// <summary>
     /// Parses a release tag such as "v8.1.0", "8.1" or "v8.1.0-beta" into a version with all four
@@ -99,7 +112,17 @@ public sealed class UpdateService(HttpClient http, AppSettings settings)
         Math.Max(version.Build, 0),
         Math.Max(version.Revision, 0));
 
-    private async Task<UpdateInfo?> FetchLatestAsync()
+    private Task<Release?> GetLatestAsync()
+    {
+        lock (this._lock)
+        {
+            // The request itself isn't tied to the caller's token, so a cancelled caller
+            // doesn't poison the cached result for everyone else.
+            return this._latest ??= this.FetchLatestAsync();
+        }
+    }
+
+    private async Task<Release?> FetchLatestAsync()
     {
         try
         {
@@ -121,7 +144,7 @@ public sealed class UpdateService(HttpClient http, AppSettings settings)
             }
 
             var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            return ParseRelease(json);
+            return ParseRelease(json) is { } info ? new Release(info, ParseExecutableAsset(json)) : null;
         }
         catch (Exception e) when (e is HttpRequestException or TaskCanceledException or JsonException
                                       or InvalidOperationException or UriFormatException or FormatException)
@@ -182,10 +205,47 @@ public sealed class UpdateService(HttpClient http, AppSettings settings)
             download);
     }
 
+    /// <summary>
+    /// The release asset to self-update from: the one named exactly <see cref="ExecutableAssetName"/>
+    /// (any case) with an absolute https download URL and a size. Null when there's none.
+    /// </summary>
+    internal static UpdateAsset? ParseExecutableAsset(string json)
+    {
+        using var document = JsonDocument.Parse(json);
+        if (document.RootElement.ValueKind != JsonValueKind.Object ||
+            document.RootElement.TryGetProperty("assets", out var assets) == false ||
+            assets.ValueKind != JsonValueKind.Array)
+        {
+            return null;
+        }
+
+        foreach (var asset in assets.EnumerateArray())
+        {
+            var name = GetString(asset, "name");
+            var url = GetString(asset, "browser_download_url");
+            if (name != null &&
+                string.Equals(name, ExecutableAssetName, StringComparison.OrdinalIgnoreCase) &&
+                Uri.TryCreate(url, UriKind.Absolute, out var download) &&
+                download.Scheme == Uri.UriSchemeHttps &&
+                asset.TryGetProperty("size", out var sizeElement) &&
+                sizeElement.ValueKind == JsonValueKind.Number &&
+                sizeElement.TryGetInt64(out var size) &&
+                size > 0)
+            {
+                return new UpdateAsset(name, download, size);
+            }
+        }
+
+        return null;
+    }
+
     private static string? GetString(JsonElement element, string name) =>
         element.ValueKind == JsonValueKind.Object &&
         element.TryGetProperty(name, out var value) &&
         value.ValueKind == JsonValueKind.String
             ? value.GetString()
             : null;
+
+    /// <summary>A parsed latest release: what's shown to the user, and the exe to self-update from.</summary>
+    private sealed record Release(UpdateInfo Info, UpdateAsset? Executable);
 }
