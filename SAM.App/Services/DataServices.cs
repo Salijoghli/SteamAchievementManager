@@ -23,6 +23,7 @@ public sealed class AppServices
         this.Playtime = new PlaytimeService(steam);
         this.GlobalPercents = new GlobalPercentService(this.Cache, http);
         this.AchievementCounts = new AchievementCountService(this.Cache, http);
+        this.Friends = new FriendsService(steam, this.Cache, http);
         this.Images = new ImageCache(this.Cache, http);
         this.Art = new GameArt(steam);
         this.Games = new GameListService(this.Cache, steam, http);
@@ -85,6 +86,9 @@ public sealed class AppServices
 
     /// <summary>Whether games have achievements, from the store, for games whose schema Steam hasn't downloaded.</summary>
     public AchievementCountService AchievementCounts { get; }
+
+    /// <summary>Steam friends and their achievements (for comparing).</summary>
+    public FriendsService Friends { get; }
 
     public ImageCache Images { get; }
 
