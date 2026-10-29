@@ -38,6 +38,10 @@ public enum AchievementDateFilter
 /// <summary>Index order of the sort ComboBox.</summary>
 public enum AchievementSort
 {
+    /// <summary>The default: locked achievements first, then unlocked, each in the game's order.</summary>
+    LockedFirst,
+
+    /// <summary>The game's own (schema) order.</summary>
     Default,
     Name,
     RarestFirst,
@@ -508,7 +512,10 @@ public sealed partial class GameViewModel : ObservableObject
                 .OrderBy(a => a.UnlockTime.HasValue ? 0 : 1)
                 .ThenByDescending(a => a.UnlockTime ?? DateTimeOffset.MinValue)
                 .ThenBy(a => a.SchemaIndex),
-            _ => items.OrderBy(a => a.SchemaIndex),
+            AchievementSort.Default => items.OrderBy(a => a.SchemaIndex),
+
+            // By Steam's state (IsAchieved), not the pending toggle, so rows don't jump while editing.
+            _ => items.OrderBy(a => a.IsAchieved).ThenBy(a => a.SchemaIndex),
         };
 
         Sync(this.VisibleAchievements, items.ToList());

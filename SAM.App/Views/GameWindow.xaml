@@ -382,6 +382,7 @@
                             MinWidth="200"
                             x:Uid="Game_SortBox"
                             SelectedIndex="{x:Bind ViewModel.SortIndex, Mode=TwoWay}">
+                            <ComboBoxItem x:Uid="Game_SortLockedFirst" />
                             <ComboBoxItem x:Uid="Game_SortDefault" />
                             <ComboBoxItem x:Uid="Game_SortName" />
                             <ComboBoxItem x:Uid="Game_SortRarest" />

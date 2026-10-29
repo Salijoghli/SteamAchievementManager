@@ -1236,8 +1236,11 @@
   <data name="Game_SortBox.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>დალაგების წესი</value>
   </data>
+  <data name="Game_SortLockedFirst.Content" xml:space="preserve">
+    <value>დალაგება: ჯერ დაბლოკილი</value>
+  </data>
   <data name="Game_SortDefault.Content" xml:space="preserve">
-    <value>დალაგება: ნაგულისხმევი</value>
+    <value>დალაგება: თამაშის თანმიმდევრობით</value>
   </data>
   <data name="Game_SortName.Content" xml:space="preserve">
     <value>დალაგება: სახელი</value>

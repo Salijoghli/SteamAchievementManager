@@ -1250,8 +1250,11 @@ Installed · {2}</value>
   <data name="Game_SortBox.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Sort order</value>
   </data>
+  <data name="Game_SortLockedFirst.Content" xml:space="preserve">
+    <value>Sort: Locked first</value>
+  </data>
   <data name="Game_SortDefault.Content" xml:space="preserve">
-    <value>Sort: Default order</value>
+    <value>Sort: Game order</value>
   </data>
   <data name="Game_SortName.Content" xml:space="preserve">
     <value>Sort: Name</value>
