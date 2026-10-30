@@ -129,6 +129,19 @@ public sealed class SelfUpdaterTests : IDisposable
     private static string AppVersion => UpdateService.CurrentVersion.ToString(3);
 
     [Fact]
+    public void PublishedBuildsAreReplaceableEvenThoughTheirCodeIsExtracted()
+    {
+        // Single-file Windows App SDK builds extract SAM.dll to %TEMP%\.net\SAM\<hash>\ at start.
+        Assert.False(SelfUpdater.IsDevelopmentLayout(@"C:\Tools\SAM\SAM.exe", @"C:\Users\me\AppData\Local\Temp\.net\SAM\abc=\SAM.dll"));
+        Assert.False(SelfUpdater.IsDevelopmentLayout(@"C:\Tools\SAM\SAM.exe", ""));
+        Assert.False(SelfUpdater.IsDevelopmentLayout(@"C:\Tools\SAM\SAM.exe", null));
+
+        // A development build runs SAM.dll from the exe's own folder.
+        Assert.True(SelfUpdater.IsDevelopmentLayout(@"C:\src\SAM.App\bin\SAM.exe", @"C:\src\SAM.App\bin\SAM.dll"));
+        Assert.True(SelfUpdater.IsDevelopmentLayout(@"C:\src\bin\SAM.exe", @"c:\SRC\BIN\SAM.dll"));
+    }
+
+    [Fact]
     public void AcceptsAProgramOfTheReleaseVersion()
     {
         var size = new FileInfo(AppAssembly).Length;

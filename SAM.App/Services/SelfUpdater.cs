@@ -53,15 +53,26 @@ public static class SelfUpdater
     public static string? GetReplaceableExecutable()
     {
         var path = Environment.ProcessPath;
-
-        // A development build runs from SAM.App.dll next to the exe; swapping only the exe would break it.
-        if (path == null || string.IsNullOrEmpty(typeof(SelfUpdater).Assembly.Location) == false)
+        if (path == null || IsDevelopmentLayout(path, typeof(SelfUpdater).Assembly.Location))
         {
             return null;
         }
 
         return Path.GetDirectoryName(path) is { } folder && CanWriteTo(folder) ? path : null;
     }
+
+    /// <summary>
+    /// True for a development build: the app's code (SAM.dll) sits next to the exe, so swapping only
+    /// the exe would break it. A published single-file build has its code inside the exe; Windows
+    /// App SDK apps extract it to a temp folder (%TEMP%\.net\SAM\…) at start, so the assembly has a
+    /// location there, but never in the exe's own folder.
+    /// </summary>
+    internal static bool IsDevelopmentLayout(string exePath, string? assemblyLocation) =>
+        string.IsNullOrEmpty(assemblyLocation) == false &&
+        string.Equals(
+            Path.GetFullPath(Path.GetDirectoryName(assemblyLocation) ?? ""),
+            Path.GetFullPath(Path.GetDirectoryName(exePath) ?? ""),
+            StringComparison.OrdinalIgnoreCase);
 
     /// <summary>True if a file can be created (and deleted) in <paramref name="folder"/>.</summary>
     internal static bool CanWriteTo(string folder)
