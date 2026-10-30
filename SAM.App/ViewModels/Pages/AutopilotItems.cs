@@ -57,6 +57,7 @@ public sealed partial class AutopilotGameItem : ObservableObject
     private readonly Action<AutopilotGameItem>? _moveDown;
     private readonly Action<AutopilotGameItem>? _remove;
     private readonly Action<AutopilotGameItem>? _editOverrides;
+    private readonly Action<AutopilotGameItem, bool>? _includedChanged;
 
     public AutopilotGameItem(
         uint appId,
@@ -66,8 +67,12 @@ public sealed partial class AutopilotGameItem : ObservableObject
         Action<AutopilotGameItem>? moveUp = null,
         Action<AutopilotGameItem>? moveDown = null,
         Action<AutopilotGameItem>? remove = null,
-        Action<AutopilotGameItem>? editOverrides = null)
+        Action<AutopilotGameItem>? editOverrides = null,
+        bool isIncluded = true,
+        Action<AutopilotGameItem, bool>? includedChanged = null)
     {
+        this._isIncluded = isIncluded;
+        this._includedChanged = includedChanged;
         this.AppId = appId;
         this.Name = name;
         this.Detail = detail;
@@ -89,6 +94,18 @@ public sealed partial class AutopilotGameItem : ObservableObject
 
     [ObservableProperty]
     private ImageSource? _image;
+
+    /// <summary>Ticked: Autopilot runs this game. Unticked games stay in the list but are skipped.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(RowOpacity))]
+    private bool _isIncluded;
+
+    /// <summary>Skipped games are dimmed.</summary>
+    public double RowOpacity => this.IsIncluded ? 1 : 0.5;
+
+    public string IncludeLabel => Strings.Format("Autopilot_IncludeNamed", this.Name);
+
+    partial void OnIsIncludedChanged(bool value) => this._includedChanged?.Invoke(this, value);
 
     /// <summary>Whether this game has per-game override settings (shows a badge).</summary>
     [ObservableProperty]

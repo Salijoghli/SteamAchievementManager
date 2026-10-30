@@ -7,27 +7,103 @@
     DefaultButton="Close"
     Style="{StaticResource DefaultContentDialogStyle}">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
-        <StackPanel Width="420" Spacing="20">
-            <StackPanel Spacing="8">
-                <TextBlock x:Uid="Settings_Appearance" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                <RadioButtons
-                    x:Uid="Settings_Theme"
-                    SelectedIndex="{x:Bind ViewModel.ThemeIndex, Mode=TwoWay}"
-                    MaxColumns="3">
-                    <RadioButton x:Uid="Settings_ThemeSystem" />
-                    <RadioButton x:Uid="Settings_ThemeLight" />
-                    <RadioButton x:Uid="Settings_ThemeDark" />
-                </RadioButtons>
-                <RadioButtons
-                    x:Uid="Settings_Language"
-                    SelectedIndex="{x:Bind ViewModel.LanguageIndex, Mode=TwoWay}"
-                    MaxColumns="2">
-                    <RadioButton x:Uid="Settings_LanguageEnglish" />
-                    <RadioButton x:Uid="Settings_LanguageGeorgian" />
-                </RadioButtons>
+    <!--
+        Windows 11 Settings layout: groups of cards, one setting per card, with an icon, a title and
+        a one-line description on the left and the control on the right.
+    -->
+    <ContentDialog.Resources>
+        <Style x:Key="SettingsCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="{ThemeResource CardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource CardBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
+            <Setter Property="Padding" Value="16,12" />
+            <Setter Property="MinHeight" Value="64" />
+        </Style>
+        <Style x:Key="SettingsRowStyle" TargetType="Grid">
+            <Setter Property="ColumnSpacing" Value="16" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="SettingsIconStyle" TargetType="FontIcon">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="Width" Value="20" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+        </Style>
+        <Style x:Key="SettingsGroupTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
+            <Setter Property="Margin" Value="2,0,0,4" />
+        </Style>
+        <Style x:Key="SettingsDescriptionStyle" TargetType="TextBlock" BasedOn="{StaticResource CaptionTextBlockStyle}">
+            <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+        <Style x:Key="SettingsToggleStyle" TargetType="ToggleSwitch">
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="OnContent" Value="" />
+            <Setter Property="OffContent" Value="" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,-12,0" />
+        </Style>
+        <Style x:Key="SettingsComboStyle" TargetType="ComboBox">
+            <Setter Property="MinWidth" Value="150" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+    </ContentDialog.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" Padding="0,0,12,0" Margin="0,0,-12,0">
+        <StackPanel Width="460" Spacing="24">
+
+            <!-- Appearance. -->
+            <StackPanel Spacing="4">
+                <TextBlock x:Uid="Settings_Appearance" Style="{StaticResource SettingsGroupTitleStyle}" />
+                <Border Style="{StaticResource SettingsCardStyle}">
+                    <Grid Style="{StaticResource SettingsRowStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xE790;" Style="{StaticResource SettingsIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock x:Name="ThemeTitle" x:Uid="Settings_Theme" />
+                            <TextBlock x:Uid="Settings_ThemeHint" Style="{StaticResource SettingsDescriptionStyle}" />
+                        </StackPanel>
+                        <ComboBox
+                            Grid.Column="2"
+                            Style="{StaticResource SettingsComboStyle}"
+                            SelectedIndex="{x:Bind ViewModel.ThemeIndex, Mode=TwoWay}"
+                            AutomationProperties.LabeledBy="{Binding ElementName=ThemeTitle}">
+                            <ComboBoxItem x:Uid="Settings_ThemeSystem" />
+                            <ComboBoxItem x:Uid="Settings_ThemeLight" />
+                            <ComboBoxItem x:Uid="Settings_ThemeDark" />
+                        </ComboBox>
+                    </Grid>
+                </Border>
+                <Border Style="{StaticResource SettingsCardStyle}">
+                    <Grid Style="{StaticResource SettingsRowStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xF2B7;" Style="{StaticResource SettingsIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock x:Name="LanguageTitle" x:Uid="Settings_Language" />
+                            <TextBlock x:Uid="Settings_LanguageHint" Style="{StaticResource SettingsDescriptionStyle}" />
+                        </StackPanel>
+                        <ComboBox
+                            Grid.Column="2"
+                            Style="{StaticResource SettingsComboStyle}"
+                            SelectedIndex="{x:Bind ViewModel.LanguageIndex, Mode=TwoWay}"
+                            AutomationProperties.LabeledBy="{Binding ElementName=LanguageTitle}">
+                            <ComboBoxItem x:Uid="Settings_LanguageEnglish" />
+                            <ComboBoxItem x:Uid="Settings_LanguageGeorgian" />
+                        </ComboBox>
+                    </Grid>
+                </Border>
                 <InfoBar
                     x:Uid="Settings_RestartNeeded"
+                    Margin="0,4,0,0"
                     Severity="Informational"
                     IsClosable="False"
                     IsOpen="{x:Bind ViewModel.IsRestartNeeded, Mode=OneWay}"
@@ -38,120 +114,237 @@
                 </InfoBar>
             </StackPanel>
 
-            <StackPanel Spacing="8">
-                <TextBlock x:Uid="Settings_Library" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                <ToggleSwitch
-                    x:Uid="Settings_KeepOtherAccountsCache"
-                    IsOn="{x:Bind ViewModel.KeepOtherAccountsCache, Mode=TwoWay}" />
-                <Grid ColumnSpacing="12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel VerticalAlignment="Center" Spacing="2">
-                        <TextBlock x:Uid="Settings_CacheSize" />
-                        <Grid>
-                            <controls:Skeleton x:Name="CacheSizeSkeleton" Width="80" Height="14" HorizontalAlignment="Left" />
-                            <TextBlock
-                                x:Name="CacheSizeText"
-                                Style="{StaticResource CaptionTextBlockStyle}"
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                Visibility="Collapsed" />
+            <!-- Library. -->
+            <StackPanel Spacing="4">
+                <TextBlock x:Uid="Settings_Library" Style="{StaticResource SettingsGroupTitleStyle}" />
+                <Border Style="{StaticResource SettingsCardStyle}">
+                    <Grid Style="{StaticResource SettingsRowStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xE748;" Style="{StaticResource SettingsIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock x:Name="KeepCacheTitle" x:Uid="Settings_KeepOtherAccountsCache" TextWrapping="Wrap" />
+                            <TextBlock x:Uid="Settings_KeepOtherAccountsCacheHint" Style="{StaticResource SettingsDescriptionStyle}" />
+                        </StackPanel>
+                        <ToggleSwitch
+                            Grid.Column="2"
+                            Style="{StaticResource SettingsToggleStyle}"
+                            IsOn="{x:Bind ViewModel.KeepOtherAccountsCache, Mode=TwoWay}"
+                            AutomationProperties.LabeledBy="{Binding ElementName=KeepCacheTitle}" />
+                    </Grid>
+                </Border>
+                <Border Style="{StaticResource SettingsCardStyle}">
+                    <Grid Style="{StaticResource SettingsRowStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xEDA2;" Style="{StaticResource SettingsIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                            <TextBlock x:Uid="Settings_CacheSize" />
+                            <Grid>
+                                <controls:Skeleton x:Name="CacheSizeSkeleton" Width="80" Height="12" HorizontalAlignment="Left" />
+                                <TextBlock x:Name="CacheSizeText" Style="{StaticResource SettingsDescriptionStyle}" Visibility="Collapsed" />
+                            </Grid>
+                        </StackPanel>
+                        <Button x:Name="ClearCacheButton" x:Uid="Settings_ClearCache" Grid.Column="2" VerticalAlignment="Center">
+                            <Button.Flyout>
+                                <Flyout x:Name="ConfirmFlyout">
+                                    <StackPanel Width="280" Spacing="12">
+                                        <TextBlock x:Uid="Settings_ClearCacheConfirm" TextWrapping="Wrap" />
+                                        <Button
+                                            x:Uid="Settings_ClearCacheConfirmButton"
+                                            HorizontalAlignment="Right"
+                                            Style="{StaticResource AccentButtonStyle}"
+                                            Click="OnConfirmClearCache" />
+                                    </StackPanel>
+                                </Flyout>
+                            </Button.Flyout>
+                        </Button>
+                    </Grid>
+                </Border>
+            </StackPanel>
+
+            <!-- Game window. -->
+            <StackPanel Spacing="4">
+                <TextBlock x:Uid="Settings_GameWindow" Style="{StaticResource SettingsGroupTitleStyle}" />
+                <Border Style="{StaticResource SettingsCardStyle}">
+                    <Grid Style="{StaticResource SettingsRowStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xED1A;" Style="{StaticResource SettingsIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock x:Name="SpoilerTitle" x:Uid="Settings_SpoilerProtection" />
+                            <TextBlock x:Uid="Settings_SpoilerProtectionHint" Style="{StaticResource SettingsDescriptionStyle}" />
+                        </StackPanel>
+                        <ToggleSwitch
+                            Grid.Column="2"
+                            Style="{StaticResource SettingsToggleStyle}"
+                            IsOn="{x:Bind ViewModel.SpoilerProtection, Mode=TwoWay}"
+                            AutomationProperties.LabeledBy="{Binding ElementName=SpoilerTitle}" />
+                    </Grid>
+                </Border>
+                <Border Style="{StaticResource SettingsCardStyle}">
+                    <Grid Style="{StaticResource SettingsRowStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xE81C;" Style="{StaticResource SettingsIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock x:Name="BackupTitle" x:Uid="Settings_BackupBeforeCommit" />
+                            <TextBlock x:Uid="Settings_BackupBeforeCommitHint" Style="{StaticResource SettingsDescriptionStyle}" />
+                        </StackPanel>
+                        <ToggleSwitch
+                            Grid.Column="2"
+                            Style="{StaticResource SettingsToggleStyle}"
+                            IsOn="{x:Bind ViewModel.BackupBeforeCommit, Mode=TwoWay}"
+                            AutomationProperties.LabeledBy="{Binding ElementName=BackupTitle}" />
+                    </Grid>
+                </Border>
+            </StackPanel>
+
+            <!-- App. -->
+            <StackPanel Spacing="4">
+                <TextBlock x:Uid="Settings_App" Style="{StaticResource SettingsGroupTitleStyle}" />
+                <Border Style="{StaticResource SettingsCardStyle}">
+                    <Grid Style="{StaticResource SettingsRowStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xE8BB;" Style="{StaticResource SettingsIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock x:Name="TrayTitle" x:Uid="Settings_MinimizeToTray" />
+                            <TextBlock x:Uid="Settings_MinimizeToTrayHint" Style="{StaticResource SettingsDescriptionStyle}" />
+                        </StackPanel>
+                        <ToggleSwitch
+                            Grid.Column="2"
+                            Style="{StaticResource SettingsToggleStyle}"
+                            IsOn="{x:Bind ViewModel.MinimizeToTray, Mode=TwoWay}"
+                            AutomationProperties.LabeledBy="{Binding ElementName=TrayTitle}" />
+                    </Grid>
+                </Border>
+
+                <!-- Notifications, with "unlock" notifications as a dependent row inside the same card. -->
+                <Border Style="{StaticResource SettingsCardStyle}" Padding="0">
+                    <StackPanel>
+                        <Grid Style="{StaticResource SettingsRowStyle}" Padding="16,12" MinHeight="64">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon Glyph="&#xEA8F;" Style="{StaticResource SettingsIconStyle}" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock x:Name="NotificationsTitle" x:Uid="Settings_ShowNotifications" />
+                                <TextBlock x:Uid="Settings_ShowNotificationsHint" Style="{StaticResource SettingsDescriptionStyle}" />
+                            </StackPanel>
+                            <ToggleSwitch
+                                Grid.Column="2"
+                                Style="{StaticResource SettingsToggleStyle}"
+                                IsOn="{x:Bind ViewModel.ShowNotifications, Mode=TwoWay}"
+                                AutomationProperties.LabeledBy="{Binding ElementName=NotificationsTitle}" />
+                        </Grid>
+                        <Border Height="1" Background="{ThemeResource CardBorderBrush}" />
+                        <Grid Style="{StaticResource SettingsRowStyle}" Padding="52,12,16,12" MinHeight="56">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock x:Name="UnlockTitle" x:Uid="Notify_OnUnlockSetting" />
+                                <TextBlock x:Uid="Notify_OnUnlockSettingHint" Style="{StaticResource SettingsDescriptionStyle}" />
+                            </StackPanel>
+                            <ToggleSwitch
+                                Grid.Column="1"
+                                Style="{StaticResource SettingsToggleStyle}"
+                                IsOn="{x:Bind ViewModel.NotifyOnUnlock, Mode=TwoWay}"
+                                IsEnabled="{x:Bind ViewModel.ShowNotifications, Mode=OneWay}"
+                                AutomationProperties.LabeledBy="{Binding ElementName=UnlockTitle}" />
                         </Grid>
                     </StackPanel>
-                    <Button x:Name="ClearCacheButton" x:Uid="Settings_ClearCache" Grid.Column="1">
-                        <Button.Flyout>
-                            <Flyout x:Name="ConfirmFlyout">
-                                <StackPanel Width="280" Spacing="12">
-                                    <TextBlock
-                                        x:Uid="Settings_ClearCacheConfirm"
-                                        TextWrapping="Wrap" />
-                                    <Button
-                                        x:Uid="Settings_ClearCacheConfirmButton"
-                                        HorizontalAlignment="Right"
-                                        Style="{StaticResource AccentButtonStyle}"
-                                        Click="OnConfirmClearCache" />
-                                </StackPanel>
-                            </Flyout>
-                        </Button.Flyout>
-                    </Button>
-                </Grid>
-            </StackPanel>
+                </Border>
 
-            <StackPanel Spacing="8">
-                <TextBlock x:Uid="Settings_GameWindow" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                <ToggleSwitch
-                    x:Uid="Settings_SpoilerProtection"
-                    IsOn="{x:Bind ViewModel.SpoilerProtection, Mode=TwoWay}" />
-                <TextBlock
-                    x:Uid="Settings_SpoilerProtectionHint"
-                    Style="{StaticResource CaptionTextBlockStyle}"
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    TextWrapping="Wrap"
-                    Margin="0,-8,0,0" />
-                <ToggleSwitch
-                    x:Uid="Settings_BackupBeforeCommit"
-                    IsOn="{x:Bind ViewModel.BackupBeforeCommit, Mode=TwoWay}" />
-                <TextBlock
-                    x:Uid="Settings_BackupBeforeCommitHint"
-                    Style="{StaticResource CaptionTextBlockStyle}"
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    TextWrapping="Wrap"
-                    Margin="0,-8,0,0" />
-            </StackPanel>
-
-            <StackPanel Spacing="8">
-                <TextBlock x:Uid="Settings_App" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                <ToggleSwitch
-                    x:Uid="Settings_MinimizeToTray"
-                    IsOn="{x:Bind ViewModel.MinimizeToTray, Mode=TwoWay}" />
-                <ToggleSwitch
-                    x:Uid="Settings_ShowNotifications"
-                    IsOn="{x:Bind ViewModel.ShowNotifications, Mode=TwoWay}" />
-                <ToggleSwitch
-                    x:Uid="Notify_OnUnlockSetting"
-                    IsOn="{x:Bind ViewModel.NotifyOnUnlock, Mode=TwoWay}"
-                    IsEnabled="{x:Bind ViewModel.ShowNotifications, Mode=OneWay}" />
-                <TextBlock
-                    x:Uid="Notify_OnUnlockSettingHint"
-                    Style="{StaticResource CaptionTextBlockStyle}"
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    TextWrapping="Wrap"
-                    Margin="0,-8,0,0" />
-                <ToggleSwitch
-                    x:Uid="Settings_CheckForUpdates"
-                    IsOn="{x:Bind ViewModel.CheckForUpdates, Mode=TwoWay}" />
-                <Grid ColumnSpacing="12">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel VerticalAlignment="Center" Spacing="2">
-                        <TextBlock x:Name="VersionText" />
-                        <TextBlock
-                            x:Name="UpdateStatusText"
-                            Style="{StaticResource CaptionTextBlockStyle}"
-                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                            TextWrapping="Wrap"
-                            Visibility="Collapsed" />
+                <!-- Version and updates: "Check now", or "Update now" once a newer release is known. -->
+                <Border Style="{StaticResource SettingsCardStyle}" Padding="0">
+                    <StackPanel>
+                        <Grid Style="{StaticResource SettingsRowStyle}" Padding="16,12" MinHeight="64">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <FontIcon x:Name="UpdateIcon" Glyph="&#xE895;" Style="{StaticResource SettingsIconStyle}" />
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock x:Name="VersionText" />
+                                <TextBlock
+                                    x:Name="UpdateStatusText"
+                                    Style="{StaticResource SettingsDescriptionStyle}"
+                                    Visibility="Collapsed"
+                                    AutomationProperties.LiveSetting="Polite" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                                <ProgressRing x:Name="UpdateProgress" Width="16" Height="16" IsActive="False" Visibility="Collapsed" />
+                                <Button x:Name="CheckNowButton" x:Uid="Settings_CheckNow" Click="OnCheckNowClick" />
+                                <Button
+                                    x:Name="UpdateNowButton"
+                                    Style="{StaticResource AccentButtonStyle}"
+                                    Content="{x:Bind ViewModel.UpdateActionText, Mode=OneWay}"
+                                    Command="{x:Bind ViewModel.DownloadUpdateCommand}"
+                                    IsEnabled="{x:Bind ViewModel.IsUpdateIdle, Mode=OneWay}"
+                                    Visibility="Collapsed" />
+                            </StackPanel>
+                        </Grid>
+                        <Border Height="1" Background="{ThemeResource CardBorderBrush}" />
+                        <Grid Style="{StaticResource SettingsRowStyle}" Padding="52,12,16,12" MinHeight="56">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock x:Name="CheckForUpdatesTitle" x:Uid="Settings_CheckForUpdates" />
+                                <TextBlock x:Uid="Settings_CheckForUpdatesHint" Style="{StaticResource SettingsDescriptionStyle}" />
+                            </StackPanel>
+                            <ToggleSwitch
+                                Grid.Column="1"
+                                Style="{StaticResource SettingsToggleStyle}"
+                                IsOn="{x:Bind ViewModel.CheckForUpdates, Mode=TwoWay}"
+                                AutomationProperties.LabeledBy="{Binding ElementName=CheckForUpdatesTitle}" />
+                        </Grid>
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                        <ProgressRing x:Name="UpdateProgress" Width="16" Height="16" IsActive="False" Visibility="Collapsed" />
-                        <Button x:Name="CheckNowButton" x:Uid="Settings_CheckNow" Click="OnCheckNowClick" />
-                    </StackPanel>
-                </Grid>
+                </Border>
             </StackPanel>
 
-            <StackPanel Spacing="8">
-                <TextBlock x:Uid="Settings_SteamAccount" Style="{StaticResource BodyStrongTextBlockStyle}" />
-                <StackPanel Spacing="2">
-                    <TextBlock Text="SteamID64" />
-                    <TextBlock
-                        Text="{x:Bind ViewModel.SteamIdText}"
-                        IsTextSelectionEnabled="True"
-                        FontFamily="Consolas"
-                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                </StackPanel>
+            <!-- Steam account. -->
+            <StackPanel Spacing="4">
+                <TextBlock x:Uid="Settings_SteamAccount" Style="{StaticResource SettingsGroupTitleStyle}" />
+                <Border Style="{StaticResource SettingsCardStyle}">
+                    <Grid Style="{StaticResource SettingsRowStyle}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <FontIcon Glyph="&#xE77B;" Style="{StaticResource SettingsIconStyle}" />
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                            <TextBlock Text="SteamID64" />
+                            <TextBlock
+                                Text="{x:Bind ViewModel.SteamIdText}"
+                                Style="{StaticResource SettingsDescriptionStyle}"
+                                IsTextSelectionEnabled="True"
+                                FontFamily="Consolas" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

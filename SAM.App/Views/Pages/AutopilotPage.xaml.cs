@@ -37,7 +37,6 @@ public sealed partial class AutopilotPage : UserControl, IAutopilotDialogs
     {
         var width = e.NewSize.Width;
         var columns = width >= 1100 ? 2 : 1;
-        PageLayout.Reflow(this.GamesColumns, columns);
         PageLayout.Reflow(this.RulesColumns, columns);
         PageLayout.Reflow(this.ScheduleColumns, columns);
         PageLayout.Reflow(this.BehaviourColumns, columns);

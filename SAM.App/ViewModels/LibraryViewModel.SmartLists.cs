@@ -29,7 +29,7 @@ public sealed partial class LibraryViewModel
     private string? _columnSort;
 
     #region Smart lists
-    private static bool MatchesSmartList(GameCardViewModel card, string? smartList) => smartList switch
+    internal static bool MatchesSmartList(GameCardViewModel card, string? smartList) => smartList switch
     {
         AlmostPerfectList => card.Progress is { Total: > 0 } p && p.Fraction >= AlmostPerfectThreshold && p.Unlocked < p.Total,
         NeverStartedList => card.Progress is { Total: > 0, Unlocked: 0 },

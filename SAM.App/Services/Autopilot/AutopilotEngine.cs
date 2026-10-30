@@ -101,7 +101,39 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
     public bool IsRunning => this._running;
 
     /// <summary>The current configuration (a live object; call SaveConfig after editing a copy).</summary>
-    public AutopilotConfig Config => this._config ??= services.AutopilotStore.LoadConfig();
+    public AutopilotConfig Config => this._config ??= this.MigrateSource(services.AutopilotStore.LoadConfig());
+
+    /// <summary>
+    /// Autopilot now always runs the games the user picked. A config saved with another source
+    /// (all games, installed, a collection or a smart list) becomes that source's current games,
+    /// all ticked, so nothing silently stops running.
+    /// </summary>
+    private AutopilotConfig MigrateSource(AutopilotConfig config)
+    {
+        if (config.Source == AutopilotGameSource.Manual)
+        {
+            return config;
+        }
+
+        try
+        {
+            var games = this.Resolve(config).Select(g => g.AppId).ToList();
+            Diagnostics.Log($"Autopilot: turned the {config.Source} source into a list of {games.Count} picked games");
+            config.ManualGames = games;
+            config.ExcludedGames = [];
+            config.Source = AutopilotGameSource.Manual;
+            if (this._dryRun == false)
+            {
+                services.AutopilotStore.SaveConfig(config);
+            }
+        }
+        catch (Exception e)
+        {
+            Diagnostics.Log("Autopilot: couldn't convert the game source", e);
+        }
+
+        return config;
+    }
 
     /// <summary>
     /// Runtime state. In dry-run mode a copy that's never saved, so pretend unlocks, hours and
@@ -1347,8 +1379,8 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
             _ => [],
         };
 
-        // Exclusions filter the automatic sources; picked games are run as picked.
-        var excluded = config.Source == AutopilotGameSource.Manual ? new HashSet<uint>() : config.ExcludedGames.ToHashSet();
+        // With picked games, exclusions are the games whose checkbox is unticked.
+        var excluded = config.ExcludedGames.ToHashSet();
         var seen = new HashSet<uint>();
         var result = new List<ResolvedGame>();
         foreach (var appId in source)

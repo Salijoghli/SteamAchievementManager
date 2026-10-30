@@ -329,171 +329,120 @@
                             </StackPanel>
                         </StackPanel>
                     </Expander.Header>
-                    <Grid x:Name="GamesColumns" ColumnSpacing="32" RowSpacing="24">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
+                    <!--
+                        One full-width list of the games Autopilot runs, in run order. The checkbox switches a
+                        game on or off without removing it; the toolbar holds Add and how many run at once.
+                    -->
+                    <StackPanel Spacing="12">
+                        <Grid ColumnSpacing="16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock x:Uid="Autopilot_ManualTitle" Style="{StaticResource GroupTitleStyle}" Margin="0" />
+                                <TextBlock Text="{x:Bind ViewModel.SourceSummary, Mode=OneWay}" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.VisibleIfText(ViewModel.SourceSummary), Mode=OneWay}" />
+                                <TextBlock x:Uid="Autopilot_ManualHint" Style="{StaticResource HintStyle}" />
+                            </StackPanel>
+                            <Button Grid.Column="1" VerticalAlignment="Center" Command="{x:Bind ViewModel.AddGamesCommand}" x:Uid="Autopilot_AddGamesButton">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE710;" FontSize="14" />
+                                    <TextBlock x:Uid="Autopilot_AddGamesLabel" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
 
-                        <!-- Source and the manual queue. -->
-                        <StackPanel Spacing="10">
-                            <ComboBox
-                                x:Uid="Autopilot_Source"
-                                MinWidth="280"
-                                ItemsSource="{x:Bind pages:AutopilotViewModel.SourceOptions}"
-                                SelectedIndex="{x:Bind ViewModel.SourceIndex, Mode=TwoWay}" />
-                            <ComboBox
-                                x:Uid="Autopilot_Collection"
-                                MinWidth="280"
-                                ItemsSource="{x:Bind ViewModel.CollectionOptions, Mode=OneWay}"
-                                SelectedIndex="{x:Bind ViewModel.CollectionIndex, Mode=TwoWay}"
-                                Visibility="{x:Bind ViewModel.IsCollectionSource, Mode=OneWay}" />
-                            <TextBlock Text="{x:Bind ViewModel.CollectionError, Mode=OneWay}" Style="{StaticResource ErrorStyle}" Visibility="{x:Bind ViewModel.HasCollectionError, Mode=OneWay}" />
-                            <ComboBox
-                                x:Uid="Autopilot_SmartList"
-                                MinWidth="280"
-                                ItemsSource="{x:Bind pages:AutopilotViewModel.SmartListOptions}"
-                                SelectedIndex="{x:Bind ViewModel.SmartListIndex, Mode=TwoWay}"
-                                Visibility="{x:Bind ViewModel.IsSmartListSource, Mode=OneWay}" />
-                            <TextBlock Text="{x:Bind ViewModel.SourceSummary, Mode=OneWay}" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.VisibleIfText(ViewModel.SourceSummary), Mode=OneWay}" />
-
-                            <StackPanel Spacing="8" Visibility="{x:Bind ViewModel.IsManualSource, Mode=OneWay}">
-                                <Grid Margin="0,6,0,0">
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock x:Uid="Autopilot_ManualTitle" Style="{StaticResource GroupTitleStyle}" Margin="0" />
-                                        <TextBlock x:Uid="Autopilot_ManualHint" Style="{StaticResource HintStyle}" />
-                                    </StackPanel>
-                                    <Button HorizontalAlignment="Right" VerticalAlignment="Center" Command="{x:Bind ViewModel.AddGamesCommand}" x:Uid="Autopilot_AddGamesButton">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE710;" FontSize="14" />
-                                            <TextBlock x:Uid="Autopilot_AddGamesLabel" />
-                                        </StackPanel>
-                                    </Button>
-                                </Grid>
-                                <ListView
-                                    x:Uid="Autopilot_ManualList"
-                                    MaxHeight="440"
-                                    SelectionMode="None"
-                                    CanDragItems="True"
-                                    CanReorderItems="True"
-                                    AllowDrop="True"
-                                    ItemsSource="{x:Bind ViewModel.ManualGames}"
-                                    ItemContainerStyle="{StaticResource GameRowStyle}"
-                                    Visibility="{x:Bind ViewModel.HasManualGames, Mode=OneWay}">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate x:DataType="pages:AutopilotGameItem">
-                                            <Grid ColumnSpacing="10" AutomationProperties.Name="{x:Bind Name}">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="64" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <FontIcon Glyph="&#xE76F;" FontSize="12" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
-                                                <Border Grid.Column="1" Width="64" Height="30" CornerRadius="3" Background="{ThemeResource SubtleFillColorSecondaryBrush}">
-                                                    <Image Source="{x:Bind Image, Mode=OneWay}" Stretch="UniformToFill" />
+                        <ListView
+                            x:Uid="Autopilot_ManualList"
+                            MaxHeight="560"
+                            SelectionMode="None"
+                            CanDragItems="True"
+                            CanReorderItems="True"
+                            AllowDrop="True"
+                            ItemsSource="{x:Bind ViewModel.ManualGames}"
+                            ItemContainerStyle="{StaticResource GameRowStyle}"
+                            Visibility="{x:Bind ViewModel.HasManualGames, Mode=OneWay}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate x:DataType="pages:AutopilotGameItem">
+                                    <Grid ColumnSpacing="12" AutomationProperties.Name="{x:Bind Name}">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <FontIcon Glyph="&#xE76F;" FontSize="12" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                        <CheckBox
+                                            Grid.Column="1"
+                                            MinWidth="0"
+                                            Padding="0"
+                                            VerticalAlignment="Center"
+                                            IsChecked="{x:Bind IsIncluded, Mode=TwoWay}"
+                                            ToolTipService.ToolTip="{x:Bind IncludeLabel}"
+                                            AutomationProperties.Name="{x:Bind IncludeLabel}" />
+                                        <Border Grid.Column="2" Width="80" Height="37" CornerRadius="4" Background="{ThemeResource SubtleFillColorSecondaryBrush}" Opacity="{x:Bind RowOpacity, Mode=OneWay}">
+                                            <Image Source="{x:Bind Image, Mode=OneWay}" Stretch="UniformToFill" />
+                                        </Border>
+                                        <StackPanel Grid.Column="3" VerticalAlignment="Center" Opacity="{x:Bind RowOpacity, Mode=OneWay}">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" />
+                                                <Border
+                                                    Padding="6,0,6,1"
+                                                    CornerRadius="8"
+                                                    VerticalAlignment="Center"
+                                                    Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                                    Visibility="{x:Bind HasOverride, Mode=OneWay}">
+                                                    <TextBlock x:Uid="Autopilot_OverrideBadge" FontSize="11" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
                                                 </Border>
-                                                <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                                        <TextBlock Text="{x:Bind Name}" TextTrimming="CharacterEllipsis" />
-                                                        <Border
-                                                            Padding="6,0,6,1"
-                                                            CornerRadius="8"
-                                                            VerticalAlignment="Center"
-                                                            Background="{ThemeResource AccentFillColorDefaultBrush}"
-                                                            Visibility="{x:Bind HasOverride, Mode=OneWay}">
-                                                            <TextBlock x:Uid="Autopilot_OverrideBadge" FontSize="11" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
-                                                        </Border>
-                                                    </StackPanel>
-                                                    <TextBlock Text="{x:Bind Detail}" Style="{StaticResource HintStyle}" Visibility="{x:Bind HasDetail}" />
-                                                </StackPanel>
-                                                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2">
-                                                    <Button
-                                                        Style="{StaticResource IconButtonStyle}"
-                                                        IsEnabled="{x:Bind CanMoveUp, Mode=OneWay}"
-                                                        Command="{x:Bind MoveUpCommand}"
-                                                        ToolTipService.ToolTip="{x:Bind MoveUpLabel}"
-                                                        AutomationProperties.Name="{x:Bind MoveUpLabel}">
-                                                        <FontIcon Glyph="&#xE70E;" FontSize="12" />
-                                                    </Button>
-                                                    <Button
-                                                        Style="{StaticResource IconButtonStyle}"
-                                                        IsEnabled="{x:Bind CanMoveDown, Mode=OneWay}"
-                                                        Command="{x:Bind MoveDownCommand}"
-                                                        ToolTipService.ToolTip="{x:Bind MoveDownLabel}"
-                                                        AutomationProperties.Name="{x:Bind MoveDownLabel}">
-                                                        <FontIcon Glyph="&#xE70D;" FontSize="12" />
-                                                    </Button>
-                                                    <Button
-                                                        Style="{StaticResource IconButtonStyle}"
-                                                        Command="{x:Bind EditOverridesCommand}"
-                                                        ToolTipService.ToolTip="{x:Bind OverridesLabel}"
-                                                        AutomationProperties.Name="{x:Bind OverridesLabel}">
-                                                        <FontIcon Glyph="&#xE70F;" FontSize="12" />
-                                                    </Button>
-                                                    <Button
-                                                        Style="{StaticResource IconButtonStyle}"
-                                                        Command="{x:Bind RemoveCommand}"
-                                                        ToolTipService.ToolTip="{x:Bind RemoveLabel}"
-                                                        AutomationProperties.Name="{x:Bind RemoveLabel}">
-                                                        <FontIcon Glyph="&#xE711;" FontSize="12" />
-                                                    </Button>
-                                                </StackPanel>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
-                                <TextBlock x:Uid="Autopilot_ManualEmpty" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.HasManualGames), Mode=OneWay}" />
-                            </StackPanel>
+                                            </StackPanel>
+                                            <TextBlock Text="{x:Bind Detail}" Style="{StaticResource HintStyle}" Visibility="{x:Bind HasDetail}" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="2">
+                                            <Button
+                                                Style="{StaticResource IconButtonStyle}"
+                                                IsEnabled="{x:Bind CanMoveUp, Mode=OneWay}"
+                                                Command="{x:Bind MoveUpCommand}"
+                                                ToolTipService.ToolTip="{x:Bind MoveUpLabel}"
+                                                AutomationProperties.Name="{x:Bind MoveUpLabel}">
+                                                <FontIcon Glyph="&#xE70E;" FontSize="12" />
+                                            </Button>
+                                            <Button
+                                                Style="{StaticResource IconButtonStyle}"
+                                                IsEnabled="{x:Bind CanMoveDown, Mode=OneWay}"
+                                                Command="{x:Bind MoveDownCommand}"
+                                                ToolTipService.ToolTip="{x:Bind MoveDownLabel}"
+                                                AutomationProperties.Name="{x:Bind MoveDownLabel}">
+                                                <FontIcon Glyph="&#xE70D;" FontSize="12" />
+                                            </Button>
+                                            <Button
+                                                Style="{StaticResource IconButtonStyle}"
+                                                Command="{x:Bind EditOverridesCommand}"
+                                                ToolTipService.ToolTip="{x:Bind OverridesLabel}"
+                                                AutomationProperties.Name="{x:Bind OverridesLabel}">
+                                                <FontIcon Glyph="&#xE70F;" FontSize="12" />
+                                            </Button>
+                                            <Button
+                                                Style="{StaticResource IconButtonStyle}"
+                                                Command="{x:Bind RemoveCommand}"
+                                                ToolTipService.ToolTip="{x:Bind RemoveLabel}"
+                                                AutomationProperties.Name="{x:Bind RemoveLabel}">
+                                                <FontIcon Glyph="&#xE711;" FontSize="12" />
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                        <TextBlock x:Uid="Autopilot_ManualEmpty" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.HasManualGames), Mode=OneWay}" />
+
+                        <!-- Overrides left for games no longer in the list (so they can be removed). -->
+                        <StackPanel Spacing="6" Visibility="{x:Bind ViewModel.ShowOverridesSection, Mode=OneWay}">
+                            <TextBlock x:Uid="Autopilot_OverridesTitle" Style="{StaticResource GroupTitleStyle}" Margin="0" />
+                            <TextBlock x:Uid="Autopilot_OverridesOrphanHint" Style="{StaticResource HintStyle}" />
+                            <ItemsControl ItemsSource="{x:Bind ViewModel.OverrideGames}" ItemTemplate="{StaticResource SimpleGameTemplate}" />
                         </StackPanel>
-
-                        <!-- Exclusions, overrides and concurrency. -->
-                        <StackPanel Grid.Column="1" Spacing="20">
-                            <StackPanel Spacing="6" Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.IsManualSource), Mode=OneWay}">
-                                <Grid>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock x:Uid="Autopilot_ExcludedTitle" Style="{StaticResource GroupTitleStyle}" Margin="0" />
-                                        <TextBlock x:Uid="Autopilot_ExcludedHint" Style="{StaticResource HintStyle}" />
-                                    </StackPanel>
-                                    <Button HorizontalAlignment="Right" VerticalAlignment="Center" Command="{x:Bind ViewModel.AddExcludedCommand}" x:Uid="Autopilot_AddExcludedButton" />
-                                </Grid>
-                                <ItemsControl ItemsSource="{x:Bind ViewModel.ExcludedGames}" ItemTemplate="{StaticResource SimpleGameTemplate}" />
-                                <TextBlock x:Uid="Autopilot_NoneYet" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.HasExcludedGames), Mode=OneWay}" />
-                            </StackPanel>
-
-                            <StackPanel Spacing="6" Visibility="{x:Bind ViewModel.ShowOverridesSection, Mode=OneWay}">
-                                <Grid>
-                                    <StackPanel VerticalAlignment="Center">
-                                        <TextBlock x:Uid="Autopilot_OverridesTitle" Style="{StaticResource GroupTitleStyle}" Margin="0" />
-                                        <TextBlock x:Uid="Autopilot_OverridesHint" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.IsManualSource), Mode=OneWay}" />
-                                        <TextBlock x:Uid="Autopilot_OverridesOrphanHint" Style="{StaticResource HintStyle}" Visibility="{x:Bind ViewModel.IsManualSource, Mode=OneWay}" />
-                                    </StackPanel>
-                                    <Button
-                                        HorizontalAlignment="Right"
-                                        VerticalAlignment="Center"
-                                        Command="{x:Bind ViewModel.AddOverrideCommand}"
-                                        Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.IsManualSource), Mode=OneWay}"
-                                        x:Uid="Autopilot_AddOverrideButton" />
-                                </Grid>
-                                <ItemsControl ItemsSource="{x:Bind ViewModel.OverrideGames}" ItemTemplate="{StaticResource SimpleGameTemplate}" />
-                                <TextBlock x:Uid="Autopilot_NoneYet" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.HasOverrideGames), Mode=OneWay}" />
-                            </StackPanel>
-
-                            <StackPanel Spacing="4">
-                                <NumberBox
-                                    x:Uid="Autopilot_MaxConcurrent"
-                                    HorizontalAlignment="Left"
-                                    MinWidth="200"
-                                    Minimum="1"
-                                    Maximum="32"
-                                    SmallChange="1"
-                                    LargeChange="4"
-                                    SpinButtonPlacementMode="Inline"
-                                    Value="{x:Bind ViewModel.MaxConcurrentGames, Mode=TwoWay}" />
-                                <TextBlock x:Uid="Autopilot_MaxConcurrentHint" Style="{StaticResource HintStyle}" />
-                            </StackPanel>
-                        </StackPanel>
-                    </Grid>
+                    </StackPanel>
                 </Expander>
 
                 <!-- 4. Rules. -->
@@ -875,6 +824,19 @@
                             <ToggleSwitch x:Uid="Autopilot_BackupBeforeUnlock" IsOn="{x:Bind ViewModel.BackupBeforeUnlock, Mode=TwoWay}" />
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="10">
+                            <StackPanel Spacing="4">
+                                <NumberBox
+                                    x:Uid="Autopilot_MaxConcurrent"
+                                    HorizontalAlignment="Left"
+                                    MinWidth="200"
+                                    Minimum="1"
+                                    Maximum="32"
+                                    SmallChange="1"
+                                    LargeChange="4"
+                                    SpinButtonPlacementMode="Inline"
+                                    Value="{x:Bind ViewModel.MaxConcurrentGames, Mode=TwoWay}" />
+                                <TextBlock x:Uid="Autopilot_MaxConcurrentHint" Style="{StaticResource HintStyle}" />
+                            </StackPanel>
                             <ToggleSwitch x:Uid="Autopilot_StartWithWindows" IsOn="{x:Bind ViewModel.StartWithWindows, Mode=TwoWay}" />
                             <TextBlock x:Uid="Autopilot_StartWithWindowsHint" Style="{StaticResource HintStyle}" Margin="0,-6,0,0" />
                             <ToggleSwitch x:Uid="Autopilot_ResumeOnStartup" IsOn="{x:Bind ViewModel.ResumeOnStartup, Mode=TwoWay}" />

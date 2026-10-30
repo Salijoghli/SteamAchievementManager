@@ -73,7 +73,7 @@
   <data name="Settings_Appearance.Text" xml:space="preserve">
     <value>Appearance</value>
   </data>
-  <data name="Settings_Theme.Header" xml:space="preserve">
+  <data name="Settings_Theme.Text" xml:space="preserve">
     <value>Theme</value>
   </data>
   <data name="Settings_ThemeSystem.Content" xml:space="preserve">
@@ -85,7 +85,7 @@
   <data name="Settings_ThemeDark.Content" xml:space="preserve">
     <value>Dark</value>
   </data>
-  <data name="Settings_Language.Header" xml:space="preserve">
+  <data name="Settings_Language.Text" xml:space="preserve">
     <value>Language</value>
   </data>
   <data name="Settings_LanguageEnglish.Content" xml:space="preserve">
@@ -107,7 +107,7 @@
   <data name="Settings_Library.Text" xml:space="preserve">
     <value>Library</value>
   </data>
-  <data name="Settings_KeepOtherAccountsCache.Header" xml:space="preserve">
+  <data name="Settings_KeepOtherAccountsCache.Text" xml:space="preserve">
     <value>Keep cached data for other Steam accounts</value>
   </data>
   <data name="Settings_CacheSize.Text" xml:space="preserve">
@@ -125,13 +125,13 @@
   <data name="Settings_GameWindow.Text" xml:space="preserve">
     <value>Game window</value>
   </data>
-  <data name="Settings_SpoilerProtection.Header" xml:space="preserve">
+  <data name="Settings_SpoilerProtection.Text" xml:space="preserve">
     <value>Spoiler protection for hidden achievements</value>
   </data>
   <data name="Settings_SpoilerProtectionHint.Text" xml:space="preserve">
     <value>Hidden achievements' descriptions stay blurred until you click them.</value>
   </data>
-  <data name="Settings_BackupBeforeCommit.Header" xml:space="preserve">
+  <data name="Settings_BackupBeforeCommit.Text" xml:space="preserve">
     <value>Back up before every commit</value>
   </data>
   <data name="Settings_BackupBeforeCommitHint.Text" xml:space="preserve">
@@ -140,13 +140,13 @@
   <data name="Settings_App.Text" xml:space="preserve">
     <value>App</value>
   </data>
-  <data name="Settings_MinimizeToTray.Header" xml:space="preserve">
+  <data name="Settings_MinimizeToTray.Text" xml:space="preserve">
     <value>Close to system tray</value>
   </data>
-  <data name="Settings_ShowNotifications.Header" xml:space="preserve">
+  <data name="Settings_ShowNotifications.Text" xml:space="preserve">
     <value>Show notifications</value>
   </data>
-  <data name="Settings_CheckForUpdates.Header" xml:space="preserve">
+  <data name="Settings_CheckForUpdates.Text" xml:space="preserve">
     <value>Check for updates on startup</value>
   </data>
   <data name="Settings_CheckNow.Content" xml:space="preserve">
@@ -157,6 +157,24 @@
   </data>
   <data name="Settings_Version" xml:space="preserve">
     <value>Version {0}</value>
+  </data>
+  <data name="Settings_ThemeHint.Text" xml:space="preserve">
+    <value>Match Windows, or always light or dark</value>
+  </data>
+  <data name="Settings_LanguageHint.Text" xml:space="preserve">
+    <value>Takes effect after SAM restarts</value>
+  </data>
+  <data name="Settings_KeepOtherAccountsCacheHint.Text" xml:space="preserve">
+    <value>Keeps game lists and images when you switch Steam accounts</value>
+  </data>
+  <data name="Settings_MinimizeToTrayHint.Text" xml:space="preserve">
+    <value>Closing the window keeps SAM running in the notification area</value>
+  </data>
+  <data name="Settings_ShowNotificationsHint.Text" xml:space="preserve">
+    <value>Windows notifications from SAM</value>
+  </data>
+  <data name="Settings_CheckForUpdatesHint.Text" xml:space="preserve">
+    <value>Looks for a new version each time SAM starts</value>
   </data>
   <data name="App_CantConnectToSteam" xml:space="preserve">
     <value>Can't connect to Steam</value>
@@ -1164,7 +1182,7 @@ Installed · {2}</value>
   <data name="Notify_UnknownGame" xml:space="preserve">
     <value>App {0}</value>
   </data>
-  <data name="Notify_OnUnlockSetting.Header" xml:space="preserve">
+  <data name="Notify_OnUnlockSetting.Text" xml:space="preserve">
     <value>Notify when I unlock achievements in games</value>
   </data>
   <data name="Notify_OnUnlockSettingHint.Text" xml:space="preserve">
@@ -2856,7 +2874,7 @@ Installed · {2}</value>
     <value>Games</value>
   </data>
   <data name="Autopilot_GamesSubtitle.Text" xml:space="preserve">
-    <value>Which games run, in what order, and how many at once</value>
+    <value>Which games run, and in what order</value>
   </data>
   <data name="Autopilot_Source.Header" xml:space="preserve">
     <value>Games come from</value>
@@ -2899,6 +2917,24 @@ Installed · {2}</value>
   </data>
   <data name="Autopilot_ManualTitle.Text" xml:space="preserve">
     <value>Run order</value>
+  </data>
+  <data name="Autopilot_IncludeNamed" xml:space="preserve">
+    <value>Run {0}</value>
+  </data>
+  <data name="Autopilot_PickerFilter.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="Autopilot_PickerFilterAll" xml:space="preserve">
+    <value>All games</value>
+  </data>
+  <data name="Autopilot_PickerFilterInstalled" xml:space="preserve">
+    <value>Installed</value>
+  </data>
+  <data name="Autopilot_PickerFilterFavorites" xml:space="preserve">
+    <value>Favorites</value>
+  </data>
+  <data name="Autopilot_PickerSelectAll.Content" xml:space="preserve">
+    <value>Select all shown</value>
   </data>
   <data name="Autopilot_ManualHint.Text" xml:space="preserve">
     <value>Drag or use the arrows to reorder. Games higher in the list run first.</value>

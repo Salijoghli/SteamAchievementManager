@@ -30,6 +30,13 @@ public sealed partial class LibraryViewModel
 
     public bool IsUpdateIdle => this.IsUpdating == false;
 
+    /// <summary>The newer version the last check found ("8.2.1"), for Settings; null until one is found.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasAvailableUpdate))]
+    private string? _availableUpdateVersion;
+
+    public bool HasAvailableUpdate => this.AvailableUpdateVersion != null;
+
     /// <summary>Notify about achievements unlocked by playing (Settings; saved at once).</summary>
     public bool NotifyOnUnlock
     {
@@ -258,6 +265,7 @@ public sealed partial class LibraryViewModel
 
         this._update = update;
         this._selfUpdate = null;
+        this.AvailableUpdateVersion = update.Version;
         this.UpdateActionText = Strings.Get("Update_Download");
         this.ResolveSelfUpdate(update);
         this.UpdateTitle = Strings.Format("Update_AvailableTitle", update.Version);

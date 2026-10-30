@@ -27,16 +27,25 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <AutoSuggestBox
                 x:Name="SearchBox"
                 x:Uid="Autopilot_PickerSearch"
                 QueryIcon="Find"
                 TextChanged="OnSearchTextChanged" />
+            <!-- All games, installed, favorites, smart lists and collections. -->
+            <ComboBox
+                x:Name="FilterBox"
+                x:Uid="Autopilot_PickerFilter"
+                Grid.Column="1"
+                MinWidth="170"
+                MaxWidth="220"
+                SelectionChanged="OnFilterSelectionChanged" />
             <CheckBox
                 x:Name="LockedOnlyBox"
                 x:Uid="Autopilot_PickerLockedOnly"
-                Grid.Column="1"
+                Grid.Column="2"
                 IsChecked="True"
                 Click="OnFilterChanged" />
         </Grid>
@@ -117,10 +126,17 @@
                 Visibility="Collapsed" />
         </Grid>
 
-        <TextBlock
-            x:Name="CountText"
-            Grid.Row="2"
-            Style="{StaticResource CaptionTextBlockStyle}"
-            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+        <Grid Grid.Row="2" ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock
+                x:Name="CountText"
+                VerticalAlignment="Center"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            <HyperlinkButton x:Name="SelectAllButton" x:Uid="Autopilot_PickerSelectAll" Grid.Column="1" Padding="6,2" Click="OnSelectAllClick" />
+        </Grid>
     </Grid>
 </ContentDialog>

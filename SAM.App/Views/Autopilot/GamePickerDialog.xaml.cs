@@ -15,6 +15,7 @@ public sealed partial class GamePickerDialog : ContentDialog
     private readonly LibraryViewModel _library;
     private readonly IReadOnlySet<uint> _alreadyListed;
     private readonly HashSet<uint> _selected = [];
+    private readonly List<PickerFilter> _filters;
     private bool _restoringSelection;
 
     public GamePickerDialog(LibraryViewModel library, string title, string primaryText, IReadOnlyCollection<uint> alreadyListed)
@@ -27,6 +28,10 @@ public sealed partial class GamePickerDialog : ContentDialog
         this.CloseButtonText = Strings.Get("Common_Cancel");
         this.IsPrimaryButtonEnabled = false;
         this.RequestedTheme = library.RequestedTheme;
+
+        this._filters = BuildFilters(library);
+        this.FilterBox.ItemsSource = this._filters;
+        this.FilterBox.SelectedIndex = 0;
 
         library.PropertyChanged += this.OnLibraryPropertyChanged;
         this.Closed += (_, _) => library.PropertyChanged -= this.OnLibraryPropertyChanged;
@@ -52,6 +57,39 @@ public sealed partial class GamePickerDialog : ContentDialog
         }
     }
 
+    /// <summary>One "Show" choice: a name and which library games it keeps.</summary>
+    private sealed record PickerFilter(string Name, Func<GameCardViewModel, bool> Matches)
+    {
+        public override string ToString() => this.Name;
+    }
+
+    private static List<PickerFilter> BuildFilters(LibraryViewModel library)
+    {
+        var filters = new List<PickerFilter>
+        {
+            new(Strings.Get("Autopilot_PickerFilterAll"), _ => true),
+            new(Strings.Get("Autopilot_PickerFilterInstalled"), c => c.IsInstalled),
+            new(Strings.Get("Autopilot_PickerFilterFavorites"), c => c.IsFavorite),
+        };
+
+        foreach (var list in LibraryViewModel.SmartLists.Where(l => l.Key is LibraryViewModel.AlmostPerfectList or LibraryViewModel.NeverStartedList))
+        {
+            filters.Add(new(list.Name, c => LibraryViewModel.MatchesSmartList(c, list.Key)));
+        }
+
+        foreach (var collection in library.SteamCollections.Concat(library.CustomCollections))
+        {
+            filters.Add(new(collection.Name, c => collection.AppIds.Contains(c.AppId)));
+        }
+
+        return filters;
+    }
+
+    private void OnFilterSelectionChanged(object sender, SelectionChangedEventArgs e) => this.ApplyFilter();
+
+    /// <summary>Adds every game the filter shows (e.g. a whole collection) to the selection.</summary>
+    private void OnSelectAllClick(object sender, RoutedEventArgs e) => this.GameList.SelectAll();
+
     private void OnSearchTextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args) => this.ApplyFilter();
 
     private void OnFilterChanged(object sender, RoutedEventArgs e) => this.ApplyFilter();
@@ -69,8 +107,10 @@ public sealed partial class GamePickerDialog : ContentDialog
 
         var query = this.SearchBox.Text.Trim();
         var lockedOnly = this.LockedOnlyBox.IsChecked == true;
+        var filter = this.FilterBox.SelectedItem as PickerFilter ?? this._filters[0];
         var games = this._library.AllGames
             .Where(c => c.HasAchievements && this._alreadyListed.Contains(c.AppId) == false)
+            .Where(filter.Matches)
             .Where(c => lockedOnly == false || c.IsPerfect == false)
             .Where(c => query.Length == 0 ||
                         c.Name.Contains(query, StringComparison.CurrentCultureIgnoreCase) ||
@@ -92,6 +132,7 @@ public sealed partial class GamePickerDialog : ContentDialog
             this._restoringSelection = false;
         }
 
+        this.SelectAllButton.IsEnabled = games.Count > 0;
         this.GameList.Visibility = games.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
         this.EmptyText.Visibility = games.Count > 0 ? Visibility.Collapsed : Visibility.Visible;
         this.UpdateCount(games.Count);

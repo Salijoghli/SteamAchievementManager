@@ -1125,10 +1125,32 @@ public sealed partial class AutopilotViewModel : ObservableObject
         this.OnEdited();
     }
 
+    /// <summary>A run-order checkbox: unticked games stay listed but are skipped (stored as exclusions).</summary>
+    private void SetIncluded(AutopilotGameItem item, bool included)
+    {
+        if (this._syncingLists)
+        {
+            return;
+        }
+
+        var changed = included ? this._edit.ExcludedGames.Remove(item.AppId) : this._edit.ExcludedGames.Contains(item.AppId) == false;
+        if (included == false && changed)
+        {
+            this._edit.ExcludedGames.Add(item.AppId);
+        }
+
+        if (changed)
+        {
+            this.UpdateSourceSummary();
+            this.OnEdited();
+        }
+    }
+
     private void RemoveManual(AutopilotGameItem item)
     {
         var before = this._edit.ManualGames.Count;
         this._edit.ManualGames.Remove(item.AppId);
+        this._edit.ExcludedGames.Remove(item.AppId);
         this.FollowGameCount(before);
         this.RebuildLists();
         this.OnEdited();
@@ -1214,7 +1236,9 @@ public sealed partial class AutopilotViewModel : ObservableObject
                     moveUp: i => this.MoveManual(i, -1),
                     moveDown: i => this.MoveManual(i, 1),
                     remove: this.RemoveManual,
-                    editOverrides: i => _ = this.EditOverridesAsync(i.AppId, i.Name))
+                    editOverrides: i => _ = this.EditOverridesAsync(i.AppId, i.Name),
+                    isIncluded: this._edit.ExcludedGames.Contains(appId) == false,
+                    includedChanged: this.SetIncluded)
                 {
                     HasOverride = this._edit.Overrides.ContainsKey(appId),
                 });

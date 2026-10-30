@@ -72,7 +72,7 @@
   <data name="Settings_Appearance.Text" xml:space="preserve">
     <value>იერსახე</value>
   </data>
-  <data name="Settings_Theme.Header" xml:space="preserve">
+  <data name="Settings_Theme.Text" xml:space="preserve">
     <value>თემა</value>
   </data>
   <data name="Settings_ThemeSystem.Content" xml:space="preserve">
@@ -84,7 +84,7 @@
   <data name="Settings_ThemeDark.Content" xml:space="preserve">
     <value>მუქი</value>
   </data>
-  <data name="Settings_Language.Header" xml:space="preserve">
+  <data name="Settings_Language.Text" xml:space="preserve">
     <value>ენა</value>
   </data>
   <data name="Settings_LanguageEnglish.Content" xml:space="preserve">
@@ -105,7 +105,7 @@
   <data name="Settings_Library.Text" xml:space="preserve">
     <value>ბიბლიოთეკა</value>
   </data>
-  <data name="Settings_KeepOtherAccountsCache.Header" xml:space="preserve">
+  <data name="Settings_KeepOtherAccountsCache.Text" xml:space="preserve">
     <value>სხვა Steam-ანგარიშების ქეშის შენარჩუნება</value>
   </data>
   <data name="Settings_CacheSize.Text" xml:space="preserve">
@@ -123,13 +123,13 @@
   <data name="Settings_GameWindow.Text" xml:space="preserve">
     <value>თამაშის ფანჯარა</value>
   </data>
-  <data name="Settings_SpoilerProtection.Header" xml:space="preserve">
+  <data name="Settings_SpoilerProtection.Text" xml:space="preserve">
     <value>სპოილერებისგან დაცვა ფარული მიღწევებისთვის</value>
   </data>
   <data name="Settings_SpoilerProtectionHint.Text" xml:space="preserve">
     <value>ფარული მიღწევების აღწერა დაბინდული რჩება, სანამ მასზე არ დააწკაპუნებთ.</value>
   </data>
-  <data name="Settings_BackupBeforeCommit.Header" xml:space="preserve">
+  <data name="Settings_BackupBeforeCommit.Text" xml:space="preserve">
     <value>სარეზერვო ასლი ყოველი შენახვის წინ</value>
   </data>
   <data name="Settings_BackupBeforeCommitHint.Text" xml:space="preserve">
@@ -138,13 +138,13 @@
   <data name="Settings_App.Text" xml:space="preserve">
     <value>აპლიკაცია</value>
   </data>
-  <data name="Settings_MinimizeToTray.Header" xml:space="preserve">
+  <data name="Settings_MinimizeToTray.Text" xml:space="preserve">
     <value>დახურვისას სისტემურ არეში ჩაკეცვა</value>
   </data>
-  <data name="Settings_ShowNotifications.Header" xml:space="preserve">
+  <data name="Settings_ShowNotifications.Text" xml:space="preserve">
     <value>შეტყობინებების ჩვენება</value>
   </data>
-  <data name="Settings_CheckForUpdates.Header" xml:space="preserve">
+  <data name="Settings_CheckForUpdates.Text" xml:space="preserve">
     <value>განახლებების შემოწმება გაშვებისას</value>
   </data>
   <data name="Settings_CheckNow.Content" xml:space="preserve">
@@ -155,6 +155,24 @@
   </data>
   <data name="Settings_Version" xml:space="preserve">
     <value>ვერსია {0}</value>
+  </data>
+  <data name="Settings_ThemeHint.Text" xml:space="preserve">
+    <value>Windows-ის მიხედვით, ან ყოველთვის ღია ან მუქი</value>
+  </data>
+  <data name="Settings_LanguageHint.Text" xml:space="preserve">
+    <value>ძალაში შედის SAM-ის გადატვირთვის შემდეგ</value>
+  </data>
+  <data name="Settings_KeepOtherAccountsCacheHint.Text" xml:space="preserve">
+    <value>Steam-ის ანგარიშის შეცვლისას თამაშების სიები და სურათები შენახული რჩება</value>
+  </data>
+  <data name="Settings_MinimizeToTrayHint.Text" xml:space="preserve">
+    <value>ფანჯრის დახურვის შემდეგ SAM შეტყობინებების არეში აგრძელებს მუშაობას</value>
+  </data>
+  <data name="Settings_ShowNotificationsHint.Text" xml:space="preserve">
+    <value>SAM-ის შეტყობინებები Windows-ში</value>
+  </data>
+  <data name="Settings_CheckForUpdatesHint.Text" xml:space="preserve">
+    <value>ყოველი გაშვებისას ამოწმებს, გამოვიდა თუ არა ახალი ვერსია</value>
   </data>
   <data name="App_CantConnectToSteam" xml:space="preserve">
     <value>Steam-თან დაკავშირება ვერ მოხერხდა</value>
@@ -1152,7 +1170,7 @@
   <data name="Notify_UnknownGame" xml:space="preserve">
     <value>აპი {0}</value>
   </data>
-  <data name="Notify_OnUnlockSetting.Header" xml:space="preserve">
+  <data name="Notify_OnUnlockSetting.Text" xml:space="preserve">
     <value>შეტყობინება, როცა თამაშში მიღწევას განვბლოკავ</value>
   </data>
   <data name="Notify_OnUnlockSettingHint.Text" xml:space="preserve">
@@ -2810,7 +2828,7 @@
     <value>თამაშები</value>
   </data>
   <data name="Autopilot_GamesSubtitle.Text" xml:space="preserve">
-    <value>რომელი თამაშები ეშვება, რა თანმიმდევრობით და რამდენი ერთდროულად</value>
+    <value>რომელი თამაშები ეშვება და რა თანმიმდევრობით</value>
   </data>
   <data name="Autopilot_Source.Header" xml:space="preserve">
     <value>თამაშების წყარო</value>
@@ -2853,6 +2871,24 @@
   </data>
   <data name="Autopilot_ManualTitle.Text" xml:space="preserve">
     <value>გაშვების რიგი</value>
+  </data>
+  <data name="Autopilot_IncludeNamed" xml:space="preserve">
+    <value>{0}-ის გაშვება</value>
+  </data>
+  <data name="Autopilot_PickerFilter.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ჩვენება</value>
+  </data>
+  <data name="Autopilot_PickerFilterAll" xml:space="preserve">
+    <value>ყველა თამაში</value>
+  </data>
+  <data name="Autopilot_PickerFilterInstalled" xml:space="preserve">
+    <value>დაინსტალირებული</value>
+  </data>
+  <data name="Autopilot_PickerFilterFavorites" xml:space="preserve">
+    <value>რჩეულები</value>
+  </data>
+  <data name="Autopilot_PickerSelectAll.Content" xml:space="preserve">
+    <value>ყველა ნაჩვენების მონიშვნა</value>
   </data>
   <data name="Autopilot_ManualHint.Text" xml:space="preserve">
     <value>თანმიმდევრობის შესაცვლელად გადაათრიეთ ან გამოიყენეთ ისრები. სიაში ზემოთ მყოფი თამაშები პირველად ეშვება.</value>
