@@ -2653,6 +2653,12 @@
   <data name="Autopilot_StateStopped" xml:space="preserve">
     <value>გაჩერებულია</value>
   </data>
+  <data name="Autopilot_StartNoGames" xml:space="preserve">
+    <value>გასაშვები თამაშები არ არის. ჯერ დაამატე თამაშები (ან აირჩიე სხვა წყარო) და შეინახე.</value>
+  </data>
+  <data name="Autopilot_StateStoppedNoGames" xml:space="preserve">
+    <value>გაჩერებულია · დასაწყებად ქვემოთ დაამატე თამაშები და შეინახე</value>
+  </data>
   <data name="Autopilot_StateUnavailable" xml:space="preserve">
     <value>მიუწვდომელია</value>
   </data>

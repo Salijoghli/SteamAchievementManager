@@ -46,6 +46,28 @@ public sealed partial class AutopilotPage : UserControl, IAutopilotDialogs
         PageLayout.Reflow(this.CurveColumns, width >= 1600 || (width >= 760 && width < 1100) ? 2 : 1);
     }
 
+    /// <summary>
+    /// Opening a section scrolls its header to the top, so the content doesn't open below the
+    /// window edge (or under the save bar).
+    /// </summary>
+    private void OnSectionExpanding(Expander sender, ExpanderExpandingEventArgs args)
+    {
+        // Sections expanded in XAML raise this while the page loads; leave the scroll position alone then.
+        if (sender.IsLoaded == false)
+        {
+            return;
+        }
+
+        // After one layout pass, so the content is there to scroll to.
+        void OnLayoutUpdated(object? s, object e)
+        {
+            sender.LayoutUpdated -= OnLayoutUpdated;
+            sender.StartBringIntoView(new BringIntoViewOptions { VerticalAlignmentRatio = 0, AnimationDesired = true });
+        }
+
+        sender.LayoutUpdated += OnLayoutUpdated;
+    }
+
     #region IAutopilotDialogs
     public async Task<IReadOnlyList<uint>?> PickGamesAsync(string title, string primaryText, IReadOnlyCollection<uint> alreadyListed)
     {

@@ -2699,6 +2699,12 @@ Installed · {2}</value>
   <data name="Autopilot_StateStopped" xml:space="preserve">
     <value>Stopped</value>
   </data>
+  <data name="Autopilot_StartNoGames" xml:space="preserve">
+    <value>There are no games to run. Add games (or pick another source) and save first.</value>
+  </data>
+  <data name="Autopilot_StateStoppedNoGames" xml:space="preserve">
+    <value>Stopped · add games below and save to start</value>
+  </data>
   <data name="Autopilot_StateUnavailable" xml:space="preserve">
     <value>Not available</value>
   </data>

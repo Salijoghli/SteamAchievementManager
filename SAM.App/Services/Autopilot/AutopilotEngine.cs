@@ -160,6 +160,9 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
     /// </summary>
     internal string? TrayStatus { get; private set; }
 
+    /// <summary>Whether the saved config's game source has any game in it (Start does nothing without one).</summary>
+    public bool HasGames() => this.Resolve(this.Config).Count > 0;
+
     /// <summary>The games Autopilot would consider right now under the current config (resolves the source).</summary>
     public IReadOnlyList<GameEntry> ResolveGames()
     {
@@ -177,6 +180,13 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
         {
             if (this._running || this._disposed)
             {
+                return;
+            }
+
+            // Nothing to run (e.g. resuming after the last game was removed): stay stopped.
+            if (this.HasGames() == false)
+            {
+                Diagnostics.Log("Autopilot: not starting, no games in the selected source");
                 return;
             }
 

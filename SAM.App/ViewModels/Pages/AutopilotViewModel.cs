@@ -148,15 +148,25 @@ public sealed partial class AutopilotViewModel : ObservableObject
     public bool HasEngineError => this.EngineError != null;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(StartStopLabel), nameof(StartStopGlyph))]
+    [NotifyPropertyChangedFor(nameof(StartStopLabel), nameof(StartStopGlyph), nameof(IsStopped), nameof(CanToggleRunning))]
     private bool _isRunning;
+
+    public bool IsStopped => this.IsRunning == false;
+
+    /// <summary>The saved game source has games in it; Start is disabled without any.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanToggleRunning))]
+    private bool _hasGamesToRun = true;
 
     /// <summary>Starting or stopping.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanToggleRunning))]
+    [NotifyPropertyChangedFor(nameof(CanToggleRunning), nameof(IsNotToggling))]
     private bool _isToggling;
 
-    public bool CanToggleRunning => this.IsToggling == false && this.HasEngineError == false;
+    /// <summary>Shows the Start/Stop icon; the spinner takes its place while toggling.</summary>
+    public bool IsNotToggling => this.IsToggling == false;
+
+    public bool CanToggleRunning => this.IsToggling == false && this.HasEngineError == false && (this.IsRunning || this.HasGamesToRun);
 
     public string StartStopLabel => Strings.Get(this.IsRunning ? "Autopilot_Stop" : "Autopilot_Start");
 
@@ -187,11 +197,16 @@ public sealed partial class AutopilotViewModel : ObservableObject
     public ObservableCollection<AutopilotStatusItem> Status { get; } = [];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsStatusEmpty))]
+    [NotifyPropertyChangedFor(nameof(IsStatusEmpty), nameof(ShowGetStarted))]
     private bool _hasStatus;
 
-    /// <summary>No games in scope: "Add games to get started".</summary>
     public bool IsStatusEmpty => this.HasStatus == false;
+
+    /// <summary>
+    /// "Add games to get started": only while nothing is running and no games are picked yet (even
+    /// unsaved), so the game settings below get the attention once there are some.
+    /// </summary>
+    public bool ShowGetStarted => this.HasStatus == false && this.IsManualSource && this.HasManualGames == false;
     #endregion
 
     #region Editing
@@ -284,6 +299,7 @@ public sealed partial class AutopilotViewModel : ObservableObject
     public ObservableCollection<AutopilotGameItem> OverrideGames { get; } = [];
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowGetStarted))]
     private bool _hasManualGames;
 
     [ObservableProperty]
@@ -571,9 +587,13 @@ public sealed partial class AutopilotViewModel : ObservableObject
             {
                 await this._engine.StopAsync();
             }
-            else
+            else if (this._engine.HasGames())
             {
                 await this._engine.StartAsync();
+            }
+            else
+            {
+                this.ActionError = Strings.Get("Autopilot_StartNoGames");
             }
         }
         catch (Exception e)
@@ -609,6 +629,18 @@ public sealed partial class AutopilotViewModel : ObservableObject
         }
 
         this.IsRunning = running;
+        if (running == false && this._engine != null && this.EngineError == null)
+        {
+            try
+            {
+                this.HasGamesToRun = this._engine.HasGames();
+            }
+            catch (Exception e)
+            {
+                Diagnostics.Log("Autopilot: couldn't resolve the games", e);
+                this.HasGamesToRun = true;
+            }
+        }
 
         // Update cards in place, in the engine's queue order.
         var existing = this.Status.ToDictionary(s => s.AppId);
@@ -659,7 +691,7 @@ public sealed partial class AutopilotViewModel : ObservableObject
 
         if (this.IsRunning == false)
         {
-            this.StateText = Strings.Get("Autopilot_StateStopped");
+            this.StateText = Strings.Get(this.HasGamesToRun ? "Autopilot_StateStopped" : "Autopilot_StateStoppedNoGames");
             return;
         }
 
@@ -954,6 +986,7 @@ public sealed partial class AutopilotViewModel : ObservableObject
         this.OnPropertyChanged(nameof(this.IsManualSource));
         this.OnPropertyChanged(nameof(this.IsCollectionSource));
         this.OnPropertyChanged(nameof(this.IsSmartListSource));
+        this.OnPropertyChanged(nameof(this.ShowGetStarted));
         this.OnEdited();
         this.UpdateSourceSummary();
     }
