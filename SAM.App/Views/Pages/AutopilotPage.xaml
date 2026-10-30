@@ -197,7 +197,7 @@
                 </Border>
 
                 <!-- 2. Status. -->
-                <StackPanel Spacing="10">
+                <StackPanel Spacing="10" Visibility="{x:Bind ViewModel.ShowStatusArea, Mode=OneWay}">
                     <TextBlock x:Uid="Autopilot_StatusTitle" Style="{StaticResource SectionTitleStyle}" Visibility="{x:Bind ViewModel.HasStatus, Mode=OneWay}" />
                     <ItemsRepeater ItemsSource="{x:Bind ViewModel.Status}" x:Uid="Autopilot_StatusList">
                         <ItemsRepeater.Layout>
@@ -449,7 +449,7 @@
 
                         <!-- Exclusions, overrides and concurrency. -->
                         <StackPanel Grid.Column="1" Spacing="20">
-                            <StackPanel Spacing="6">
+                            <StackPanel Spacing="6" Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.IsManualSource), Mode=OneWay}">
                                 <Grid>
                                     <StackPanel VerticalAlignment="Center">
                                         <TextBlock x:Uid="Autopilot_ExcludedTitle" Style="{StaticResource GroupTitleStyle}" Margin="0" />

@@ -197,7 +197,7 @@ public sealed partial class AutopilotViewModel : ObservableObject
     public ObservableCollection<AutopilotStatusItem> Status { get; } = [];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsStatusEmpty), nameof(ShowGetStarted))]
+    [NotifyPropertyChangedFor(nameof(IsStatusEmpty), nameof(ShowGetStarted), nameof(ShowStatusArea))]
     private bool _hasStatus;
 
     public bool IsStatusEmpty => this.HasStatus == false;
@@ -207,6 +207,9 @@ public sealed partial class AutopilotViewModel : ObservableObject
     /// unsaved), so the game settings below get the attention once there are some.
     /// </summary>
     public bool ShowGetStarted => this.HasStatus == false && this.IsManualSource && this.HasManualGames == false;
+
+    /// <summary>The Status section: hidden entirely (no empty gap) when it has nothing to show.</summary>
+    public bool ShowStatusArea => this.HasStatus || this.ShowGetStarted;
     #endregion
 
     #region Editing
@@ -299,7 +302,7 @@ public sealed partial class AutopilotViewModel : ObservableObject
     public ObservableCollection<AutopilotGameItem> OverrideGames { get; } = [];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(ShowGetStarted))]
+    [NotifyPropertyChangedFor(nameof(ShowGetStarted), nameof(ShowStatusArea))]
     private bool _hasManualGames;
 
     [ObservableProperty]
@@ -995,6 +998,7 @@ public sealed partial class AutopilotViewModel : ObservableObject
         this.OnPropertyChanged(nameof(this.IsCollectionSource));
         this.OnPropertyChanged(nameof(this.IsSmartListSource));
         this.OnPropertyChanged(nameof(this.ShowGetStarted));
+        this.OnPropertyChanged(nameof(this.ShowStatusArea));
         this.OnPropertyChanged(nameof(this.ShowOverridesSection));
         this.RebuildLists();
         this.OnEdited();

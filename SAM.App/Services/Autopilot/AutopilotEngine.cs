@@ -1347,7 +1347,8 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
             _ => [],
         };
 
-        var excluded = config.ExcludedGames.ToHashSet();
+        // Exclusions filter the automatic sources; picked games are run as picked.
+        var excluded = config.Source == AutopilotGameSource.Manual ? new HashSet<uint>() : config.ExcludedGames.ToHashSet();
         var seen = new HashSet<uint>();
         var result = new List<ResolvedGame>();
         foreach (var appId in source)
