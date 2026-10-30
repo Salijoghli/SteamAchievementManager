@@ -82,6 +82,9 @@ public sealed partial class AutopilotOverridesViewModel : ObservableObject
 
     public IReadOnlyList<string> ProfileOptions { get; }
 
+    /// <summary>For the mode radio buttons: whether <paramref name="modeIndex"/> is <paramref name="index"/>.</summary>
+    public static bool IsMode(int modeIndex, int index) => modeIndex == index;
+
     public static IReadOnlyList<string> TargetOptions { get; } =
         [Strings.Get("Autopilot_OverrideUseProfile"), .. AutopilotProfileEditor.TargetModeOptions];
 

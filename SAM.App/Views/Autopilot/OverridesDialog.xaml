@@ -68,14 +68,31 @@
 
         <!-- Achievement list mode. -->
         <StackPanel Grid.Row="2" Spacing="4">
-            <RadioButtons
-                x:Uid="Autopilot_OverrideMode"
-                MaxColumns="3"
-                SelectedIndex="{x:Bind ViewModel.ModeIndex, Mode=TwoWay}">
-                <RadioButton x:Uid="Autopilot_OverrideModeNone" />
-                <RadioButton x:Uid="Autopilot_OverrideModeOnly" />
-                <RadioButton x:Uid="Autopilot_OverrideModeExclude" />
-            </RadioButtons>
+            <!-- Plain radio buttons at their natural widths (RadioButtons makes every column as wide as the longest label). -->
+            <TextBlock x:Uid="Autopilot_OverrideMode" />
+            <StackPanel Orientation="Horizontal" Spacing="24">
+                <RadioButton
+                    x:Uid="Autopilot_OverrideModeNone"
+                    MinWidth="0"
+                    GroupName="OverrideMode"
+                    Tag="0"
+                    IsChecked="{x:Bind pages:AutopilotOverridesViewModel.IsMode(ViewModel.ModeIndex, 0), Mode=OneWay}"
+                    Checked="OnModeChecked" />
+                <RadioButton
+                    x:Uid="Autopilot_OverrideModeOnly"
+                    MinWidth="0"
+                    GroupName="OverrideMode"
+                    Tag="1"
+                    IsChecked="{x:Bind pages:AutopilotOverridesViewModel.IsMode(ViewModel.ModeIndex, 1), Mode=OneWay}"
+                    Checked="OnModeChecked" />
+                <RadioButton
+                    x:Uid="Autopilot_OverrideModeExclude"
+                    MinWidth="0"
+                    GroupName="OverrideMode"
+                    Tag="2"
+                    IsChecked="{x:Bind pages:AutopilotOverridesViewModel.IsMode(ViewModel.ModeIndex, 2), Mode=OneWay}"
+                    Checked="OnModeChecked" />
+            </StackPanel>
             <TextBlock
                 Text="{x:Bind ViewModel.ModeHint, Mode=OneWay}"
                 Style="{StaticResource CaptionTextBlockStyle}"

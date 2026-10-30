@@ -3440,7 +3440,7 @@ Installed · {2}</value>
   <data name="Autopilot_OverrideRareSkip" xml:space="preserve">
     <value>Skip</value>
   </data>
-  <data name="Autopilot_OverrideMode.Header" xml:space="preserve">
+  <data name="Autopilot_OverrideMode.Text" xml:space="preserve">
     <value>Achievements</value>
   </data>
   <data name="Autopilot_OverrideModeNone.Content" xml:space="preserve">

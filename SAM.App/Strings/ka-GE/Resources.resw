@@ -3394,7 +3394,7 @@
   <data name="Autopilot_OverrideRareSkip" xml:space="preserve">
     <value>გამოტოვება</value>
   </data>
-  <data name="Autopilot_OverrideMode.Header" xml:space="preserve">
+  <data name="Autopilot_OverrideMode.Text" xml:space="preserve">
     <value>მიღწევები</value>
   </data>
   <data name="Autopilot_OverrideModeNone.Content" xml:space="preserve">

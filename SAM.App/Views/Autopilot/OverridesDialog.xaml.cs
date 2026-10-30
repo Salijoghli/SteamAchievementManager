@@ -19,4 +19,12 @@ public sealed partial class OverridesDialog : ContentDialog
     }
 
     public AutopilotOverridesViewModel ViewModel { get; }
+
+    private void OnModeChecked(object sender, RoutedEventArgs e)
+    {
+        if (sender is RadioButton { Tag: string tag } && int.TryParse(tag, out var index))
+        {
+            this.ViewModel.ModeIndex = index;
+        }
+    }
 }
