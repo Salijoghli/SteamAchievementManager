@@ -461,13 +461,19 @@
                                 <TextBlock x:Uid="Autopilot_NoneYet" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.HasExcludedGames), Mode=OneWay}" />
                             </StackPanel>
 
-                            <StackPanel Spacing="6">
+                            <StackPanel Spacing="6" Visibility="{x:Bind ViewModel.ShowOverridesSection, Mode=OneWay}">
                                 <Grid>
                                     <StackPanel VerticalAlignment="Center">
                                         <TextBlock x:Uid="Autopilot_OverridesTitle" Style="{StaticResource GroupTitleStyle}" Margin="0" />
-                                        <TextBlock x:Uid="Autopilot_OverridesHint" Style="{StaticResource HintStyle}" />
+                                        <TextBlock x:Uid="Autopilot_OverridesHint" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.IsManualSource), Mode=OneWay}" />
+                                        <TextBlock x:Uid="Autopilot_OverridesOrphanHint" Style="{StaticResource HintStyle}" Visibility="{x:Bind ViewModel.IsManualSource, Mode=OneWay}" />
                                     </StackPanel>
-                                    <Button HorizontalAlignment="Right" VerticalAlignment="Center" Command="{x:Bind ViewModel.AddOverrideCommand}" x:Uid="Autopilot_AddOverrideButton" />
+                                    <Button
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Center"
+                                        Command="{x:Bind ViewModel.AddOverrideCommand}"
+                                        Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.IsManualSource), Mode=OneWay}"
+                                        x:Uid="Autopilot_AddOverrideButton" />
                                 </Grid>
                                 <ItemsControl ItemsSource="{x:Bind ViewModel.OverrideGames}" ItemTemplate="{StaticResource SimpleGameTemplate}" />
                                 <TextBlock x:Uid="Autopilot_NoneYet" Style="{StaticResource HintStyle}" Visibility="{x:Bind pages:AutopilotFormat.Collapsed(ViewModel.HasOverrideGames), Mode=OneWay}" />

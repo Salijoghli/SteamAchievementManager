@@ -306,7 +306,15 @@ public sealed partial class AutopilotViewModel : ObservableObject
     private bool _hasExcludedGames;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowOverridesSection))]
     private bool _hasOverrideGames;
+
+    /// <summary>
+    /// The "Per-game overrides" group. With picked games each run-order row has its own edit button,
+    /// so the group only appears there to list overrides for games no longer in the run order
+    /// (which could otherwise not be removed). Other sources have no per-game rows, so it's always shown.
+    /// </summary>
+    public bool ShowOverridesSection => this.IsManualSource == false || this.HasOverrideGames;
 
     public double MaxConcurrentGames
     {
@@ -987,6 +995,8 @@ public sealed partial class AutopilotViewModel : ObservableObject
         this.OnPropertyChanged(nameof(this.IsCollectionSource));
         this.OnPropertyChanged(nameof(this.IsSmartListSource));
         this.OnPropertyChanged(nameof(this.ShowGetStarted));
+        this.OnPropertyChanged(nameof(this.ShowOverridesSection));
+        this.RebuildLists();
         this.OnEdited();
         this.UpdateSourceSummary();
     }
@@ -1028,12 +1038,14 @@ public sealed partial class AutopilotViewModel : ObservableObject
             this.SourceIndex = 0;
         }
 
+        var before = this._edit.ManualGames.Count;
         foreach (var appId in picked.Where(id => this._edit.ManualGames.Contains(id) == false))
         {
             this._edit.ManualGames.Add(appId);
             this._edit.ExcludedGames.Remove(appId);
         }
 
+        this.FollowGameCount(before);
         this.RebuildLists();
         this.OnEdited();
     }
@@ -1111,9 +1123,31 @@ public sealed partial class AutopilotViewModel : ObservableObject
 
     private void RemoveManual(AutopilotGameItem item)
     {
+        var before = this._edit.ManualGames.Count;
         this._edit.ManualGames.Remove(item.AppId);
+        this.FollowGameCount(before);
         this.RebuildLists();
         this.OnEdited();
+    }
+
+    /// <summary>
+    /// "Games running at once" follows the number of picked games (all of them run together) until
+    /// the user sets it to something else: it moves only while it still equals the old game count,
+    /// or when the list was empty.
+    /// </summary>
+    private void FollowGameCount(int before)
+    {
+        var after = this._edit.ManualGames.Count;
+        if (this.IsManualSource == false || after == 0 || after == before)
+        {
+            return;
+        }
+
+        if (before == 0 || this._edit.MaxConcurrentGames == Math.Clamp(before, 1, 32))
+        {
+            this._edit.MaxConcurrentGames = Math.Clamp(after, 1, 32);
+            this.OnPropertyChanged(nameof(this.MaxConcurrentGames));
+        }
     }
 
     private void RemoveExcluded(AutopilotGameItem item)
@@ -1190,7 +1224,8 @@ public sealed partial class AutopilotViewModel : ObservableObject
             }
 
             this.OverrideGames.Clear();
-            foreach (var (appId, value) in this._edit.Overrides)
+            var listed = this.IsManualSource ? this._edit.ManualGames.ToHashSet() : [];
+            foreach (var (appId, value) in this._edit.Overrides.Where(o => listed.Contains(o.Key) == false))
             {
                 this.OverrideGames.Add(new AutopilotGameItem(
                     appId,

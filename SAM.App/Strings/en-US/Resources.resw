@@ -2933,6 +2933,9 @@ Installed · {2}</value>
   <data name="Autopilot_OverridesHint.Text" xml:space="preserve">
     <value>Different rules or achievements for specific games</value>
   </data>
+  <data name="Autopilot_OverridesOrphanHint.Text" xml:space="preserve">
+    <value>Set for games no longer in the run order. Use the edit button on a game above to change its overrides.</value>
+  </data>
   <data name="Autopilot_AddOverrideButton.Content" xml:space="preserve">
     <value>Add…</value>
   </data>
@@ -2943,7 +2946,7 @@ Installed · {2}</value>
     <value>Games running at once</value>
   </data>
   <data name="Autopilot_MaxConcurrentHint.Text" xml:space="preserve">
-    <value>1–32. Steam allows about 32 games running at the same time.</value>
+    <value>1–32. Follows the number of games you pick until you change it. Steam allows about 32 games running at the same time.</value>
   </data>
   <data name="Autopilot_AddGamesTitle" xml:space="preserve">
     <value>Add games</value>

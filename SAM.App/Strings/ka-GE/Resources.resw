@@ -2887,6 +2887,9 @@
   <data name="Autopilot_OverridesHint.Text" xml:space="preserve">
     <value>განსხვავებული წესები ან მიღწევები კონკრეტული თამაშებისთვის</value>
   </data>
+  <data name="Autopilot_OverridesOrphanHint.Text" xml:space="preserve">
+    <value>მითითებულია თამაშებისთვის, რომლებიც აღარ არის გაშვების რიგში. თამაშის პარამეტრების შესაცვლელად გამოიყენე რედაქტირების ღილაკი ზემოთ.</value>
+  </data>
   <data name="Autopilot_AddOverrideButton.Content" xml:space="preserve">
     <value>დამატება…</value>
   </data>
@@ -2897,7 +2900,7 @@
     <value>ერთდროულად გაშვებული თამაშები</value>
   </data>
   <data name="Autopilot_MaxConcurrentHint.Text" xml:space="preserve">
-    <value>1–32. Steam ერთდროულად დაახლოებით 32 თამაშის გაშვებას იძლევა.</value>
+    <value>1–32. ავტომატურად ემთხვევა არჩეული თამაშების რაოდენობას, სანამ თავად არ შეცვლი. Steam ერთდროულად დაახლოებით 32 თამაშის გაშვებას იძლევა.</value>
   </data>
   <data name="Autopilot_AddGamesTitle" xml:space="preserve">
     <value>თამაშების დამატება</value>
