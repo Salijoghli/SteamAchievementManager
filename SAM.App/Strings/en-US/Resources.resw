@@ -3848,4 +3848,10 @@ Installed · {2}</value>
   <data name="Suggest_EasyWinsLoadFailed" xml:space="preserve">
     <value>Easy wins needs your achievements from Steam's local stats cache, which couldn't be read.</value>
   </data>
+  <data name="Autopilot_UnlockNow" xml:space="preserve">
+    <value>Unlock “{0}” now</value>
+  </data>
+  <data name="Autopilot_UnlockingNow" xml:space="preserve">
+    <value>Unlocking “{0}”…</value>
+  </data>
 </root>

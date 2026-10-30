@@ -186,7 +186,8 @@ public sealed partial class AutopilotStatusItem : ObservableObject
     [NotifyPropertyChangedFor(
         nameof(Name), nameof(KindText), nameof(KindGlyph), nameof(KindBrush), nameof(IsPaused), nameof(PauseLabel), nameof(PauseGlyph),
         nameof(CountsText), nameof(HasNext), nameof(Message), nameof(HasMessage), nameof(IsError), nameof(AutomationName),
-        nameof(ProgressValue), nameof(ProgressMaximum), nameof(HasTarget), nameof(ProgressText))]
+        nameof(ProgressValue), nameof(ProgressMaximum), nameof(HasTarget), nameof(ProgressText),
+        nameof(CanUnlockNow), nameof(IsUnlockingNow), nameof(IsNotUnlockingNow), nameof(UnlockNowLabel))]
     private AutopilotGameStatus _status;
 
     /// <summary>The time target this game's progress bar measures against (from its resolved profile).</summary>
@@ -240,6 +241,17 @@ public sealed partial class AutopilotStatusItem : ObservableObject
 
     public bool HasNext => string.IsNullOrEmpty(this.Status.NextUnlockName) == false;
 
+    /// <summary>"Unlock next now" is offered for running games that have a next unlock.</summary>
+    public bool CanUnlockNow => this.Status.Kind == AutopilotGameStatusKind.Running && (this.HasNext || this.IsUnlockingNow);
+
+    public bool IsUnlockingNow => this.Status.UnlockingNow;
+
+    public bool IsNotUnlockingNow => this.IsUnlockingNow == false;
+
+    public string UnlockNowLabel => Strings.Format(
+        this.IsUnlockingNow ? "Autopilot_UnlockingNow" : "Autopilot_UnlockNow",
+        this.Status.NextUnlockName ?? "");
+
     public string? Message => this.Status.Message;
 
     public bool HasMessage => string.IsNullOrWhiteSpace(this.Status.Message) == false;
@@ -268,6 +280,9 @@ public sealed partial class AutopilotStatusItem : ObservableObject
 
     [RelayCommand]
     private Task PreviewAsync() => this._owner.PreviewGameAsync(this.AppId, this.Name);
+
+    [RelayCommand]
+    private void UnlockNow() => this._owner.UnlockNextNow(this);
 
     [RelayCommand]
     private Task ResetAsync() => this._owner.ResetGameAsync(this);

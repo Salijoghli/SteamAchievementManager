@@ -3802,4 +3802,10 @@
   <data name="Suggest_EasyWinsLoadFailed" xml:space="preserve">
     <value>„იოლ გამარჯვებებს“ სჭირდება თქვენი მიღწევები Steam-ის სტატისტიკის ლოკალური ქეშიდან, რომლის წაკითხვაც ვერ მოხერხდა.</value>
   </data>
+  <data name="Autopilot_UnlockNow" xml:space="preserve">
+    <value>„{0}“-ის განბლოკვა ახლავე</value>
+  </data>
+  <data name="Autopilot_UnlockingNow" xml:space="preserve">
+    <value>„{0}“-ის განბლოკვა…</value>
+  </data>
 </root>

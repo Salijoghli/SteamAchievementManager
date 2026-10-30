@@ -742,6 +742,15 @@ public sealed partial class AutopilotViewModel : ObservableObject
         });
     }
 
+    /// <summary>Unlocks a running game's next planned achievement right away (on the engine's next pass).</summary>
+    internal void UnlockNextNow(AutopilotStatusItem item)
+    {
+        if (item.IsUnlockingNow == false)
+        {
+            this.RunEngineAction(engine => engine.UnlockNextNow(item.AppId));
+        }
+    }
+
     internal async Task ResetGameAsync(AutopilotStatusItem item)
     {
         if (this.Dialogs == null ||

@@ -39,6 +39,9 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
     /// <summary>After a failed global-percentage lookup, how long before asking Steam again.</summary>
     private static readonly TimeSpan PercentRetryDelay = TimeSpan.FromMinutes(2);
     private static readonly TimeSpan NextUnlockLifetime = TimeSpan.FromMinutes(10);
+
+    /// <summary>How long an "unlock next now" request waits for its game's next pass before it's dropped.</summary>
+    private static readonly TimeSpan UnlockNowLifetime = TimeSpan.FromMinutes(2);
     private static readonly TimeSpan UnlockRetryDelay = TimeSpan.FromMinutes(10);
     private static readonly TimeSpan StableWorkerUptime = TimeSpan.FromMinutes(10);
     private static readonly TimeSpan StateTimeout = TimeSpan.FromSeconds(15);
@@ -64,6 +67,7 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
     private readonly Dictionary<uint, DateTimeOffset> _unlockRetryAt = [];
     private readonly Dictionary<uint, AwakeClock.Mark> _creditedUntil = [];
     private readonly HashSet<uint> _unlocking = [];
+    private readonly Dictionary<uint, DateTimeOffset> _unlockNow = [];
     private readonly Dictionary<uint, (DateTimeOffset At, GlobalPercentResult Result)> _percents = [];
     private readonly Dictionary<uint, IReadOnlyList<AutopilotAchievement>> _achievements = [];
     private readonly Dictionary<uint, (DateTimeOffset At, string? Name, DateTimeOffset? Estimate)> _nextUnlocks = [];
@@ -291,6 +295,27 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
     }
 
     public void PauseGame(uint appId) => this.SetPaused(appId, true);
+
+    /// <summary>
+    /// Asks for a running game's next planned achievement to be unlocked on its next pass (right
+    /// away), ignoring pacing, limits and quiet hours; the unlock is still counted and recorded
+    /// like any other. Returns false when the game isn't running.
+    /// </summary>
+    public bool UnlockNextNow(uint appId)
+    {
+        if (this.Live == false || this._workers.TryGetValue(appId, out var worker) == false || worker.IsReady == false)
+        {
+            return false;
+        }
+
+        this._unlockNow[appId] = DateTimeOffset.Now;
+        this.RequestTick();
+        this.RaiseChanged();
+        return true;
+    }
+
+    /// <summary>Whether an "unlock next now" request for <paramref name="appId"/> is waiting or being sent.</summary>
+    public bool IsUnlockingNow(uint appId) => this._unlockNow.ContainsKey(appId);
 
     public void ResumeGame(uint appId) => this.SetPaused(appId, false);
 
@@ -800,10 +825,28 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
         config.Overrides.TryGetValue(appId, out var gameOverride);
         var playtime = this.CurrentPlaytime(state);
 
-        if (AutopilotPlanner.IsQuietTime(config, now) == false &&
-            (this._unlockRetryAt.TryGetValue(appId, out var retryAt) == false || retryAt <= now))
+        if (this._unlockNow.TryGetValue(appId, out var askedAt) && now - askedAt >= UnlockNowLifetime)
         {
-            var due = AutopilotPlanner.DueNow(profile, gameOverride, achievements, state, playtime, now, this._random);
+            this._unlockNow.Remove(appId);
+        }
+
+        var unlockNow = this._unlockNow.ContainsKey(appId);
+        if (unlockNow ||
+            (AutopilotPlanner.IsQuietTime(config, now) == false &&
+             (this._unlockRetryAt.TryGetValue(appId, out var retryAt) == false || retryAt <= now)))
+        {
+            var due = AutopilotPlanner.DueNow(profile, gameOverride, achievements, state, playtime, now, this._random).ToList();
+            if (unlockNow)
+            {
+                // The user asked for the next planned one: add it to whatever is due anyway.
+                var next = NextPlanned(AutopilotPlanner.Preview(appId, config, achievements, state, playtime, now));
+                var wanted = next == null ? null : achievements.FirstOrDefault(a => a.Id == next.AchievementId && a.IsUnlocked == false);
+                if (wanted != null && due.All(a => a.Id != wanted.Id))
+                {
+                    due.Add(wanted);
+                }
+            }
+
             this._stateDirty = true;
             if (due.Count > 0 && this.Live)
             {
@@ -815,11 +858,26 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
                     this._nextUnlocks.Remove(appId);
                 }
 
+                if (unlockNow)
+                {
+                    this._unlockNow.Remove(appId);
+                }
+
                 if (ReferenceEquals(this.Config, config) == false)
                 {
                     return;
                 }
             }
+
+            if (unlockNow)
+            {
+                // Nothing to unlock (or SAM stopped before sending): drop the request.
+                this._unlockNow.Remove(appId);
+            }
+        }
+        else
+        {
+            this._unlockNow.Remove(appId);
         }
 
         state = this.GetOrCreateState(appId);
@@ -1018,12 +1076,7 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
 
                 this.State.Games.TryGetValue(appId, out var state);
                 var playtime = state == null ? this.SteamHours(appId) : this.CurrentPlaytime(state);
-                var plan = AutopilotPlanner.Preview(appId, config, achievements, state, playtime, now);
-                var next = plan
-                    .Where(p => p.Skip == AutopilotSkipReason.None)
-                    .OrderBy(p => p.EstimatedAt ?? DateTimeOffset.MaxValue)
-                    .ThenBy(p => p.AtPlaytimeHours)
-                    .FirstOrDefault();
+                var next = NextPlanned(AutopilotPlanner.Preview(appId, config, achievements, state, playtime, now));
                 this._nextUnlocks[appId] = (now, next?.Name, next?.EstimatedAt);
             }
             catch (OperationCanceledException)
@@ -1037,6 +1090,13 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
             }
         }
     }
+
+    /// <summary>The planned unlock shown as "next": the earliest one the rules allow.</summary>
+    private static AutopilotPlannedUnlock? NextPlanned(IReadOnlyList<AutopilotPlannedUnlock> plan) => plan
+        .Where(p => p.Skip == AutopilotSkipReason.None)
+        .OrderBy(p => p.EstimatedAt ?? DateTimeOffset.MaxValue)
+        .ThenBy(p => p.AtPlaytimeHours)
+        .FirstOrDefault();
 
     /// <summary>Builds <see cref="Status"/> and the tray text from the decisions and raises Changed.</summary>
     private void PublishStatus(IReadOnlyList<Decision> decisions, AutopilotConfig config, DateTimeOffset now)
@@ -1091,7 +1151,8 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
                 remaining,
                 kindNow is AutopilotGameStatusKind.Completed or AutopilotGameStatusKind.PausedByUser ? null : next.Name,
                 kindNow is AutopilotGameStatusKind.Completed or AutopilotGameStatusKind.PausedByUser ? null : next.Estimate,
-                message));
+                message,
+                this._unlockNow.ContainsKey(appId)));
         }
 
         this._status = result;
@@ -1265,6 +1326,7 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
         this.CreditRunningTime(appId, DateTimeOffset.Now);
         this._workers.Remove(appId);
         this._creditedUntil.Remove(appId);
+        this._unlockNow.Remove(appId);
         try
         {
             await worker.StopAsync(StopTimeout);
@@ -1298,6 +1360,7 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
         }
 
         this._creditedUntil.Remove(appId);
+        this._unlockNow.Remove(appId);
     }
 
     /// <summary>Remembers why a game's worker failed and when to try again (30 s, doubling, at most 30 min).</summary>

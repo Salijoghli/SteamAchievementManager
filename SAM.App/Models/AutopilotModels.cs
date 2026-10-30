@@ -366,5 +366,6 @@ public sealed record AutopilotGameStatus(
     int RemainingAllowed,
     string? NextUnlockName,
     DateTimeOffset? NextUnlockEstimate,
-    string? Message);
+    string? Message,
+    bool UnlockingNow = false);
 #endregion
