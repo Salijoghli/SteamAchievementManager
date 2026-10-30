@@ -3446,7 +3446,7 @@
     <value>თამაში</value>
   </data>
   <data name="Autopilot_ColumnPlanned.Text" xml:space="preserve">
-    <value>დაგეგმილი</value>
+    <value>თამაშის დრო</value>
   </data>
   <data name="Autopilot_ColumnEstimate.Text" xml:space="preserve">
     <value>სავარაუდო დრო</value>
@@ -3504,6 +3504,36 @@
   </data>
   <data name="Autopilot_PreviewAtPlaytime" xml:space="preserve">
     <value>თამაშის {0}-ზე</value>
+  </data>
+  <data name="Autopilot_PreviewAfterRun" xml:space="preserve">
+    <value>ამ გაშვების შემდეგ</value>
+  </data>
+  <data name="Autopilot_PreviewAfterRunHint" xml:space="preserve">
+    <value>საჭიროებს იმაზე მეტ თამაშის დროს, ვიდრე ამ გაშვების დროის ლიმიტია (წესები → რამდენ ხანს), ამიტომ ამ გაშვებაში არ გაიხსნება.</value>
+  </data>
+  <data name="Autopilot_PreviewAfterRunCount_One" xml:space="preserve">
+    <value>(კიდევ {0} — გაშვების შემდეგ)</value>
+  </data>
+  <data name="Autopilot_PreviewAfterRunCount_Other" xml:space="preserve">
+    <value>(კიდევ {0} — გაშვების შემდეგ)</value>
+  </data>
+  <data name="Autopilot_PreviewTileUnlocks.Text" xml:space="preserve">
+    <value>ამ გაშვებაში გაიხსნება</value>
+  </data>
+  <data name="Autopilot_PreviewTileAfter.Text" xml:space="preserve">
+    <value>ამ გაშვების შემდეგ</value>
+  </data>
+  <data name="Autopilot_PreviewTileSkipped.Text" xml:space="preserve">
+    <value>გამოტოვებული</value>
+  </data>
+  <data name="Autopilot_PreviewTileFinish.Text" xml:space="preserve">
+    <value>ბოლო გახსნა</value>
+  </data>
+  <data name="Autopilot_TodayAt" xml:space="preserve">
+    <value>დღეს {0}</value>
+  </data>
+  <data name="Autopilot_TomorrowAt" xml:space="preserve">
+    <value>ხვალ {0}</value>
   </data>
   <data name="Autopilot_PreviewSomeFailed_One" xml:space="preserve">
     <value>{0} თამაშის დაგეგმვა ვერ მოხერხდა: {1}</value>

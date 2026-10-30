@@ -3492,10 +3492,10 @@ Installed · {2}</value>
     <value>Game</value>
   </data>
   <data name="Autopilot_ColumnPlanned.Text" xml:space="preserve">
-    <value>Planned</value>
+    <value>At playtime</value>
   </data>
   <data name="Autopilot_ColumnEstimate.Text" xml:space="preserve">
-    <value>Estimated</value>
+    <value>Expected</value>
   </data>
   <data name="Autopilot_OverrideLoading.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
     <value>Loading achievements</value>
@@ -3550,6 +3550,36 @@ Installed · {2}</value>
   </data>
   <data name="Autopilot_PreviewAtPlaytime" xml:space="preserve">
     <value>at {0} of playtime</value>
+  </data>
+  <data name="Autopilot_PreviewAfterRun" xml:space="preserve">
+    <value>After this run</value>
+  </data>
+  <data name="Autopilot_PreviewAfterRunHint" xml:space="preserve">
+    <value>Needs more playtime than this run's time target (Rules → How long), so it won't unlock in this run.</value>
+  </data>
+  <data name="Autopilot_PreviewAfterRunCount_One" xml:space="preserve">
+    <value>({0} more after this run)</value>
+  </data>
+  <data name="Autopilot_PreviewAfterRunCount_Other" xml:space="preserve">
+    <value>({0} more after this run)</value>
+  </data>
+  <data name="Autopilot_PreviewTileUnlocks.Text" xml:space="preserve">
+    <value>Unlock in this run</value>
+  </data>
+  <data name="Autopilot_PreviewTileAfter.Text" xml:space="preserve">
+    <value>After this run</value>
+  </data>
+  <data name="Autopilot_PreviewTileSkipped.Text" xml:space="preserve">
+    <value>Skipped</value>
+  </data>
+  <data name="Autopilot_PreviewTileFinish.Text" xml:space="preserve">
+    <value>Last unlock</value>
+  </data>
+  <data name="Autopilot_TodayAt" xml:space="preserve">
+    <value>Today {0}</value>
+  </data>
+  <data name="Autopilot_TomorrowAt" xml:space="preserve">
+    <value>Tomorrow {0}</value>
   </data>
   <data name="Autopilot_PreviewSomeFailed_One" xml:space="preserve">
     <value>{0} game couldn't be planned: {1}</value>

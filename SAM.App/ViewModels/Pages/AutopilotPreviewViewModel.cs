@@ -2,7 +2,9 @@
 #pragma warning disable MVVMTK0045
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.Globalization;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using SAM.App.Models;
 using SAM.App.Services;
 using SAM.App.Services.Autopilot;
@@ -10,7 +12,11 @@ using SAM.App.Services.Autopilot;
 namespace SAM.App.ViewModels.Pages;
 
 /// <summary>One row of the dry-run table: when an achievement will unlock, or why it won't.</summary>
-public sealed class AutopilotPreviewRow(string gameName, AutopilotPlannedUnlock plan, bool showGame)
+/// <param name="hasCalendar">
+/// Some unlock in the plan has a date. Then a planned unlock without one comes after the run's time
+/// target ("After this run"); without any dates the schedule allows no running time at all.
+/// </param>
+public sealed class AutopilotPreviewRow(string gameName, AutopilotPlannedUnlock plan, bool showGame, bool hasCalendar)
 {
     public string GameName { get; } = gameName;
 
@@ -21,21 +27,45 @@ public sealed class AutopilotPreviewRow(string gameName, AutopilotPlannedUnlock 
 
     public string PercentText { get; } = AutopilotFormat.Percent(plan.GlobalPercent);
 
+    public AchievementRarity Rarity { get; } = AchievementViewModel.GetRarity(plan.GlobalPercent);
+
+    public bool HasRarity => this.Rarity != AchievementRarity.Unknown;
+
+    public string RarityTierText => AchievementViewModel.RarityName(this.Rarity);
+
     public bool IsSkipped { get; } = plan.Skip != AutopilotSkipReason.None;
 
     public bool IsPlanned => this.IsSkipped == false;
 
-    /// <summary>"at 5.5 h of playtime", or the localized skip reason.</summary>
-    public string PlannedText { get; } = plan.Skip != AutopilotSkipReason.None
-        ? AutopilotFormat.SkipReasonText(plan.Skip)
+    /// <summary>Planned, but past the run's time target, so it won't happen in this run.</summary>
+    public bool IsAfterRun { get; } = plan.Skip == AutopilotSkipReason.None && plan.EstimatedAt == null && hasCalendar;
+
+    /// <summary>The playtime the unlock is planned at ("7.5 h"); empty for skipped rows.</summary>
+    public string PlannedText { get; } = plan.Skip != AutopilotSkipReason.None ? "" : AutopilotFormat.Hours(plan.AtPlaytimeHours);
+
+    public string PlannedToolTip { get; } = plan.Skip != AutopilotSkipReason.None
+        ? ""
         : Strings.Format("Autopilot_PreviewAtPlaytime", AutopilotFormat.Hours(plan.AtPlaytimeHours));
 
-    public string EstimateText { get; } = plan.Skip != AutopilotSkipReason.None ? "" : AutopilotFormat.DateTime(plan.EstimatedAt);
+    /// <summary>"Today 6:28 PM", "After this run", or why it's skipped.</summary>
+    public string EstimateText { get; } = plan.Skip != AutopilotSkipReason.None
+        ? AutopilotFormat.SkipReasonText(plan.Skip)
+        : plan.EstimatedAt is { } at ? AutopilotPreviewViewModel.FriendlyTime(at, DateTimeOffset.Now)
+        : hasCalendar ? Strings.Get("Autopilot_PreviewAfterRun")
+        : AutopilotFormat.DateTime(null);
 
-    public double Opacity => this.IsSkipped ? 0.6 : 1;
+    public string EstimateToolTip { get; } = plan.Skip == AutopilotSkipReason.None && plan.EstimatedAt == null && hasCalendar
+        ? Strings.Get("Autopilot_PreviewAfterRunHint")
+        : plan.EstimatedAt is { } exact ? AutopilotFormat.DateTime(exact) : "";
+
+    public double Opacity => this.IsSkipped ? 0.55 : 1;
+
+    public static Brush SecondaryIf(bool value) => (Brush)Application.Current.Resources[value ? "TextFillColorSecondaryBrush" : "TextFillColorPrimaryBrush"];
+
+    public static Windows.UI.Text.FontStyle ItalicIf(bool value) => value ? Windows.UI.Text.FontStyle.Italic : Windows.UI.Text.FontStyle.Normal;
 
     /// <summary>What screen readers announce for the row.</summary>
-    public override string ToString() => string.Join(", ", new[] { this.GameName, this.Name, this.PercentText, this.PlannedText, this.EstimateText }.Where(s => s.Length > 0));
+    public override string ToString() => string.Join(", ", new[] { this.GameName, this.Name, this.PercentText, this.PlannedToolTip, this.EstimateText }.Where(s => s.Length > 0));
 }
 
 /// <summary>
@@ -102,6 +132,27 @@ public sealed partial class AutopilotPreviewViewModel : ObservableObject
 
     [ObservableProperty]
     private string _totalsText = "";
+
+    /// <summary>Tile: unlocks that happen within this run.</summary>
+    [ObservableProperty]
+    private string _inRunCountText = "";
+
+    /// <summary>Tile: planned unlocks past the run's time target.</summary>
+    [ObservableProperty]
+    private string _afterRunCountText = "";
+
+    [ObservableProperty]
+    private string _skippedCountText = "";
+
+    /// <summary>Tile tooltip: "1 already unlocked, 2 protected".</summary>
+    [ObservableProperty]
+    private string _skippedReasonsText = "";
+
+    /// <summary>Tile: when the last unlock of this run lands ("Tomorrow 1:45 AM"), or the playtime it needs.</summary>
+    [ObservableProperty]
+    private string _finishText = "";
+
+    public string AfterRunHint => Strings.Get("Autopilot_PreviewAfterRunHint");
 
     /// <summary>Planning problems for some of the merged games (the rest still show).</summary>
     [ObservableProperty]
@@ -177,14 +228,17 @@ public sealed partial class AutopilotPreviewViewModel : ObservableObject
                 .Where(g => this._plans.ContainsKey(g.AppId))
                 .SelectMany(g => this._plans[g.AppId].Select(p => (g.Name, Plan: p)))
                 .ToList();
+            var hasCalendar = plans.Any(p => p.Plan.EstimatedAt != null);
             this.Rows = plans
                 .OrderBy(p => p.Plan.Skip == AutopilotSkipReason.None ? 0 : 1)
                 .ThenBy(p => p.Plan.EstimatedAt ?? DateTimeOffset.MaxValue)
                 .ThenBy(p => p.Plan.AtPlaytimeHours)
                 .ThenBy(p => p.Plan.Skip)
-                .Select(p => new AutopilotPreviewRow(p.Name, p.Plan, selected.Count > 1))
+                .Select(p => new AutopilotPreviewRow(p.Name, p.Plan, selected.Count > 1, hasCalendar))
                 .ToList();
-            this.TotalsText = Totals(plans.Select(p => p.Plan).ToList());
+            var all = plans.Select(p => p.Plan).ToList();
+            this.TotalsText = Totals(all);
+            this.FillTiles(all);
         }
         finally
         {
@@ -196,21 +250,66 @@ public sealed partial class AutopilotPreviewViewModel : ObservableObject
         }
     }
 
-    /// <summary>"12 will unlock over ~9 days; 5 skipped: 3 rare, 2 protected".</summary>
+    private void FillTiles(IReadOnlyList<AutopilotPlannedUnlock> plans)
+    {
+        var planned = plans.Where(p => p.Skip == AutopilotSkipReason.None).ToList();
+        var inRun = planned.Where(p => p.EstimatedAt != null).ToList();
+        var hasCalendar = inRun.Count > 0;
+        var skipped = plans.Where(p => p.Skip != AutopilotSkipReason.None).ToList();
+
+        this.InRunCountText = (hasCalendar ? inRun.Count : planned.Count).ToString("N0", CultureInfo.CurrentCulture);
+        this.AfterRunCountText = (hasCalendar ? planned.Count - inRun.Count : 0).ToString("N0", CultureInfo.CurrentCulture);
+        this.SkippedCountText = skipped.Count.ToString("N0", CultureInfo.CurrentCulture);
+        this.SkippedReasonsText = SkipReasons(skipped);
+        this.FinishText = hasCalendar
+            ? FriendlyTime(inRun.Max(p => p.EstimatedAt!.Value), DateTimeOffset.Now)
+            : planned.Count > 0 ? Strings.Format("Autopilot_PreviewAtPlaytime", AutopilotFormat.Hours(planned.Max(p => p.AtPlaytimeHours)))
+            : AutopilotFormat.DateTime(null);
+    }
+
+    /// <summary>"Today 6:28 PM", "Tomorrow 1:45 AM", else the short date and time.</summary>
+    internal static string FriendlyTime(DateTimeOffset at, DateTimeOffset now)
+    {
+        var local = at.ToLocalTime();
+        var days = (local.Date - now.ToLocalTime().Date).Days;
+        var time = local.ToString("t", CultureInfo.CurrentCulture);
+        return days switch
+        {
+            0 => Strings.Format("Autopilot_TodayAt", time),
+            1 => Strings.Format("Autopilot_TomorrowAt", time),
+            _ => AutopilotFormat.DateTime(at),
+        };
+    }
+
+    private static string SkipReasons(IReadOnlyList<AutopilotPlannedUnlock> skipped) => string.Join(", ", skipped
+        .GroupBy(p => p.Skip)
+        .OrderByDescending(g => g.Count())
+        .Select(g => Strings.Format("Autopilot_PreviewReasonCount", g.Count(), Strings.Get("Autopilot_ReasonShort" + g.Key))));
+
+    /// <summary>
+    /// "9 will unlock over ~1 day (4 more after this run); 1 skipped: 1 already unlocked". Unlocks
+    /// past the run's time target have no date and aren't counted as happening in this run.
+    /// </summary>
     internal static string Totals(IReadOnlyList<AutopilotPlannedUnlock> plans)
     {
         var planned = plans.Where(p => p.Skip == AutopilotSkipReason.None).ToList();
         var skipped = plans.Where(p => p.Skip != AutopilotSkipReason.None).ToList();
+        var inRun = planned.Where(p => p.EstimatedAt != null).ToList();
 
         string unlockPart;
         if (planned.Count == 0)
         {
             unlockPart = Strings.Get("Autopilot_PreviewNothingPlanned");
         }
-        else if (planned.Max(p => p.EstimatedAt) is { } last)
+        else if (inRun.Count > 0)
         {
+            var last = inRun.Max(p => p.EstimatedAt!.Value);
             var days = Math.Max(1, (long)Math.Ceiling((last - DateTimeOffset.Now).TotalDays));
-            unlockPart = Strings.Plural("Autopilot_PreviewWillUnlockDays", planned.Count, Strings.Plural("Autopilot_Days", days));
+            unlockPart = Strings.Plural("Autopilot_PreviewWillUnlockDays", inRun.Count, Strings.Plural("Autopilot_Days", days));
+            if (planned.Count > inRun.Count)
+            {
+                unlockPart += " " + Strings.Plural("Autopilot_PreviewAfterRunCount", planned.Count - inRun.Count);
+            }
         }
         else
         {
@@ -222,10 +321,6 @@ public sealed partial class AutopilotPreviewViewModel : ObservableObject
             return unlockPart;
         }
 
-        var reasons = skipped
-            .GroupBy(p => p.Skip)
-            .OrderByDescending(g => g.Count())
-            .Select(g => Strings.Format("Autopilot_PreviewReasonCount", g.Count(), Strings.Get("Autopilot_ReasonShort" + g.Key)));
-        return Strings.Format("Autopilot_PreviewTotals", unlockPart, Strings.Plural("Autopilot_PreviewSkipped", skipped.Count), string.Join(", ", reasons));
+        return Strings.Format("Autopilot_PreviewTotals", unlockPart, Strings.Plural("Autopilot_PreviewSkipped", skipped.Count), SkipReasons(skipped));
     }
 }
