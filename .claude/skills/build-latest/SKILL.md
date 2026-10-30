@@ -65,6 +65,8 @@ so if it equals the latest GitHub release, the in-app update check won't offer t
 ## Notes
 
 - `SAM.exe` in the root is git-ignored (`/SAM.exe` in `.gitignore`); never commit it.
+- On the user's PC the shortcut `..\Steam Achievement Manager.lnk` opens this root `SAM.exe`, so a
+  successful build is what the shortcut starts next time.
 - Don't bump the version, commit, tag or release as part of this skill. Releasing is a separate
   step the user asks for (bump `<Version>/<AssemblyVersion>/<FileVersion>`, commit, push, push a
   `vX.Y.Z` tag).

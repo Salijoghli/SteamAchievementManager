@@ -25,7 +25,8 @@ if ($Configuration -eq 'Debug') {
 
 $upload = Join-Path $PSScriptRoot 'upload'
 if (Test-Path $upload) {
-    Remove-Item -Recurse -Force $upload
+    # Empty it rather than delete it: the folder itself may be open in Explorer or a terminal.
+    Get-ChildItem $upload -Force | Remove-Item -Recurse -Force
 }
 
 & dotnet publish (Join-Path $PSScriptRoot 'SAM.App\SAM.App.csproj') `
