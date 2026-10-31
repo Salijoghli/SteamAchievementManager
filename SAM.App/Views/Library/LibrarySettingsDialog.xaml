@@ -12,13 +12,15 @@
         a one-line description on the left and the control on the right.
     -->
     <ContentDialog.Resources>
+        <!-- Wide enough that each description fits on one line, like Windows Settings. -->
+        <x:Double x:Key="ContentDialogMaxWidth">720</x:Double>
         <Style x:Key="SettingsCardStyle" TargetType="Border">
             <Setter Property="Background" Value="{ThemeResource CardBackgroundBrush}" />
             <Setter Property="BorderBrush" Value="{ThemeResource CardBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}" />
-            <Setter Property="Padding" Value="16,12" />
-            <Setter Property="MinHeight" Value="64" />
+            <Setter Property="Padding" Value="16,10" />
+            <Setter Property="MinHeight" Value="68" />
         </Style>
         <Style x:Key="SettingsRowStyle" TargetType="Grid">
             <Setter Property="ColumnSpacing" Value="16" />
@@ -31,7 +33,7 @@
             <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
         </Style>
         <Style x:Key="SettingsGroupTitleStyle" TargetType="TextBlock" BasedOn="{StaticResource BodyStrongTextBlockStyle}">
-            <Setter Property="Margin" Value="2,0,0,4" />
+            <Setter Property="Margin" Value="2,0,0,6" />
         </Style>
         <Style x:Key="SettingsDescriptionStyle" TargetType="TextBlock" BasedOn="{StaticResource CaptionTextBlockStyle}">
             <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
@@ -47,16 +49,16 @@
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
         <Style x:Key="SettingsComboStyle" TargetType="ComboBox">
-            <Setter Property="MinWidth" Value="150" />
+            <Setter Property="MinWidth" Value="160" />
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
     </ContentDialog.Resources>
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" Padding="0,0,12,0" Margin="0,0,-12,0">
-        <StackPanel Width="460" Spacing="24">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" Padding="0,0,16,0" Margin="0,0,-16,0">
+        <StackPanel MaxWidth="620" Spacing="24">
 
             <!-- Appearance. -->
-            <StackPanel Spacing="4">
+            <StackPanel Spacing="6">
                 <TextBlock x:Uid="Settings_Appearance" Style="{StaticResource SettingsGroupTitleStyle}" />
                 <Border Style="{StaticResource SettingsCardStyle}">
                     <Grid Style="{StaticResource SettingsRowStyle}">
@@ -117,7 +119,7 @@
             </StackPanel>
 
             <!-- Library. -->
-            <StackPanel Spacing="4">
+            <StackPanel Spacing="6">
                 <TextBlock x:Uid="Settings_Library" Style="{StaticResource SettingsGroupTitleStyle}" />
                 <Border Style="{StaticResource SettingsCardStyle}">
                     <Grid Style="{StaticResource SettingsRowStyle}">
@@ -145,7 +147,7 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <FontIcon Glyph="&#xEDA2;" Style="{StaticResource SettingsIconStyle}" />
+                        <FontIcon Glyph="&#xE7B8;" Style="{StaticResource SettingsIconStyle}" />
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
                             <TextBlock x:Uid="Settings_CacheSize" />
                             <Grid>
@@ -172,7 +174,7 @@
             </StackPanel>
 
             <!-- Game window. -->
-            <StackPanel Spacing="4">
+            <StackPanel Spacing="6">
                 <TextBlock x:Uid="Settings_GameWindow" Style="{StaticResource SettingsGroupTitleStyle}" />
                 <Border Style="{StaticResource SettingsCardStyle}">
                     <Grid Style="{StaticResource SettingsRowStyle}">
@@ -215,7 +217,7 @@
             </StackPanel>
 
             <!-- App. -->
-            <StackPanel Spacing="4">
+            <StackPanel Spacing="6">
                 <TextBlock x:Uid="Settings_App" Style="{StaticResource SettingsGroupTitleStyle}" />
                 <Border Style="{StaticResource SettingsCardStyle}">
                     <Grid Style="{StaticResource SettingsRowStyle}">
@@ -328,7 +330,7 @@
             </StackPanel>
 
             <!-- Steam account. -->
-            <StackPanel Spacing="4">
+            <StackPanel Spacing="6">
                 <TextBlock x:Uid="Settings_SteamAccount" Style="{StaticResource SettingsGroupTitleStyle}" />
                 <Border Style="{StaticResource SettingsCardStyle}">
                     <Grid Style="{StaticResource SettingsRowStyle}">

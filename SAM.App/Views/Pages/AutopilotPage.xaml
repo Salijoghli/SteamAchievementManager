@@ -109,7 +109,7 @@
 
                 <!-- 1. Header. -->
                 <Border Style="{StaticResource PanelStyle}">
-                    <Grid ColumnSpacing="24" RowSpacing="12">
+                    <Grid ColumnSpacing="24">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
@@ -182,7 +182,8 @@
                                 </StackPanel>
                             </Button>
                         </StackPanel>
-                        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Spacing="8">
+                        <!-- Collapsed without errors, so the header has no empty space at the bottom. -->
+                        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Spacing="8" Margin="0,12,0,0" Visibility="{x:Bind ViewModel.HasHeaderError, Mode=OneWay}">
                             <InfoBar
                                 x:Uid="Autopilot_EngineErrorBar"
                                 Severity="Warning"
@@ -203,7 +204,8 @@
                     <TextBlock x:Uid="Autopilot_StatusTitle" Style="{StaticResource SectionTitleStyle}" Visibility="{x:Bind ViewModel.HasStatus, Mode=OneWay}" />
                     <ItemsRepeater ItemsSource="{x:Bind ViewModel.Status}" x:Uid="Autopilot_StatusList">
                         <ItemsRepeater.Layout>
-                            <UniformGridLayout MinItemWidth="520" MinColumnSpacing="12" MinRowSpacing="12" ItemsStretch="Fill" />
+                            <!-- One card per row, each as tall as its own text (a uniform grid sizes every card like the first, clipping the rest). -->
+                            <StackLayout Spacing="8" />
                         </ItemsRepeater.Layout>
                         <ItemsRepeater.ItemTemplate>
                             <!-- One compact row per game: art, name and state, progress and next unlock, then icon actions. -->
@@ -235,13 +237,17 @@
                                                 Visibility="{x:Bind HasTarget, Mode=OneWay}"
                                                 ToolTipService.ToolTip="{x:Bind ProgressText, Mode=OneWay}"
                                                 AutomationProperties.Name="{x:Bind ProgressText, Mode=OneWay}" />
-                                            <TextBlock Style="{StaticResource HintStyle}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" ToolTipService.ToolTip="{x:Bind CountsText, Mode=OneWay}">
+                                            <TextBlock Style="{StaticResource HintStyle}" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" ToolTipService.ToolTip="{x:Bind CountsText, Mode=OneWay}">
                                                 <Run Text="{x:Bind ProgressText, Mode=OneWay}" /><Run Text=" · " /><Run Text="{x:Bind CountsText, Mode=OneWay}" />
                                             </TextBlock>
-                                            <StackPanel Orientation="Horizontal" Spacing="6" Visibility="{x:Bind HasNext, Mode=OneWay}">
-                                                <FontIcon Glyph="&#xE823;" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                                <TextBlock Text="{x:Bind NextText, Mode=OneWay}" Style="{StaticResource HintStyle}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" />
-                                            </StackPanel>
+                                            <Grid ColumnSpacing="6" Visibility="{x:Bind HasNext, Mode=OneWay}">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <FontIcon Glyph="&#xE823;" FontSize="11" VerticalAlignment="Top" Margin="0,3,0,0" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock Text="{x:Bind NextText, Mode=OneWay}" Style="{StaticResource HintStyle}" Grid.Column="1" TextWrapping="Wrap" MaxLines="2" TextTrimming="CharacterEllipsis" />
+                                            </Grid>
                                             <TextBlock
                                                 Text="{x:Bind Message, Mode=OneWay}"
                                                 Style="{StaticResource HintStyle}"

@@ -142,10 +142,13 @@ public sealed partial class AutopilotViewModel : ObservableObject
     #region Engine state and header
     /// <summary>Set when the engine couldn't be reached; the page still shows (and edits) a default configuration.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasEngineError), nameof(CanToggleRunning))]
+    [NotifyPropertyChangedFor(nameof(HasEngineError), nameof(CanToggleRunning), nameof(HasHeaderError))]
     private string? _engineError;
 
     public bool HasEngineError => this.EngineError != null;
+
+    /// <summary>Either InfoBar under the header is showing.</summary>
+    public bool HasHeaderError => this.HasEngineError || this.HasActionError;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StartStopLabel), nameof(StartStopGlyph), nameof(IsStopped), nameof(CanToggleRunning))]
@@ -177,7 +180,7 @@ public sealed partial class AutopilotViewModel : ObservableObject
 
     /// <summary>A failed action (start, pause, save…): shown in an InfoBar under the header.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasActionError))]
+    [NotifyPropertyChangedFor(nameof(HasActionError), nameof(HasHeaderError))]
     private string? _actionError;
 
     public bool HasActionError
@@ -653,7 +656,9 @@ public sealed partial class AutopilotViewModel : ObservableObject
             }
         }
 
-        // Update cards in place, in the engine's queue order.
+        // Update cards in place, in the engine's queue order, with finished games moved to the end
+        // (OrderBy is stable, so the rest keep their order).
+        status = status.OrderBy(s => s.Kind == AutopilotGameStatusKind.Completed ? 1 : 0).ToList();
         var existing = this.Status.ToDictionary(s => s.AppId);
         var savedConfig = this.SavedConfig();
         for (var i = 0; i < status.Count; i++)
