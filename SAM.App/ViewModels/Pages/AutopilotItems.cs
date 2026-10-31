@@ -69,8 +69,12 @@ public sealed partial class AutopilotGameItem : ObservableObject
         Action<AutopilotGameItem>? remove = null,
         Action<AutopilotGameItem>? editOverrides = null,
         bool isIncluded = true,
-        Action<AutopilotGameItem, bool>? includedChanged = null)
+        Action<AutopilotGameItem, bool>? includedChanged = null,
+        int unlocked = 0,
+        int total = 0)
     {
+        this.Unlocked = unlocked;
+        this.Total = total;
         this._isIncluded = isIncluded;
         this._includedChanged = includedChanged;
         this.AppId = appId;
@@ -91,6 +95,22 @@ public sealed partial class AutopilotGameItem : ObservableObject
     public string Detail { get; }
 
     public bool HasDetail => this.Detail.Length > 0;
+
+    /// <summary>Achievements unlocked / in total (Total 0: unknown, no progress bar).</summary>
+    public int Unlocked { get; }
+
+    public int Total { get; }
+
+    public bool HasProgress => this.Total > 0;
+
+    public string ProgressCountText => Strings.Format("Autopilot_GameProgressShort", this.Unlocked, this.Total);
+
+    /// <summary>1-based place in the run order.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PositionText))]
+    private int _position;
+
+    public string PositionText => this.Position.ToString(System.Globalization.CultureInfo.CurrentCulture);
 
     [ObservableProperty]
     private ImageSource? _image;

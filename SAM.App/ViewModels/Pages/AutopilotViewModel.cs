@@ -1237,6 +1237,7 @@ public sealed partial class AutopilotViewModel : ObservableObject
             this.ManualGames.Clear();
             foreach (var appId in this._edit.ManualGames)
             {
+                var progress = this._library.AllGames.FirstOrDefault(c => c.AppId == appId)?.Progress;
                 this.ManualGames.Add(new AutopilotGameItem(
                     appId,
                     AutopilotFormat.GameName(this._library, this._services, appId),
@@ -1247,7 +1248,9 @@ public sealed partial class AutopilotViewModel : ObservableObject
                     remove: this.RemoveManual,
                     editOverrides: i => _ = this.EditOverridesAsync(i.AppId, i.Name),
                     isIncluded: this._edit.ExcludedGames.Contains(appId) == false,
-                    includedChanged: this.SetIncluded)
+                    includedChanged: this.SetIncluded,
+                    unlocked: progress?.Unlocked ?? 0,
+                    total: progress?.Total ?? 0)
                 {
                     HasOverride = this._edit.Overrides.ContainsKey(appId),
                 });
@@ -1289,6 +1292,7 @@ public sealed partial class AutopilotViewModel : ObservableObject
     {
         for (var i = 0; i < this.ManualGames.Count; i++)
         {
+            this.ManualGames[i].Position = i + 1;
             this.ManualGames[i].CanMoveUp = i > 0;
             this.ManualGames[i].CanMoveDown = i < this.ManualGames.Count - 1;
         }

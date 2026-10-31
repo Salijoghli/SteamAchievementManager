@@ -38,6 +38,9 @@ public sealed class AutopilotWorker
     private string _gameName = "";
     private DateTimeOffset _lastContact = DateTimeOffset.Now;
     private bool _connected;
+
+    /// <summary>Set when the game's own window opened: the worker stops and exits with ExitWindowOpen.</summary>
+    private bool _windowOpened;
     private bool _everConnected;
 
     /// <summary>Dry run: achievements "unlocked" this session, reported as unlocked so plans move on.</summary>
@@ -142,7 +145,7 @@ public sealed class AutopilotWorker
                     watchdog.Stop();
                 }
 
-                return AutopilotProtocol.ExitSuccess;
+                return this._windowOpened ? AutopilotProtocol.ExitWindowOpen : AutopilotProtocol.ExitSuccess;
             }
             finally
             {
@@ -213,6 +216,15 @@ public sealed class AutopilotWorker
         else if (this._connected == false && DateTimeOffset.Now - this._lastContact > limit)
         {
             Diagnostics.Log($"Autopilot worker for {this._appId}: no engine connected for {limit.TotalSeconds:0} s; stopping");
+            this._stop.Cancel();
+        }
+        else if (this._windowOpened == false && IsWindowOpen(this._appId))
+        {
+            // The game's window waits for this worker to let go before it commits anything. An
+            // unlock in progress still finishes and answers: only the wait for the next request
+            // is cancelled.
+            Diagnostics.Log($"Autopilot worker for {this._appId}: the game's window opened; handing the game over");
+            this._windowOpened = true;
             this._stop.Cancel();
         }
     }

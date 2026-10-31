@@ -1366,6 +1366,15 @@ public sealed class AutopilotEngine(AppServices services) : IDisposable
     /// <summary>Remembers why a game's worker failed and when to try again (30 s, doubling, at most 30 min).</summary>
     private void RecordFailure(uint appId, string message, DateTimeOffset now)
     {
+        if (AutopilotWorker.IsWindowOpen(appId))
+        {
+            // The worker stopped for the game's own window (or lost its pipe doing so): the game
+            // waits as Queued until the window closes, with no retry delay.
+            this._failures.Remove(appId);
+            this.RequestTick();
+            return;
+        }
+
         var count = this._failures.TryGetValue(appId, out var previous) ? previous.Count + 1 : 1;
         var delay = TimeSpan.FromSeconds(Math.Min(30 * Math.Pow(2, count - 1), 30 * 60));
         this._failures[appId] = new WorkerFailure(count, now + delay, message);

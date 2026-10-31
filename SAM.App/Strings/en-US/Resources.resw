@@ -2664,7 +2664,7 @@ Installed · {2}</value>
     <value>Autopilot is running this game</value>
   </data>
   <data name="Autopilot_GameWarning.Message" xml:space="preserve">
-    <value>Changes you commit here may conflict — pause the game in Autopilot first.</value>
+    <value>It didn't let go of this game in time, so changes you commit here may conflict. Pause the game in Autopilot first.</value>
   </data>
   <data name="Autopilot_Title.Text" xml:space="preserve">
     <value>Autopilot</value>
@@ -2937,7 +2937,7 @@ Installed · {2}</value>
     <value>Select all shown</value>
   </data>
   <data name="Autopilot_ManualHint.Text" xml:space="preserve">
-    <value>Drag or use the arrows to reorder. Games higher in the list run first.</value>
+    <value>Drag a game, or use its ⋯ menu, to reorder. Games higher in the list run first.</value>
   </data>
   <data name="Autopilot_AddGamesButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>Add games to the list</value>
@@ -3853,5 +3853,26 @@ Installed · {2}</value>
   </data>
   <data name="Autopilot_UnlockingNow" xml:space="preserve">
     <value>Unlocking “{0}”…</value>
+  </data>
+  <data name="Autopilot_GameProgressShort" xml:space="preserve">
+    <value>{0} / {1}</value>
+  </data>
+  <data name="Autopilot_RowMoveUp.Text" xml:space="preserve">
+    <value>Move up</value>
+  </data>
+  <data name="Autopilot_RowMoveDown.Text" xml:space="preserve">
+    <value>Move down</value>
+  </data>
+  <data name="Game_AutopilotHandover.Title" xml:space="preserve">
+    <value>Autopilot is handing this game over</value>
+  </data>
+  <data name="Game_AutopilotHandover.Message" xml:space="preserve">
+    <value>It stops working on this game so the two don't clash. You can commit in a moment.</value>
+  </data>
+  <data name="Game_AutopilotPaused.Title" xml:space="preserve">
+    <value>Autopilot paused this game</value>
+  </data>
+  <data name="Game_AutopilotPaused.Message" xml:space="preserve">
+    <value>It stays paused while this window is open and carries on when you close it.</value>
   </data>
 </root>

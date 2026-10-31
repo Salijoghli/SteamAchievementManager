@@ -240,7 +240,8 @@ public sealed partial class GameViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanCommit))]
     private void Commit() => this.CommitRequested?.Invoke(this, EventArgs.Empty);
 
-    public bool CanCommit() => this.PendingCount > 0 && this.InvalidStatCount == 0 && this.IsBusy == false && this.IsLoaded;
+    public bool CanCommit() =>
+        this.PendingCount > 0 && this.InvalidStatCount == 0 && this.IsBusy == false && this.IsLoaded && this.IsAutopilotHandingOver == false;
 
     partial void OnIsLoadingChanged(bool value) => this.OnBusyChanged();
 
@@ -316,17 +317,36 @@ public sealed partial class GameViewModel : ObservableObject
     }
     #endregion
 
-    #region Autopilot warning
+    #region Autopilot handover
+    /// <summary>How long the window waits for Autopilot to let go of the game before warning instead.</summary>
+    private static readonly TimeSpan AutopilotHandoverTimeout = TimeSpan.FromSeconds(45);
+
     private bool _autopilotCheckFailed;
     private bool _wasRunningUnderAutopilot;
+    private DateTimeOffset _handoverStarted;
+    private bool _reloadAfterHandover;
 
-    /// <summary>True while an Autopilot worker holds this game (commits here may conflict with it).</summary>
+    /// <summary>
+    /// True while an Autopilot worker still holds this game after the window opened. Its worker
+    /// notices the window within seconds and stops; until then committing is held back, so the
+    /// two never write to the game at the same time.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CommitCommand))]
+    private bool _isAutopilotHandingOver;
+
+    /// <summary>Autopilot let go of this game for this window (it resumes when the window closes).</summary>
+    [ObservableProperty]
+    private bool _isAutopilotPausedOpen;
+
+    /// <summary>Autopilot still runs this game after the timeout (e.g. an older SAM): commits may conflict.</summary>
     [ObservableProperty]
     private bool _isAutopilotWarningOpen;
 
     /// <summary>
-    /// Re-checks whether Autopilot is running this game: opens the warning when it starts doing
-    /// so (a dismissed warning stays closed until then) and closes it when it stops. Never throws.
+    /// Re-checks whether an Autopilot worker holds this game (the window polls this every few
+    /// seconds). While one does, commits wait for it to stop; once it has, the achievements are
+    /// reloaded so they include its latest unlocks. Never throws.
     /// </summary>
     public void CheckAutopilot()
     {
@@ -346,10 +366,50 @@ public sealed partial class GameViewModel : ObservableObject
             running = false;
         }
 
-        if (running != this._wasRunningUnderAutopilot)
+        var now = DateTimeOffset.Now;
+        if (running)
         {
-            this._wasRunningUnderAutopilot = running;
-            this.IsAutopilotWarningOpen = running;
+            if (this._wasRunningUnderAutopilot == false)
+            {
+                this._wasRunningUnderAutopilot = true;
+                this._handoverStarted = now;
+                this.IsAutopilotPausedOpen = false;
+                this.IsAutopilotHandingOver = true;
+            }
+            else if (this.IsAutopilotHandingOver && now - this._handoverStarted > AutopilotHandoverTimeout)
+            {
+                this.IsAutopilotHandingOver = false;
+                this.IsAutopilotWarningOpen = true;
+            }
+
+            return;
+        }
+
+        if (this._wasRunningUnderAutopilot)
+        {
+            this._wasRunningUnderAutopilot = false;
+            this.IsAutopilotHandingOver = false;
+            this.IsAutopilotWarningOpen = false;
+            this.IsAutopilotPausedOpen = true;
+            this.ReloadAfterHandover();
+        }
+    }
+
+    /// <summary>What's shown may predate Autopilot's last unlocks: load again, unless that would throw edits away.</summary>
+    private void ReloadAfterHandover()
+    {
+        if (this.HasUnsavedChanges)
+        {
+            return;
+        }
+
+        if (this.IsLoading)
+        {
+            this._reloadAfterHandover = true;
+        }
+        else if (this.IsLoaded && this.IsBusy == false)
+        {
+            _ = this.LoadAsync();
         }
     }
     #endregion
@@ -618,6 +678,16 @@ public sealed partial class GameViewModel : ObservableObject
         }
 
         var ok = await this.LoadCoreAsync();
+        if (this._reloadAfterHandover)
+        {
+            // Started while Autopilot still held the game: load once more now that it let go.
+            this._reloadAfterHandover = false;
+            if (this.HasUnsavedChanges == false)
+            {
+                ok = await this.LoadCoreAsync();
+            }
+        }
+
         this.LoadCompleted?.Invoke(this, ok);
         return ok;
     }
@@ -784,7 +854,7 @@ public sealed partial class GameViewModel : ObservableObject
 
     private void OnAchievementChanged() => this.UpdatePending();
 
-    /// <summary>Header image, playtime and global percentages. Each runs once per window.</summary>
+    /// <summary>Header image and global percentages (once per window) and playtime (on every load).</summary>
     private void StartSideLoads()
     {
         if (this.HeaderImage == null && this.IsHeaderImageMissing == false && this.IsHeaderImageLoaded == false)
@@ -792,10 +862,9 @@ public sealed partial class GameViewModel : ObservableObject
             this.LoadHeaderImage();
         }
 
-        if (this.PlaytimeText == null)
-        {
-            this.LoadPlaytime();
-        }
+        // Re-read on every load (Reload, after a commit or a handover): Steam may have written new
+        // playtime since. The old text stays up until the new one is read, so nothing flickers.
+        this.RefreshPlaytime();
 
         if (this._percentsTask == null || (this._percentsDone && this._percents == null))
         {
@@ -834,33 +903,81 @@ public sealed partial class GameViewModel : ObservableObject
         this.IsHeaderImageLoaded = true;
     }
 
-    private async void LoadPlaytime()
+    /// <summary>When this window's process started: Steam counts the game as running from then on.</summary>
+    private static readonly DateTimeOffset ProcessStarted = GetProcessStart();
+
+    private bool _playtimeLoading;
+
+    /// <summary>
+    /// Reads Steam's playtime for this game again and shows it, plus the session that's running
+    /// now (Steam only adds a session to its file when it ends). The window calls this every
+    /// minute; also run on every load. Never throws.
+    /// </summary>
+    public async void RefreshPlaytime()
     {
+        if (this._playtimeLoading)
+        {
+            return;
+        }
+
+        this._playtimeLoading = true;
         try
         {
             var all = await Task.Run(this._services.Playtime.Load);
-            if (all.TryGetValue(this.AppId, out var info))
-            {
-                this.PlaytimeText = FormatPlaytime(info);
-                return;
-            }
+            this.PlaytimeText = all.TryGetValue(this.AppId, out var info)
+                ? FormatPlaytime(info, DateTimeOffset.Now, ProcessStarted)
+                : this.PlaytimeText ?? "";
         }
         catch (Exception e)
         {
             Diagnostics.Log("Couldn't read playtime", e);
+            this.PlaytimeText ??= "";
         }
-
-        this.PlaytimeText = "";
+        finally
+        {
+            this._playtimeLoading = false;
+        }
     }
 
-    private static string FormatPlaytime(PlaytimeInfo info)
+    private static DateTimeOffset GetProcessStart()
+    {
+        try
+        {
+            using var process = System.Diagnostics.Process.GetCurrentProcess();
+            return new DateTimeOffset(process.StartTime);
+        }
+        catch (Exception)
+        {
+            return DateTimeOffset.Now;
+        }
+    }
+
+    /// <summary>
+    /// The time Steam will count once the session running now ends: it started when Steam last
+    /// launched the game (LastPlayed) or, if that's older, when this window opened. Zero if
+    /// LastPlayed is unknown or in the future.
+    /// </summary>
+    internal static TimeSpan CurrentSession(PlaytimeInfo info, DateTimeOffset now, DateTimeOffset windowStarted)
+    {
+        if (info.LastPlayed is not { } last)
+        {
+            return TimeSpan.Zero;
+        }
+
+        var start = last > windowStarted ? last : windowStarted;
+        var session = now - start;
+        return session > TimeSpan.Zero ? session : TimeSpan.Zero;
+    }
+
+    internal static string FormatPlaytime(PlaytimeInfo info, DateTimeOffset now, DateTimeOffset windowStarted)
     {
         var parts = new List<string>();
-        if (info.Playtime > TimeSpan.Zero)
+        var playtime = info.Playtime + CurrentSession(info, now, windowStarted);
+        if (playtime > TimeSpan.Zero)
         {
-            parts.Add(info.Playtime.TotalHours >= 1
-                ? Strings.Format("Game_HoursPlayed", info.Playtime.TotalHours.ToString("0.#", CultureInfo.CurrentCulture))
-                : Strings.Plural("Game_MinutesPlayed", (int)info.Playtime.TotalMinutes));
+            parts.Add(playtime.TotalHours >= 1
+                ? Strings.Format("Game_HoursPlayed", playtime.TotalHours.ToString("0.#", CultureInfo.CurrentCulture))
+                : Strings.Plural("Game_MinutesPlayed", (int)playtime.TotalMinutes));
         }
 
         if (info.LastPlayed is { } last)

@@ -2618,7 +2618,7 @@
     <value>ამ თამაშს ავტოპილოტი უშვებს</value>
   </data>
   <data name="Autopilot_GameWarning.Message" xml:space="preserve">
-    <value>აქ შენახული ცვლილებები შეიძლება ავტოპილოტს შეეჯახოს — ჯერ ავტოპილოტში დააპაუზეთ ეს თამაში.</value>
+    <value>ავტოპილოტმა ეს თამაში დროულად ვერ გაათავისუფლა, ამიტომ აქ შენახული ცვლილებები შეიძლება შეეჯახოს. ჯერ ავტოპილოტში დააპაუზეთ ეს თამაში.</value>
   </data>
   <data name="Autopilot_Title.Text" xml:space="preserve">
     <value>ავტოპილოტი</value>
@@ -2891,7 +2891,7 @@
     <value>ყველა ნაჩვენების მონიშვნა</value>
   </data>
   <data name="Autopilot_ManualHint.Text" xml:space="preserve">
-    <value>თანმიმდევრობის შესაცვლელად გადაათრიეთ ან გამოიყენეთ ისრები. სიაში ზემოთ მყოფი თამაშები პირველად ეშვება.</value>
+    <value>თანმიმდევრობის შესაცვლელად გადაათრიეთ თამაში ან გამოიყენეთ მისი ⋯ მენიუ. სიაში ზემოთ მყოფი თამაშები პირველად ეშვება.</value>
   </data>
   <data name="Autopilot_AddGamesButton.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
     <value>სიაში თამაშების დამატება</value>
@@ -3807,5 +3807,26 @@
   </data>
   <data name="Autopilot_UnlockingNow" xml:space="preserve">
     <value>„{0}“-ის განბლოკვა…</value>
+  </data>
+  <data name="Autopilot_GameProgressShort" xml:space="preserve">
+    <value>{0} / {1}</value>
+  </data>
+  <data name="Autopilot_RowMoveUp.Text" xml:space="preserve">
+    <value>ზემოთ აწევა</value>
+  </data>
+  <data name="Autopilot_RowMoveDown.Text" xml:space="preserve">
+    <value>ქვემოთ ჩაწევა</value>
+  </data>
+  <data name="Game_AutopilotHandover.Title" xml:space="preserve">
+    <value>ავტოპილოტი ამ თამაშს ათავისუფლებს</value>
+  </data>
+  <data name="Game_AutopilotHandover.Message" xml:space="preserve">
+    <value>ავტოპილოტი ამ თამაშზე მუშაობას წყვეტს, რომ ერთმანეთს არ შეეჯახონ. შენახვა ცოტა ხანში შეგეძლებათ.</value>
+  </data>
+  <data name="Game_AutopilotPaused.Title" xml:space="preserve">
+    <value>ავტოპილოტმა ეს თამაში დააპაუზა</value>
+  </data>
+  <data name="Game_AutopilotPaused.Message" xml:space="preserve">
+    <value>სანამ ეს ფანჯარა ღიაა, თამაში დაპაუზებულია; ფანჯრის დახურვის შემდეგ ავტოპილოტი გააგრძელებს.</value>
   </data>
 </root>

@@ -64,8 +64,20 @@ public sealed partial class GameWindow : Window, ILaunchPresetTarget
         this.ViewModel.LoadCompleted += this.OnLoadCompleted;
         this.AchievementList.AddHandler(UIElement.KeyDownEvent, new KeyEventHandler(this.OnAchievementListKeyDown), true);
 
-        // Warn (without blocking anything) while Autopilot runs this game; re-check on activation.
+        // Autopilot hands this game over when the window opens; follow it (and re-check on activation).
         this.ViewModel.CheckAutopilot();
+        var autopilotTimer = this.DispatcherQueue.CreateTimer();
+        autopilotTimer.Interval = TimeSpan.FromSeconds(1);
+        autopilotTimer.Tick += (_, _) => this.ViewModel.CheckAutopilot();
+        autopilotTimer.Start();
+        this.Closed += (_, _) => autopilotTimer.Stop();
+
+        // Playtime keeps growing while the window is open (Steam counts it as playing the game).
+        var playtimeTimer = this.DispatcherQueue.CreateTimer();
+        playtimeTimer.Interval = TimeSpan.FromMinutes(1);
+        playtimeTimer.Tick += (_, _) => this.ViewModel.RefreshPlaytime();
+        playtimeTimer.Start();
+        this.Closed += (_, _) => playtimeTimer.Stop();
         this.Activated += (_, e) =>
         {
             if (e.WindowActivationState != WindowActivationState.Deactivated)

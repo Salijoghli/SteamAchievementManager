@@ -177,6 +177,18 @@
                     </InfoBar.ActionButton>
                 </InfoBar>
                 <InfoBar
+                    x:Uid="Game_AutopilotHandover"
+                    Severity="Informational"
+                    IsClosable="False"
+                    IsOpen="{x:Bind ViewModel.IsAutopilotHandingOver, Mode=OneWay}">
+                    <ProgressBar IsIndeterminate="True" Margin="0,0,0,12" />
+                </InfoBar>
+                <InfoBar
+                    x:Uid="Game_AutopilotPaused"
+                    Severity="Informational"
+                    IsClosable="True"
+                    IsOpen="{x:Bind ViewModel.IsAutopilotPausedOpen, Mode=TwoWay}" />
+                <InfoBar
                     x:Uid="Autopilot_GameWarning"
                     Severity="Warning"
                     IsClosable="True"
