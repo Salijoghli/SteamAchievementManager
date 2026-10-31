@@ -451,7 +451,7 @@
                                             <ToggleSwitch
                                                 Grid.Column="4"
                                                 MinWidth="0"
-                                                Width="40"
+                                                Width="46"
                                                 OnContent=""
                                                 OffContent=""
                                                 VerticalAlignment="Center"

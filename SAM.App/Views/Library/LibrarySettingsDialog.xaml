@@ -40,9 +40,10 @@
             <Setter Property="TextWrapping" Value="Wrap" />
         </Style>
         <Style x:Key="SettingsToggleStyle" TargetType="ToggleSwitch">
-            <!-- Just the switch: no On/Off text, and no space reserved for it. -->
+            <!-- Just the switch: no On/Off text. The switch draws a few px wider than its nominal
+                 40, so a 40-wide slot clips its right end; 46 shows it whole. -->
             <Setter Property="MinWidth" Value="0" />
-            <Setter Property="Width" Value="40" />
+            <Setter Property="Width" Value="46" />
             <Setter Property="OnContent" Value="" />
             <Setter Property="OffContent" Value="" />
             <Setter Property="HorizontalAlignment" Value="Right" />
