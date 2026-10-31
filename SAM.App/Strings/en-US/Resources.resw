@@ -3875,4 +3875,55 @@ Installed · {2}</value>
   <data name="Game_AutopilotPaused.Message" xml:space="preserve">
     <value>It stays paused while this window is open and carries on when you close it.</value>
   </data>
+  <data name="Library_ShowPicker.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="Library_ShowPicker.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Which games to show</value>
+  </data>
+  <data name="Library_SortPicker.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>Sort</value>
+  </data>
+  <data name="Library_SortPicker.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>Sort games</value>
+  </data>
+  <data name="Library_SortMenuName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Library_SortMenuAppId" xml:space="preserve">
+    <value>App ID</value>
+  </data>
+  <data name="Library_SortMenuRecentlyPlayed" xml:space="preserve">
+    <value>Recently played</value>
+  </data>
+  <data name="Library_SortMenuPlaytime" xml:space="preserve">
+    <value>Playtime</value>
+  </data>
+  <data name="Library_SortMenuCompletion" xml:space="preserve">
+    <value>Completion %</value>
+  </data>
+  <data name="Library_SortMenuAscending" xml:space="preserve">
+    <value>Ascending</value>
+  </data>
+  <data name="Library_SortMenuDescending" xml:space="preserve">
+    <value>Descending</value>
+  </data>
+  <data name="Library_SortMenuFavoritesFirst" xml:space="preserve">
+    <value>Favorites first</value>
+  </data>
+  <data name="Library_SortSmartListOrder" xml:space="preserve">
+    <value>Smart list order</value>
+  </data>
+  <data name="Library_SortSmartListNote" xml:space="preserve">
+    <value>Smart lists use their own order</value>
+  </data>
+  <data name="Library_ViewGridItem.Text" xml:space="preserve">
+    <value>Grid view</value>
+  </data>
+  <data name="Library_ViewListItem.Text" xml:space="preserve">
+    <value>List view</value>
+  </data>
+  <data name="Library_RefreshItem.Text" xml:space="preserve">
+    <value>Refresh library</value>
+  </data>
 </root>

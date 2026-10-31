@@ -306,11 +306,11 @@ public sealed partial class LibraryWindow : Window
         this.SyncViewModeButtons();
     }
 
-    /// <summary>The two view buttons act as a segmented control: exactly one is checked.</summary>
+    /// <summary>The Grid view / List view items in the more menu: exactly one is checked.</summary>
     private void SyncViewModeButtons()
     {
-        this.GridModeButton.IsChecked = this.ViewModel.IsListView == false;
-        this.ListModeButton.IsChecked = this.ViewModel.IsListView;
+        this.GridModeItem.IsChecked = this.ViewModel.IsListView == false;
+        this.ListModeItem.IsChecked = this.ViewModel.IsListView;
     }
 
     private void OnColumnHeaderClick(object sender, RoutedEventArgs e)
@@ -321,17 +321,19 @@ public sealed partial class LibraryWindow : Window
         }
     }
 
-    /// <summary>Rebuilds the collection picker: All games, Installed games, Steam collections, SAM collections, Manage.</summary>
-    private void OnCollectionMenuOpening(object? sender, object e)
+    /// <summary>
+    /// Rebuilds the Show menu: All games, Installed games, Steam and SAM collections, then the
+    /// smart lists, then Manage collections.
+    /// </summary>
+    private void OnShowMenuOpening(object? sender, object e)
     {
-        var items = this.CollectionMenu.Items;
+        var items = this.ShowMenu.Items;
         items.Clear();
 
         var current = this.ViewModel.CollectionFilter;
         var all = this.CollectionItem(Strings.Get("Library_CollectionsAllGames"), null);
         items.Add(all);
         var installed = this.CollectionItem(Strings.Get("Library_CollectionsInstalled"), LibraryViewModel.InstalledCollectionKey);
-        installed.Icon = new FontIcon { Glyph = "" };
         installed.IsChecked = current == LibraryViewModel.InstalledCollectionKey;
         items.Add(installed);
         var anyChecked = installed.IsChecked;
@@ -358,29 +360,12 @@ public sealed partial class LibraryWindow : Window
         AddGroup(Strings.Get("Library_CollectionsSamGroup"), this.ViewModel.CustomCollections);
         all.IsChecked = anyChecked == false;
 
+        // Smart lists: a second choice, applied within the collection.
         items.Add(new MenuFlyoutSeparator());
-        var manage = new MenuFlyoutItem { Text = Strings.Get("Library_CollectionsManage"), Icon = new FontIcon { Glyph = "" } };
-        manage.Click += this.OnManageCollectionsClick;
-        items.Add(manage);
-    }
-
-    private RadioMenuFlyoutItem CollectionItem(string text, string? filterKey)
-    {
-        var item = new RadioMenuFlyoutItem { Text = text, GroupName = "LibraryCollection" };
-        item.Click += (_, _) => this.ViewModel.CollectionFilter = filterKey;
-        return item;
-    }
-
-    private void OnSmartListMenuOpening(object? sender, object e)
-    {
-        var items = this.SmartListMenu.Items;
-        items.Clear();
-
+        items.Add(new MenuFlyoutItem { Text = Strings.Get("Library_SmartLists"), IsEnabled = false });
         var none = new RadioMenuFlyoutItem { Text = Strings.Get("Library_SmartListNone"), GroupName = "LibrarySmartList", IsChecked = this.ViewModel.SmartList == null };
         none.Click += (_, _) => this.ViewModel.SmartList = null;
         items.Add(none);
-        items.Add(new MenuFlyoutSeparator());
-
         foreach (var list in LibraryViewModel.SmartLists)
         {
             var key = list.Key;
@@ -394,6 +379,76 @@ public sealed partial class LibraryWindow : Window
             item.Click += (_, _) => this.ViewModel.SmartList = key;
             items.Add(item);
         }
+
+        items.Add(new MenuFlyoutSeparator());
+        var manage = new MenuFlyoutItem { Text = Strings.Get("Library_CollectionsManage"), Icon = new FontIcon { Glyph = "\uE8F4" } };
+        manage.Click += this.OnManageCollectionsClick;
+        items.Add(manage);
+    }
+
+    private RadioMenuFlyoutItem CollectionItem(string text, string? filterKey)
+    {
+        var item = new RadioMenuFlyoutItem { Text = text, GroupName = "LibraryCollection" };
+        item.Click += (_, _) => this.ViewModel.CollectionFilter = filterKey;
+        return item;
+    }
+
+    /// <summary>Rebuilds the Sort menu: sort by, direction and "favorites first". Disabled under a smart list (its own order).</summary>
+    private void OnSortMenuOpening(object? sender, object e)
+    {
+        var items = this.SortMenu.Items;
+        items.Clear();
+        var enabled = this.ViewModel.IsSortEnabled;
+        if (enabled == false)
+        {
+            items.Add(new MenuFlyoutItem { Text = Strings.Get("Library_SortSmartListNote"), IsEnabled = false });
+            items.Add(new MenuFlyoutSeparator());
+        }
+
+        for (var i = 0; i < LibraryViewModel.SortNameKeys.Count; i++)
+        {
+            var index = i;
+            var item = new RadioMenuFlyoutItem
+            {
+                Text = Strings.Get(LibraryViewModel.SortNameKeys[i]),
+                GroupName = "LibrarySortBy",
+                IsChecked = this.ViewModel.SortIndex == i,
+                IsEnabled = enabled,
+            };
+            item.Click += (_, _) => this.ViewModel.SortIndex = index;
+            items.Add(item);
+        }
+
+        items.Add(new MenuFlyoutSeparator());
+        var ascending = new RadioMenuFlyoutItem
+        {
+            Text = Strings.Get("Library_SortMenuAscending"),
+            GroupName = "LibrarySortDirection",
+            IsChecked = this.ViewModel.SortDescending == false,
+            IsEnabled = enabled,
+        };
+        ascending.Click += (_, _) => this.ViewModel.SortDescending = false;
+        items.Add(ascending);
+        var descending = new RadioMenuFlyoutItem
+        {
+            Text = Strings.Get("Library_SortMenuDescending"),
+            GroupName = "LibrarySortDirection",
+            IsChecked = this.ViewModel.SortDescending,
+            IsEnabled = enabled,
+        };
+        descending.Click += (_, _) => this.ViewModel.SortDescending = true;
+        items.Add(descending);
+
+        items.Add(new MenuFlyoutSeparator());
+        var favorites = new ToggleMenuFlyoutItem
+        {
+            Text = Strings.Get("Library_SortMenuFavoritesFirst"),
+            IsChecked = this.ViewModel.PinFavorites,
+            IsEnabled = enabled,
+            Icon = new FontIcon { Glyph = "\uE718" },
+        };
+        favorites.Click += (_, _) => this.ViewModel.PinFavorites = favorites.IsChecked;
+        items.Add(favorites);
     }
 
     private async void OnManageCollectionsClick(object sender, RoutedEventArgs e)

@@ -3829,4 +3829,55 @@
   <data name="Game_AutopilotPaused.Message" xml:space="preserve">
     <value>სანამ ეს ფანჯარა ღიაა, თამაში დაპაუზებულია; ფანჯრის დახურვის შემდეგ ავტოპილოტი გააგრძელებს.</value>
   </data>
+  <data name="Library_ShowPicker.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>ჩვენება</value>
+  </data>
+  <data name="Library_ShowPicker.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>რომელი თამაშები გამოჩნდეს</value>
+  </data>
+  <data name="Library_SortPicker.[using:Microsoft.UI.Xaml.Automation]AutomationProperties.Name" xml:space="preserve">
+    <value>დალაგება</value>
+  </data>
+  <data name="Library_SortPicker.[using:Microsoft.UI.Xaml.Controls]ToolTipService.ToolTip" xml:space="preserve">
+    <value>თამაშების დალაგება</value>
+  </data>
+  <data name="Library_SortMenuName" xml:space="preserve">
+    <value>სახელი</value>
+  </data>
+  <data name="Library_SortMenuAppId" xml:space="preserve">
+    <value>App ID</value>
+  </data>
+  <data name="Library_SortMenuRecentlyPlayed" xml:space="preserve">
+    <value>ბოლოს ნათამაშები</value>
+  </data>
+  <data name="Library_SortMenuPlaytime" xml:space="preserve">
+    <value>თამაშის დრო</value>
+  </data>
+  <data name="Library_SortMenuCompletion" xml:space="preserve">
+    <value>დასრულება %</value>
+  </data>
+  <data name="Library_SortMenuAscending" xml:space="preserve">
+    <value>ზრდადობით</value>
+  </data>
+  <data name="Library_SortMenuDescending" xml:space="preserve">
+    <value>კლებადობით</value>
+  </data>
+  <data name="Library_SortMenuFavoritesFirst" xml:space="preserve">
+    <value>რჩეულები თავში</value>
+  </data>
+  <data name="Library_SortSmartListOrder" xml:space="preserve">
+    <value>ჭკვიანი სიის რიგი</value>
+  </data>
+  <data name="Library_SortSmartListNote" xml:space="preserve">
+    <value>ჭკვიან სიებს საკუთარი რიგი აქვთ</value>
+  </data>
+  <data name="Library_ViewGridItem.Text" xml:space="preserve">
+    <value>ბადის ხედი</value>
+  </data>
+  <data name="Library_ViewListItem.Text" xml:space="preserve">
+    <value>სიის ხედი</value>
+  </data>
+  <data name="Library_RefreshItem.Text" xml:space="preserve">
+    <value>ბიბლიოთეკის განახლება</value>
+  </data>
 </root>

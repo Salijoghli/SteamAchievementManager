@@ -240,9 +240,8 @@
                     </Grid>
                 </Border>
 
-                <!-- Notifications, with "unlock" notifications as a dependent row inside the same card. -->
+                <!-- Notifications, then "unlock" notifications (indented: it depends on the first). -->
                 <Border Style="{StaticResource SettingsCardStyle}" Padding="0">
-                    <StackPanel>
                         <Grid Style="{StaticResource SettingsRowStyle}" Padding="16,12" MinHeight="64">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -260,7 +259,8 @@
                                 IsOn="{x:Bind ViewModel.ShowNotifications, Mode=TwoWay}"
                                 AutomationProperties.LabeledBy="{Binding ElementName=NotificationsTitle}" />
                         </Grid>
-                        <Border Height="1" Background="{ThemeResource CardBorderBrush}" />
+                </Border>
+                <Border Style="{StaticResource SettingsCardStyle}" Padding="0">
                         <Grid Style="{StaticResource SettingsRowStyle}" Padding="52,12,16,12" MinHeight="56">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -277,12 +277,10 @@
                                 IsEnabled="{x:Bind ViewModel.ShowNotifications, Mode=OneWay}"
                                 AutomationProperties.LabeledBy="{Binding ElementName=UnlockTitle}" />
                         </Grid>
-                    </StackPanel>
                 </Border>
 
                 <!-- Version and updates: "Check now", or "Update now" once a newer release is known. -->
                 <Border Style="{StaticResource SettingsCardStyle}" Padding="0">
-                    <StackPanel>
                         <Grid Style="{StaticResource SettingsRowStyle}" Padding="16,12" MinHeight="64">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -310,7 +308,8 @@
                                     Visibility="Collapsed" />
                             </StackPanel>
                         </Grid>
-                        <Border Height="1" Background="{ThemeResource CardBorderBrush}" />
+                </Border>
+                <Border Style="{StaticResource SettingsCardStyle}" Padding="0">
                         <Grid Style="{StaticResource SettingsRowStyle}" Padding="52,12,16,12" MinHeight="56">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -326,7 +325,6 @@
                                 IsOn="{x:Bind ViewModel.CheckForUpdates, Mode=TwoWay}"
                                 AutomationProperties.LabeledBy="{Binding ElementName=CheckForUpdatesTitle}" />
                         </Grid>
-                    </StackPanel>
                 </Border>
             </StackPanel>
 

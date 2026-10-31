@@ -155,10 +155,13 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
+            <!--
+                One row: search, then three menus (what to show, how to sort, filters) and the more
+                button for the view mode, refresh and the rarely used actions.
+            -->
             <Grid ColumnSpacing="8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -176,199 +179,41 @@
                     QuerySubmitted="OnSearchQuerySubmitted"
                     PreviewKeyDown="OnSearchPreviewKeyDown" />
 
-                <!-- Collection picker. -->
-                <DropDownButton
-                    x:Uid="Library_CollectionPicker"
-                    Grid.Column="1"
-                    Height="34">
+                <!-- Show: collections and smart lists in one menu. -->
+                <DropDownButton x:Uid="Library_ShowPicker" Grid.Column="1" Height="34">
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <FontIcon Glyph="&#xE8F4;" FontSize="14" />
                         <TextBlock
-                            Text="{x:Bind ViewModel.CollectionFilterName, Mode=OneWay}"
-                            MaxWidth="160"
+                            Text="{x:Bind ViewModel.ShowLabel, Mode=OneWay}"
+                            MaxWidth="220"
                             TextTrimming="CharacterEllipsis" />
                     </StackPanel>
                     <DropDownButton.Flyout>
-                        <MenuFlyout x:Name="CollectionMenu" Placement="BottomEdgeAlignedLeft" Opening="OnCollectionMenuOpening">
+                        <MenuFlyout x:Name="ShowMenu" Placement="BottomEdgeAlignedLeft" Opening="OnShowMenuOpening">
                             <MenuFlyoutItem x:Uid="Library_AllGamesItem" />
                         </MenuFlyout>
                     </DropDownButton.Flyout>
                 </DropDownButton>
 
-                <!-- Smart lists. -->
-                <DropDownButton
-                    x:Uid="Library_SmartListPicker"
-                    Grid.Column="2"
-                    Height="34">
+                <!-- Sort: order, direction and "favorites first" in one menu. -->
+                <DropDownButton x:Uid="Library_SortPicker" Grid.Column="2" Height="34">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <FontIcon Glyph="&#xE945;" FontSize="14" />
-                        <TextBlock Text="{x:Bind ViewModel.SmartListName, Mode=OneWay}" />
-                        <InfoBadge
-                            Width="8"
-                            Height="8"
-                            VerticalAlignment="Center"
-                            Visibility="{x:Bind ViewModel.IsSmartListActive, Mode=OneWay}" />
+                        <FontIcon Glyph="&#xE8CB;" FontSize="14" />
+                        <TextBlock Text="{x:Bind ViewModel.SortLabel, Mode=OneWay}" />
+                        <FontIcon
+                            Glyph="{x:Bind ViewModel.SortDirectionGlyph, Mode=OneWay}"
+                            FontSize="12"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Visibility="{x:Bind ViewModel.IsSortEnabled, Mode=OneWay}" />
                     </StackPanel>
                     <DropDownButton.Flyout>
-                        <MenuFlyout x:Name="SmartListMenu" Placement="BottomEdgeAlignedLeft" Opening="OnSmartListMenuOpening">
-                            <MenuFlyoutItem x:Uid="Library_SmartListNoneItem" />
+                        <MenuFlyout x:Name="SortMenu" Placement="BottomEdgeAlignedLeft" Opening="OnSortMenuOpening">
+                            <MenuFlyoutItem x:Uid="Library_AllGamesItem" />
                         </MenuFlyout>
                     </DropDownButton.Flyout>
                 </DropDownButton>
 
-                <!-- Grid / list view. -->
-                <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2">
-                    <ToggleButton
-                        x:Name="GridModeButton"
-                        x:Uid="Library_GridView"
-                        Width="36"
-                        Height="34"
-                        Padding="0"
-                        Click="OnGridModeClick">
-                        <FontIcon Glyph="&#xF0E2;" FontSize="14" />
-                    </ToggleButton>
-                    <ToggleButton
-                        x:Name="ListModeButton"
-                        x:Uid="Library_ListView"
-                        Width="36"
-                        Height="34"
-                        Padding="0"
-                        Click="OnListModeClick">
-                        <FontIcon Glyph="&#xE8FD;" FontSize="14" />
-                    </ToggleButton>
-                </StackPanel>
-
-                <Button
-                    Grid.Column="4"
-                    Style="{StaticResource IconButtonStyle}"
-                    x:Uid="Library_RefreshButton"
-                    Command="{x:Bind ViewModel.RefreshCommand}">
-                    <FontIcon Glyph="&#xE72C;" FontSize="16" />
-                </Button>
-                <Button
-                    Grid.Column="5"
-                    Style="{StaticResource IconButtonStyle}"
-                    x:Uid="Library_MoreOptions">
-                    <FontIcon Glyph="&#xE712;" FontSize="16" />
-                    <Button.Flyout>
-                        <MenuFlyout Placement="BottomEdgeAlignedRight">
-                            <MenuFlyoutItem x:Uid="Library_ExportLibraryItem" Click="OnExportLibraryClick" IsEnabled="{x:Bind vm:LibraryFormat.Not(ViewModel.IsExporting), Mode=OneWay}">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon Glyph="&#xEDE1;" />
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                            <MenuFlyoutItem x:Uid="Library_ExportAchievementsItem" Click="OnExportAchievementsClick" IsEnabled="{x:Bind vm:LibraryFormat.Not(ViewModel.IsExporting), Mode=OneWay}">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon Glyph="&#xEDE1;" />
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                            <MenuFlyoutSeparator />
-                            <MenuFlyoutItem x:Uid="Library_LoadMissingItem" Click="OnLoadMissingClick" IsEnabled="{x:Bind vm:LibraryFormat.Not(ViewModel.IsFetchingAll), Mode=OneWay}">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon Glyph="&#xE896;" />
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                            <MenuFlyoutItem x:Uid="Library_ManageCollectionsItem" Click="OnManageCollectionsClick">
-                                <MenuFlyoutItem.Icon>
-                                    <FontIcon Glyph="&#xE8F4;" />
-                                </MenuFlyoutItem.Icon>
-                            </MenuFlyoutItem>
-                        </MenuFlyout>
-                    </Button.Flyout>
-                </Button>
-            </Grid>
-
-            <Grid Grid.Row="1" ColumnSpacing="12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <!-- Summary. -->
-                <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
-                    <Grid VerticalAlignment="Center">
-                        <controls:Skeleton
-                            Width="90"
-                            Height="14"
-                            Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
-                        <TextBlock
-                            Text="{x:Bind ViewModel.CountText, Mode=OneWay}"
-                            Style="{StaticResource BodyStrongTextBlockStyle}"
-                            VerticalAlignment="Center"
-                            Visibility="{x:Bind vm:LibraryFormat.CollapsedIf(ViewModel.IsLoading), Mode=OneWay}" />
-                    </Grid>
-                    <StackPanel
-                        Orientation="Horizontal"
-                        Spacing="16"
-                        Visibility="{x:Bind vm:LibraryFormat.CollapsedIf(ViewModel.IsSummaryReady), Mode=OneWay}">
-                        <controls:Skeleton Width="90" Height="14" />
-                        <controls:Skeleton Width="70" Height="14" />
-                        <controls:Skeleton Width="90" Height="14" />
-                    </StackPanel>
-                    <StackPanel
-                        Orientation="Horizontal"
-                        Spacing="16"
-                        Visibility="{x:Bind ViewModel.IsSummaryReady, Mode=OneWay}">
-                        <StackPanel Orientation="Horizontal" Spacing="6" ToolTipService.ToolTip="{x:Bind ViewModel.CompletionDetail, Mode=OneWay}">
-                            <FontIcon Glyph="&#xE9D5;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                            <TextBlock Text="{x:Bind ViewModel.CompletionText, Mode=OneWay}" Style="{StaticResource SummaryTextStyle}" />
-                            <!-- "· 5 not loaded": games whose achievement data Steam hasn't downloaded. -->
-                            <TextBlock
-                                x:Uid="Library_NotLoadedHint"
-                                Text="{x:Bind ViewModel.MissingAchievementDataText, Mode=OneWay}"
-                                Style="{StaticResource SummaryTextStyle}"
-                                Visibility="{x:Bind ViewModel.HasMissingAchievementData, Mode=OneWay}" />
-                        </StackPanel>
-                        <StackPanel x:Uid="Library_PerfectSummary" Orientation="Horizontal" Spacing="6">
-                            <FontIcon Glyph="&#xE7C1;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                            <TextBlock Text="{x:Bind ViewModel.PerfectText, Mode=OneWay}" Style="{StaticResource SummaryTextStyle}" />
-                        </StackPanel>
-                        <StackPanel x:Uid="Library_PlaytimeSummary" Orientation="Horizontal" Spacing="6">
-                            <FontIcon Glyph="&#xE823;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                            <TextBlock Text="{x:Bind ViewModel.TotalPlaytimeText, Mode=OneWay}" Style="{StaticResource SummaryTextStyle}" />
-                        </StackPanel>
-                    </StackPanel>
-                    <ProgressRing
-                        x:Uid="Library_RefreshingRing"
-                        Width="16"
-                        Height="16"
-                        IsActive="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}"
-                        Visibility="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}" />
-                </StackPanel>
-
-                <!-- Sort and filters. -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                    <ComboBox
-                        x:Uid="Library_SortBy"
-                        Width="170"
-                        IsEnabled="{x:Bind ViewModel.IsSortEnabled, Mode=OneWay}"
-                        SelectedIndex="{x:Bind ViewModel.SortIndex, Mode=TwoWay}">
-                        <ComboBoxItem x:Uid="Library_SortName" />
-                        <ComboBoxItem x:Uid="Library_SortAppId" />
-                        <ComboBoxItem x:Uid="Library_SortRecentlyPlayed" />
-                        <ComboBoxItem x:Uid="Library_SortPlaytime" />
-                        <ComboBoxItem x:Uid="Library_SortCompletion" />
-                    </ComboBox>
-                    <ToggleButton
-                        Width="36"
-                        Height="32"
-                        Padding="0"
-                        IsEnabled="{x:Bind ViewModel.IsSortEnabled, Mode=OneWay}"
-                        IsChecked="{x:Bind ViewModel.SortDescending, Mode=TwoWay}"
-                        x:Uid="Library_SortDescending"
-                        ToolTipService.ToolTip="{x:Bind ViewModel.SortDirectionLabel, Mode=OneWay}">
-                        <FontIcon Glyph="{x:Bind ViewModel.SortDirectionGlyph, Mode=OneWay}" FontSize="14" />
-                    </ToggleButton>
-                    <ToggleButton
-                        Width="36"
-                        Height="32"
-                        Padding="0"
-                        IsEnabled="{x:Bind ViewModel.IsSortEnabled, Mode=OneWay}"
-                        IsChecked="{x:Bind ViewModel.PinFavorites, Mode=TwoWay}"
-                        x:Uid="Library_PinFavorites">
-                        <FontIcon Glyph="&#xE718;" FontSize="14" />
-                    </ToggleButton>
-                    <DropDownButton x:Uid="Library_FiltersButton">
+                    <DropDownButton x:Uid="Library_FiltersButton" Grid.Column="3" Height="34">
                         <StackPanel Orientation="Horizontal" Spacing="8">
                             <FontIcon Glyph="&#xE71C;" FontSize="14" />
                             <TextBlock x:Uid="Library_FiltersLabel" />
@@ -447,6 +292,103 @@
                             </Flyout>
                         </DropDownButton.Flyout>
                     </DropDownButton>
+
+                <Button
+                    Grid.Column="4"
+                    Style="{StaticResource IconButtonStyle}"
+                    x:Uid="Library_MoreOptions">
+                    <FontIcon Glyph="&#xE712;" FontSize="16" />
+                    <Button.Flyout>
+                        <MenuFlyout Placement="BottomEdgeAlignedRight">
+                            <RadioMenuFlyoutItem x:Name="GridModeItem" x:Uid="Library_ViewGridItem" GroupName="LibraryViewMode" Click="OnGridModeClick">
+                                <RadioMenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xF0E2;" />
+                                </RadioMenuFlyoutItem.Icon>
+                            </RadioMenuFlyoutItem>
+                            <RadioMenuFlyoutItem x:Name="ListModeItem" x:Uid="Library_ViewListItem" GroupName="LibraryViewMode" Click="OnListModeClick">
+                                <RadioMenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE8FD;" />
+                                </RadioMenuFlyoutItem.Icon>
+                            </RadioMenuFlyoutItem>
+                            <MenuFlyoutItem x:Uid="Library_RefreshItem" Command="{x:Bind ViewModel.RefreshCommand}" KeyboardAcceleratorTextOverride="F5">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE72C;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem x:Uid="Library_ExportLibraryItem" Click="OnExportLibraryClick" IsEnabled="{x:Bind vm:LibraryFormat.Not(ViewModel.IsExporting), Mode=OneWay}">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xEDE1;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutItem x:Uid="Library_ExportAchievementsItem" Click="OnExportAchievementsClick" IsEnabled="{x:Bind vm:LibraryFormat.Not(ViewModel.IsExporting), Mode=OneWay}">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xEDE1;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                            <MenuFlyoutSeparator />
+                            <MenuFlyoutItem x:Uid="Library_LoadMissingItem" Click="OnLoadMissingClick" IsEnabled="{x:Bind vm:LibraryFormat.Not(ViewModel.IsFetchingAll), Mode=OneWay}">
+                                <MenuFlyoutItem.Icon>
+                                    <FontIcon Glyph="&#xE896;" />
+                                </MenuFlyoutItem.Icon>
+                            </MenuFlyoutItem>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                </Button>
+            </Grid>
+
+            <!-- Summary only. -->
+            <Grid Grid.Row="1">
+                <!-- Summary. -->
+                <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                    <Grid VerticalAlignment="Center">
+                        <controls:Skeleton
+                            Width="90"
+                            Height="14"
+                            Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay}" />
+                        <TextBlock
+                            Text="{x:Bind ViewModel.CountText, Mode=OneWay}"
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            VerticalAlignment="Center"
+                            Visibility="{x:Bind vm:LibraryFormat.CollapsedIf(ViewModel.IsLoading), Mode=OneWay}" />
+                    </Grid>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Spacing="16"
+                        Visibility="{x:Bind vm:LibraryFormat.CollapsedIf(ViewModel.IsSummaryReady), Mode=OneWay}">
+                        <controls:Skeleton Width="90" Height="14" />
+                        <controls:Skeleton Width="70" Height="14" />
+                        <controls:Skeleton Width="90" Height="14" />
+                    </StackPanel>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Spacing="16"
+                        Visibility="{x:Bind ViewModel.IsSummaryReady, Mode=OneWay}">
+                        <StackPanel Orientation="Horizontal" Spacing="6" ToolTipService.ToolTip="{x:Bind ViewModel.CompletionDetail, Mode=OneWay}">
+                            <FontIcon Glyph="&#xE9D5;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.CompletionText, Mode=OneWay}" Style="{StaticResource SummaryTextStyle}" />
+                            <!-- "· 5 not loaded": games whose achievement data Steam hasn't downloaded. -->
+                            <TextBlock
+                                x:Uid="Library_NotLoadedHint"
+                                Text="{x:Bind ViewModel.MissingAchievementDataText, Mode=OneWay}"
+                                Style="{StaticResource SummaryTextStyle}"
+                                Visibility="{x:Bind ViewModel.HasMissingAchievementData, Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel x:Uid="Library_PerfectSummary" Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE7C1;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.PerfectText, Mode=OneWay}" Style="{StaticResource SummaryTextStyle}" />
+                        </StackPanel>
+                        <StackPanel x:Uid="Library_PlaytimeSummary" Orientation="Horizontal" Spacing="6">
+                            <FontIcon Glyph="&#xE823;" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                            <TextBlock Text="{x:Bind ViewModel.TotalPlaytimeText, Mode=OneWay}" Style="{StaticResource SummaryTextStyle}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <ProgressRing
+                        x:Uid="Library_RefreshingRing"
+                        Width="16"
+                        Height="16"
+                        IsActive="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}"
+                        Visibility="{x:Bind ViewModel.IsRefreshing, Mode=OneWay}" />
                 </StackPanel>
             </Grid>
         </Grid>

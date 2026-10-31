@@ -201,6 +201,7 @@ public sealed partial class LibraryViewModel : ObservableObject
     private string _searchText = "";
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SortLabel))]
     private int _sortIndex;
 
     [ObservableProperty]
@@ -290,12 +291,12 @@ public sealed partial class LibraryViewModel : ObservableObject
 
     /// <summary>The selected collection's <see cref="GameCollection.FilterKey"/>, or null for all games.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CollectionFilterName), nameof(IsCollectionFilterActive), nameof(InstalledOnly))]
+    [NotifyPropertyChangedFor(nameof(CollectionFilterName), nameof(IsCollectionFilterActive), nameof(InstalledOnly), nameof(ShowLabel))]
     private string? _collectionFilter;
 
     /// <summary>The selected smart list's key, or null for none.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsSmartListActive), nameof(SmartListName), nameof(IsSortEnabled), nameof(ActiveSortColumn))]
+    [NotifyPropertyChangedFor(nameof(IsSmartListActive), nameof(SmartListName), nameof(IsSortEnabled), nameof(ActiveSortColumn), nameof(ShowLabel), nameof(SortLabel))]
     private string? _smartList;
 
     [ObservableProperty]
@@ -369,6 +370,26 @@ public sealed partial class LibraryViewModel : ObservableObject
     public bool IsSmartListActive => this.SmartList != null;
 
     public string SmartListName => SmartLists.FirstOrDefault(l => l.Key == this.SmartList)?.Name ?? Strings.Get("Library_SmartLists");
+
+    /// <summary>The Show button's text: the collection, the smart list, or "collection · smart list".</summary>
+    public string ShowLabel => this.IsSmartListActive
+        ? (this.IsCollectionFilterActive ? $"{this.CollectionFilterName} · {this.SmartListName}" : this.SmartListName)
+        : this.CollectionFilterName;
+
+    /// <summary>Text keys of the sort orders, by <see cref="LibrarySort"/> value (the Sort menu's order).</summary>
+    public static IReadOnlyList<string> SortNameKeys { get; } =
+    [
+        "Library_SortMenuName",
+        "Library_SortMenuAppId",
+        "Library_SortMenuRecentlyPlayed",
+        "Library_SortMenuPlaytime",
+        "Library_SortMenuCompletion",
+    ];
+
+    /// <summary>The Sort button's text: the sort order, or the smart list's own order.</summary>
+    public string SortLabel => this.IsSmartListActive
+        ? Strings.Get("Library_SortSmartListOrder")
+        : Strings.Get(SortNameKeys[Math.Clamp(this.SortIndex, 0, SortNameKeys.Count - 1)]);
 
     /// <summary>Smart lists have their own order, so the sort controls are disabled while one is active.</summary>
     public bool IsSortEnabled => this.IsSmartListActive == false;
